@@ -1,0 +1,13 @@
+- name: Create systemd service unit
+  ansible.builtin.template:
+    src: service.j2
+    dest: /etc/systemd/system/{{ id }}.service
+    mode: 644
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+- name: Start and enable Docker service
+  ansible.builtin.systemd:
+    name: "{{ id }}"
+    state: started
+    enabled: "{{ enabled }}"

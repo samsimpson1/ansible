@@ -1,0 +1,30 @@
+[Unit]
+Description: {{ description }}
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+
+ExecStart=/usr/bin/docker run --rm \
+  --name {{ id }} \
+  {% if network %}--network {{ network }} \
+  {% endif -%}
+  {% if ports|length > 0 %}{{ '-p ' + ' -p '.join(ports) }} \
+  {% endif -%}
+  {% if volumes|length > 0 %}-v {{ ' -v '.join(volumes) }} \
+  {% endif -%}
+  {% if env_vars|length > 0 %}{% for k, v in env_vars.items() %}{{ '-e ' + k + '="' + v + '" ' }}{% endfor %} \
+  {% endif -%}
+  --pull {{ pull_policy }} \
+  {{ image }} {% if command %}\
+  {{ command }}
+  {% endif %}
+
+ExecStop=/usr/bin/docker stop {{ id }}
+ExecReload=/usr/bin/docker restart {{ id }}
+
+[Install]
+WantedBy=multi-user.target

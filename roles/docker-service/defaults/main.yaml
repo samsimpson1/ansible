@@ -1,0 +1,10 @@
+description: "Docker Service"
+id: docker_service
+image: hashicorp/http-echo:latest
+command: null
+pull_policy: always
+ports: []
+volumes: []
+env_vars: {}
+enabled: true
+network: null
