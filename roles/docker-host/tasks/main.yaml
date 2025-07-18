@@ -1,0 +1,28 @@
+- name: Install docker-ce dependencies
+  ansible.builtin.apt:
+    pkg: 
+      - ca-certificates
+      - curl
+    update_cache: true
+- name: Install Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+- name: Get deb arch
+  ansible.builtin.command: dpkg --print-architecture
+  register: deb_arch
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ deb_arch.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker
+- name: Install Docker
+  ansible.builtin.apt:
+    name: docker-ce
+    state: present
+    update_cache: true
+- name: Enable and start Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true

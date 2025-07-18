@@ -3,25 +3,8 @@
     - secret.yaml
   become: true
   tasks:
-    - name: Pocket ID data directory
-      ansible.builtin.file:
-        path: /srv/containers/storage/ssd/pocket-id
-        state: directory
-        mode: '0750'
-        owner: app
-        group: app
-    - name: Pocket ID service
+    - name: Docker
       include_role:
-        name: docker-service
-      vars:
-        id: "pocket-id"
-        description: "Pocket ID"
-        image: ghcr.io/pocket-id/pocket-id:v1
-        network: source_default
-        env_vars:
-          APP_URL: "https://pocket-id.srv.simpson.id"
-          TRUST_PROXY: "true"
-          PUID: "568"
-          PGID: "568"
-        volumes:
-          - "/srv/containers/storage/ssd/pocket-id:/data"
+        name: docker-host
+    - name: Miscellaneous applications
+      ansible.builtin.include_tasks: apps-misc.yaml
