@@ -19,5 +19,8 @@
       TRUST_PROXY: "true"
       PUID: "568"
       PGID: "568"
+      DB_CONNECTION_STRING: "file:/data/pocket-id.db?_pragma=journal_mode(WAL)&_pragma=busy_timeout(2500)&_txlock=immediate"
+      UPLOAD_PATH: "/data/uploads"
+      KEYS_PATH: "/data/keys"
     volumes:
       - "/srv/containers/storage/ssd/pocket-id:/data"
