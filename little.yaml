@@ -3,6 +3,9 @@
     - secret.yaml
   become: true
   tasks:
+    - name: Tailscale
+      include_role:
+        name: tailscale
     - name: Docker
       include_role:
         name: docker-host
