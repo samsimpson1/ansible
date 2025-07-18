@@ -18,4 +18,11 @@
     state: started
     enabled: true
 - name: Tailscale up
-  ansible.builtin.command: "tailscale up --auth-key={{ tailscale_oauth_key }} --hostname={{ ansible_hostname }} --accept-routes --advertise-tags={{ tailscale_tags | join(',') }}"
+  ansible.builtin.command: >
+    tailscale up
+      --reset
+      --auth-key={{ tailscale_oauth_key }}
+      --hostname={{ ansible_hostname }}
+      --advertise-tags={{ tailscale_tags | join(',') }}
+  register: tailscale_up
+  changed_when: true
