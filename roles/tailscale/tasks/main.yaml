@@ -18,6 +18,11 @@
     name: tailscaled
     state: started
     enabled: true
+- name: Tailscale status
+  ansible.builtin.command: tailscale status
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
 - name: Tailscale up
   ansible.builtin.command: >
     tailscale up
@@ -26,4 +31,6 @@
       --hostname={{ ansible_hostname }}
       --advertise-tags={{ tailscale_tags | join(',') }}
   register: tailscale_up
-  changed_when: true
+  # tailscale status returns 130 if not connected to tailnet
+  changed_when: "tailscale_status.rc == 130"
+  failed_when: "tailscale_up.rc != 0"
