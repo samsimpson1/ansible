@@ -16,11 +16,12 @@
   ansible.builtin.apt_repository:
     repo: "deb [arch={{ deb_arch.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     filename: docker
+  register: docker_repo
 - name: Install Docker
   ansible.builtin.apt:
     name: docker-ce
     state: present
-    update_cache: true
+    update_cache: "{{ docker_repo.changed }}"
 - name: Enable and start Docker service
   ansible.builtin.systemd:
     name: docker
