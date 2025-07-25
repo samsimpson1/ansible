@@ -8,3 +8,6 @@ little:
 
 little-check:
 	ansible-playbook little.yaml --check --diff -i inventory.yaml --vault-id ansible-vault@onepassword-client.sh
+
+garage-check:
+	ansible-playbook garage.yaml --check --diff -i inventory.yaml --vault-id ansible-vault@onepassword-client.sh

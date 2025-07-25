@@ -3,3 +3,8 @@ home:
     little:
       ansible_host: 10.0.0.191
       ansible_user: me
+garage:
+  hosts:
+    little:
+      ansible_host: 10.0.0.191
+      ansible_user: me
