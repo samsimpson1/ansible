@@ -31,3 +31,58 @@
       SMTP_TLS: "{{ smtp_tls }}"
     volumes:
       - "/srv/containers/storage/ssd/pocket-id:/data"
+# Karakeep
+- name: Karakeep data directory
+  ansible.builtin.file:
+    path: /srv/containers/storage/ssd/karakeep
+    state: directory
+    mode: '0750'
+    owner: app
+    group: app
+- name: Karakeep Meilisearch service
+  include_role:
+    name: docker-service
+  vars:
+    id: "karakeep-meilisearch"
+    description: "Karakeep Meilisearch"
+    image: getmeili/meilisearch:v1.13.3
+    network: source_default
+    env_vars:
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MASTER_KEY: "{{ karakeep.meilisearch_master_key }}"
+    volumes:
+      - "/srv/containers/storage/ssd/karakeep/meilisearch:/meili_data"
+- name: Karakeep Chrome service
+  include_role:
+    name: docker-service
+  vars:
+    id: "karakeep-chrome"
+    description: "Karakeep Chrome"
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    network: source_default
+    command: --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --hide-scrollbars
+- name: Karakeep web service
+  include_role:
+    name: docker-service
+  vars:
+    id: "karakeep-web"
+    description: "Karakeep Web"
+    image: ghcr.io/karakeep-app/karakeep:0.24.1
+    network: source_default
+    env_vars:
+      MEILI_ADDR: http://karakeep-meilisearch:7700
+      MEILI_MASTER_KEY: "{{ karakeep.meilisearch_master_key }}"
+      BROWSER_WEB_URL: http://karakeep-chrome:9222
+      DATA_DIR: /data
+      NEXTAUTH_URL: https://bookmarks.srv.simpson.id
+      NEXTAUTH_SECRET: "{{ karakeep.nextauth_secret }}"
+      DISABLE_SIGNUPS: "true"
+      OPENAI_API_KEY: "{{ karakeep.openai_key }}"
+      DISABLE_PASSWORD_AUTH: "true"
+      OAUTH_PROVIDER_NAME: "Pocket ID"
+      OAUTH_WELLKNOWN_URL: "{{ sso_wellknown_url }}"
+      OAUTH_CLIENT_ID: "{{ sso_clients.karakeep.id }}"
+      OAUTH_CLIENT_SECRET: "{{ sso_clients.karakeep.secret }}"
+      OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING: "true"
+    volumes:
+      - /srv/containers/storage/ssd/karakeep/web:/data
