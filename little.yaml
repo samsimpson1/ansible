@@ -9,5 +9,9 @@
     - name: Docker
       include_role:
         name: docker-host
-    - name: Miscellaneous applications
-      ansible.builtin.include_tasks: apps-misc.yaml
+    - name: Pocket ID
+      ansible.builtin.include_tasks: apps/pocket-id.yaml
+    - name: Karakeep
+      ansible.builtin.include_tasks: apps/karakeep.yaml
+    - name: FreshRSS
+      ansible.builtin.include_tasks: apps/freshrss.yaml
