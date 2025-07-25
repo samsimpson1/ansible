@@ -1,0 +1,28 @@
+- name: FreshRSS data directory
+  ansible.builtin.file:
+    path: /srv/containers/storage/ssd/freshrss
+    state: directory
+    mode: '0750'
+    owner: app
+    group: app
+- name: FreshRSS service
+  include_role:
+    name: docker-service
+  vars:
+    id: "freshrss"
+    description: "FreshRSS"
+    image: freshrss/freshrss:1.26.3
+    network: source_default
+    env_vars:
+      TZ: Europe/London
+      CRON_MIN: "15,30,45,0"
+      OIDC_ENABLED: "1"
+      OIDC_PROVIDER_METADATA_URL: "{{ sso_wellknown_url }}"
+      OIDC_CLIENT_ID: "{{ sso_clients.freshrss.id }}"
+      OIDC_CLIENT_SECRET: "{{ sso_clients.freshrss.secret }}"
+      OIDC_REMOTE_USER_CLAIM: "freshrss_username"
+      OIDC_SCOPES: "openid profile"
+      OIDC_X_FORWARDED_HEADERS: "X-Forwarded-Host X-Forwarded-Proto"
+      OIDC_CLIENT_CRYPTO_KEY: "{{ freshrss_crypto_key }}"
+    volumes:
+      - /srv/containers/storage/ssd/freshrss:/var/www/FreshRSS/data
