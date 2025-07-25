@@ -33,7 +33,7 @@
   vars:
     id: "karakeep-web"
     description: "Karakeep Web"
-    image: ghcr.io/karakeep-app/karakeep:0.24.1
+    image: ghcr.io/karakeep-app/karakeep:0.26.0
     network: source_default
     env_vars:
       MEILI_ADDR: http://karakeep-meilisearch:7700
