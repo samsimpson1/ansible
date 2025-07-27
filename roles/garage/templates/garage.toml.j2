@@ -3,6 +3,7 @@ data_dir = "{{ garage_data_dir }}"
 db_engine = "sqlite"
 
 replication_factor = {{ garage_replication_factor }}
+consistency_mode = "dangerous"
 
 rpc_bind_addr = "[::]:3901"
 rpc_public_addr = "[{{ tailscale_ipv6_address }}]:3901"

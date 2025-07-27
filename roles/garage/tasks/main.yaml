@@ -3,6 +3,7 @@
 - name: Get Tailscale IPv6 address
   ansible.builtin.command: "tailscale ip -6"
   register: tailscale_ipv6_address_o
+  changed_when: false
 - name: Save Tailscale IPv6 address
   ansible.builtin.set_fact:
     tailscale_ipv6_address: "{{ tailscale_ipv6_address_o.stdout }}"
@@ -19,6 +20,7 @@
 - name: Get Garage peer ID
   ansible.builtin.command: "garage node id -q"
   register: garage_node_id_o
+  changed_when: false
 - name: Save Garage peer ID
   ansible.builtin.set_fact:
     garage_node_id: "{{ garage_node_id_o.stdout }}"
