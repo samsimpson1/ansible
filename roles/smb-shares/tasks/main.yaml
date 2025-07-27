@@ -1,0 +1,20 @@
+- name: Install cifs-utils
+  ansible.builtin.package:
+    name: cifs-utils
+    state: present
+  when: smb_shares | length > 0
+- name: Create mount point directories
+  ansible.builtin.file:
+    path: "{{ item.mountpoint }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ smb_shares }}"
+- name: Mount shares
+  ansible.posix.mount:
+    path: "{{ item.mountpoint }}"
+    src: "{{ item.address }}"
+    fstype: "cifs"
+    opts: "rw,uid={{ item.uid }},gid={{ item.gid }},iocharset=utf8,file_mode=0660,dir_mode=0770,seal,user={{ item.username }},pass={{ item.password }}"
+    opts_no_log: false
+    state: mounted
+  loop: "{{ smb_shares }}"
