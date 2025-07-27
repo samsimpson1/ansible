@@ -1,0 +1,6 @@
+garage_version: "v2.0.0"
+garage_replication_factor: "2"
+garage_user_name: "garage"
+garage_group_name: "garage"
+garage_data_dir: "/srv/containers/storage/hdd/garage"
+garage_metadata_dir: "/srv/containers/storage/hdd/garage"

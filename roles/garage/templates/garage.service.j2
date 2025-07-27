@@ -1,0 +1,19 @@
+[Unit]
+Description=Garage
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/garage server
+User={{ garage_user_name }}
+Group={{ garage_group_name }}
+PrivateTmp=yes
+RemoveIPC=yes
+ProtectSystem=strict
+ReadWritePaths={{ garage_data_dir }} {{ garage_metadata_dir }}
+ProtectHome=true
+NoNewPrivileges=true
+LimitNOFILE=42000
+
+[Install]
+WantedBy=multi-user.target

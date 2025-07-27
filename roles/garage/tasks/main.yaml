@@ -1,0 +1,31 @@
+- name: Install Garage
+  ansible.builtin.include_tasks: install_garage.yaml
+- name: Get Tailscale IPv6 address
+  ansible.builtin.command: "tailscale ip -6"
+  register: tailscale_ipv6_address_o
+- name: Save Tailscale IPv6 address
+  ansible.builtin.set_fact:
+    tailscale_ipv6_address: "{{ tailscale_ipv6_address_o.stdout }}"
+- name: Template Garage config file
+  ansible.builtin.template:
+    src: garage.toml.j2
+    dest: /etc/garage.toml
+    mode: "0600"
+    owner: "{{ garage_user_name }}"
+    group: "{{ garage_group_name }}"
+  notify: Restart garage
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+- name: Get Garage peer ID
+  ansible.builtin.command: "garage node id -q"
+  register: garage_node_id_o
+- name: Save Garage peer ID
+  ansible.builtin.set_fact:
+    garage_node_id: "{{ garage_node_id_o.stdout }}"
+- name: Connect Garage nodes
+  ansible.builtin.command: "garage node connect {{ hostvars[item]['garage_node_id'] }}"
+  loop: "{{ ansible_play_hosts | reject('equalto', inventory_hostname) }}"
+  delegate_to: "{{ ansible_play_hosts[0] }}"
+  changed_when: false
+  run_once: true
+  when: ansible_play_hosts | length > 1

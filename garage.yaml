@@ -6,6 +6,9 @@
     - name: Tailscale
       include_role:
         name: tailscale
-    - name: Docker
+    - name: Samba
       include_role:
-        name: docker-host
+        name: smb-shares
+    - name: Garage
+      include_role:
+        name: garage
