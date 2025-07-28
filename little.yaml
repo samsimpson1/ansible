@@ -17,3 +17,24 @@
       ansible.builtin.include_tasks: apps/freshrss.yaml
     - name: Duplicacy user
       ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
+    - name: Backup
+      include_role:
+        name: backup
+      vars:
+        backup_target:
+          hostname: "u478928-sub1.your-storagebox.de"
+          user: "u478928-sub1"
+          password: !vault |
+            $ANSIBLE_VAULT;1.2;AES256;ansible-vault
+            35303635613933333562663235396630663630313239343831326235353130646237393264333936
+            3030333334303832663263333232313163663761653065350a306139313763353431393064643465
+            35346630613339393132376333386138303231303138666539303332326536613262306634353635
+            3463666139346335390a376162353938356638626562363165316236383861353636333262343961
+            31306234366666383739336363366337626561373331643535346234653832313164
+        backup_jobs:
+          - name: duplicacy
+            op: sync
+            path: /srv/containers/storage/hdd/backup-test/
+            cron:
+              minute: "0"
+              hour: "*/6"

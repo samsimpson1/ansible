@@ -1,0 +1,9 @@
+- name: Create sync scripts
+  ansible.builtin.template:
+    src: sync.sh.j2
+    dest: /srv/backups/sync-{{ item.name }}.sh
+    mode: '0750'
+    owner: root
+    group: root
+  loop: "{{ backup_jobs }}"
+  when: item.op == 'sync'

@@ -1,0 +1,40 @@
+- name: Install sync backup dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - cron
+    - rsync
+    - sshpass
+- name: Enable cron daemon
+  ansible.builtin.systemd:
+    name: cron
+    state: started
+    enabled: true
+- name: Create backup directory
+  ansible.builtin.file:
+    state: directory
+    path: /srv/backups
+    mode: '0750'
+    owner: root
+    group: root
+- name: Create password file
+  ansible.builtin.copy:
+    dest: /srv/backups/password
+    content: "{{ backup_target.password }}"
+    mode: '0600'
+    owner: root
+    group: root
+- name: Sync jobs
+  ansible.builtin.include_tasks: sync.yaml
+- name: Schedule jobs
+  ansible.builtin.cron:
+    name: "Backup {{ item.op }} {{ item.name }}"
+    user: root
+    job: "/srv/backups/{{ item.op }}-{{ item.name }}.sh"
+    minute: "{{ item.cron.minute | default('0')}}"
+    hour: "{{ item.cron.hour | default('*') }}"
+    day: "{{ item.cron.day | default('*') }}"
+    month: "{{ item.cron.month | default('*') }}"
+    weekday: "{{ item.cron.weekday | default('*') }}"
+  loop: "{{ backup_jobs }}"

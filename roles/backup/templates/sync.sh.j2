@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+set -e
+set -x
+set -o pipefail
+
+sshpass -f /srv/backups/password \
+  rsync -e "ssh -p23 -o StrictHostKeyChecking=no" \
+  -avz --delete \
+  "{{ item.path }}" \
+  "{{ backup_target.user }}@{{ backup_target.hostname }}:{{ item.name }}/"
