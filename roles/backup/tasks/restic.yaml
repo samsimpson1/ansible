@@ -1,0 +1,30 @@
+- name: Create restic scripts
+  ansible.builtin.template:
+    src: restic.sh.j2
+    dest: /srv/backups/restic-{{ item.name }}.sh
+    mode: "0750"
+    owner: root
+    group: root
+  loop: "{{ backup_jobs }}"
+  when: item.op == 'restic'
+- name: Create restic prune scripts
+  ansible.builtin.template:
+    src: restic-prune.sh.j2
+    dest: /srv/backups/restic-prune-{{ item.name }}.sh
+    mode: "0750"
+    owner: root
+    group: root
+  loop: "{{ backup_jobs }}"
+  when: item.op == 'restic'
+- name: Schedule prune jobs
+  ansible.builtin.cron:
+    name: "Prune {{ item.op }} {{ item.name }}"
+    user: root
+    job: "/srv/backups/{{ item.op }}-prune-{{ item.name }}.sh"
+    minute: "{{ item.prune_cron.minute | default('27')}}"
+    hour: "{{ item.prune_cron.hour | default('3') }}"
+    day: "{{ item.prune_cron.day | default('*') }}"
+    month: "{{ item.prune_cron.month | default('*') }}"
+    weekday: "{{ item.pruneCron.weekday | default('6') }}"
+  loop: "{{ backup_jobs }}"
+  when: item.op == 'restic'
