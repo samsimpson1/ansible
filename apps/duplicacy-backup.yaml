@@ -1,0 +1,31 @@
+- name: Duplicacy backup group
+  ansible.builtin.group:
+    name: "duplicacy-backup"
+    state: present
+- name: Duplicacy backup user
+  ansible.builtin.user:
+    name: "duplicacy-backup"
+    group: "duplicacy-backup"
+    state: present
+    create_home: true
+- name: Duplicacy ssh directory
+  ansible.builtin.file:
+    state: directory
+    path: /home/duplicacy-backup/.ssh
+    mode: "0700"
+    owner: duplicacy-backup
+    group: duplicacy-backup
+- name: Duplicacy authorized_keys
+  ansible.builtin.copy:
+    dest: /home/duplicacy-backup/.ssh/authorized_keys
+    content: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE4l17Y6wVRpu/dtbzYP9dNNRNaYF5ytHveOWtXRoF6Z"
+    mode: "0600"
+    owner: duplicacy-backup
+    group: duplicacy-backup
+- name: Duplicacy backup directory
+  ansible.builtin.file:
+    state: directory
+    path: /srv/containers/storage/hdd/duplicacy-backup
+    mode: "0750"
+    owner: duplicacy-backup
+    group: duplicacy-backup

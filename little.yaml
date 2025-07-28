@@ -15,3 +15,5 @@
       ansible.builtin.include_tasks: apps/karakeep.yaml
     - name: FreshRSS
       ansible.builtin.include_tasks: apps/freshrss.yaml
+    - name: Duplicacy user
+      ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
