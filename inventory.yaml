@@ -3,28 +3,3 @@ home:
     little:
       ansible_host: 10.0.0.191
       ansible_user: me
-garage:
-  hosts:
-    little:
-      ansible_host: 10.0.0.191
-      ansible_user: me
-      garage_metadata_dir: /srv/containers/storage/ssd/garage
-      garage_data_dir: /srv/containers/storage/hdd/garage
-    g-hetzner1:
-      ansible_host: "2a01:4f8:c013:add4::1"
-      ansible_user: root
-      garage_metadata_dir: /srv/garage_metadata
-      garage_data_dir: /srv/box/garage
-      smb_shares:
-        - username: u478593-sub1
-          password: !vault |
-            $ANSIBLE_VAULT;1.2;AES256;ansible-vault
-            63626263623437646133356134303030383439343735353634363634363535386231386430663366
-            3535303764333139313163353661363232313436643233390a303866346664366130383234646230
-            62653437353431663464393333313266666131303135316634613136306533613637346437386338
-            3435633763343765620a323361653735643863613965623230393531653366316164363939663364
-            34333763346565646462336532613037313832383737363865386337643832666132
-          address: "//u478593-sub1.your-storagebox.de/u478593-sub1"
-          mountpoint: "/srv/box"
-          uid: "1000"
-          gid: "1000"
