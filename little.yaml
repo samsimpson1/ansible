@@ -54,6 +54,12 @@
             cron:
               minute: "14"
               hour: "*/2"
+          - name: pocket-id
+            op: restic
+            path: /srv/containers/storage/ssd/pocket-id/
+            cron:
+              minute: "18"
+              hour: "*/2"
           - name: stonks
             op: restic
             path: /srv/containers/storage/ssd/stonks/
