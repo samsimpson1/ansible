@@ -3,8 +3,6 @@
     path: /srv/containers/storage/ssd/freshrss
     state: directory
     mode: '0750'
-    owner: root
-    group: root
 - name: FreshRSS service
   include_role:
     name: docker-service
