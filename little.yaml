@@ -44,11 +44,10 @@
         backup_jobs:
           - name: duplicacy
             op: sync
-            path: /srv/containers/storage/hdd/backup-test/
+            path: /srv/containers/storage/hdd/duplicacy-backup/
             cron:
-              minute: "0"
+              minute: "30"
               hour: "*/6"
-              weekday: "6"
           - name: karakeep
             op: restic
             path: /srv/containers/storage/ssd/karakeep/
