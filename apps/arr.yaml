@@ -1,0 +1,58 @@
+- name: Create arr data directories
+  ansible.builtin.file:
+    state: directory
+    path: "/srv/containers/storage/ssd/{{ item }}"
+    mode: "0750"
+    owner: "app"
+    group: "app"
+  loop:
+    - prowlarr
+    - radarr
+    - sonarr
+- name: Prowlarr service
+  include_role:
+    name: docker-service
+  vars:
+    id: "prowlarr"
+    description: "Prowlarr"
+    image: ghcr.io/home-operations/prowlarr:1.37
+    network: source_default
+    user: "568"
+    group: "568"
+    env_vars:
+      TZ: Europe/London
+      PROWLARR__PORT: "80"
+    volumes:
+      - "/srv/containers/storage/ssd/prowlarr:/config:rw"
+- name: Radarr service
+  include_role:
+    name: docker-service
+  vars:
+    id: "radarr"
+    description: "Radarr"
+    image: ghcr.io/home-operations/radarr:5.26.2
+    network: source_default
+    user: "568"
+    group: "568"
+    env_vars:
+      TZ: Europe/London
+      RADARR__PORT: "80"
+    volumes:
+      - "/srv/containers/storage/ssd/radarr:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
+- name: Sonarr service
+  include_role:
+    name: docker-service
+  vars:
+    id: "sonarr"
+    description: "Sonarr"
+    image: ghcr.io/home-operations/sonarr:4.0.15
+    network: source_default
+    user: "568"
+    group: "568"
+    env_vars:
+      TZ: Europe/London
+      SONARR__PORT: "80"
+    volumes:
+      - "/srv/containers/storage/ssd/sonarr:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
