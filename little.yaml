@@ -9,6 +9,9 @@
     - name: Docker
       include_role:
         name: docker-host
+    - name: sSMTP
+      include_role:
+        name: ssmtp
     - name: Pocket ID
       ansible.builtin.include_tasks: apps/pocket-id.yaml
     - name: Karakeep

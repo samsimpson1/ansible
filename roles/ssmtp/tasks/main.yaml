@@ -1,0 +1,11 @@
+- name: Install sSMTP
+  ansible.builtin.package:
+    name: ssmtp
+    state: present
+- name: Install sSMTP config file
+  ansible.builtin.template:
+    src: ssmtp.conf.j2
+    dest: /etc/ssmtp/ssmtp.conf
+    mode: '0644'
+    owner: root
+    group: root

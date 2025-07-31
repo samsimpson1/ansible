@@ -1,0 +1,8 @@
+Mailhub={{ smtp_hostname }}:{{ smtp_port }}
+{% if smtp_tls == 'starttls' %}
+UseSTARTTLS=YES
+{% endif -%}
+AuthUser={{ smtp_username }}
+AuthPass={{ smtp_password }}
+FromLineOverride=YES
+RewriteDomain={{ smtp_from_domain }}
