@@ -16,6 +16,13 @@
     group: root
   loop: "{{ backup_jobs }}"
   when: item.op == 'restic'
+- name: Create restic util script
+  ansible.builtin.template:
+    src: restic-util.sh.j2
+    dest: /srv/backups/restic-util.sh
+    mode: "0750"
+    owner: root
+    group: root
 - name: Schedule prune jobs
   ansible.builtin.cron:
     name: "Prune {{ item.op }} {{ item.name }}"

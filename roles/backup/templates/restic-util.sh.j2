@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -e
+
+export RESTIC_PASSWORD_FILE="/srv/backups/repository-password"
+export RESTIC_REPOSITORY="sftp:a:$1"
+SFTP_COMMAND="sshpass -f /srv/backups/password ssh -o StrictHostKeyChecking=no -p 23 {{ backup_target.user }}@{{ backup_target.hostname }} -s sftp"
+
+shift
+
+r() {
+    restic $@ -o sftp.command="${SFTP_COMMAND}"
+}
+
+r $@
