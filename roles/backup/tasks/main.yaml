@@ -48,3 +48,21 @@
     month: "{{ item.cron.month | default('*') }}"
     weekday: "{{ item.cron.weekday | default('*') }}"
   loop: "{{ backup_jobs }}"
+- name: Create report scripts
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/srv/backups/{{ item }}"
+    mode: "0750"
+    owner: root
+    group: root
+  loop:
+    - report-generate.sh
+    - report-send.sh
+- name: Schedule report job
+  ansible.builtin.cron:
+    name: "Backup report"
+    user: root
+    job: "/srv/backups/report-send.sh"
+    minute: "0"
+    hour: "12"
+    day: "*/2"

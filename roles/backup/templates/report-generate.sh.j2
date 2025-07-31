@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -e
+
+echo "From: backups@{{ smtp_from_domain }}"
+echo "Subject: Backup Report $(date "+%Y-%m-%d %R")"
+echo ""
+
+
+{% for item in backup_jobs %}
+{% if item.op == 'restic' %}
+STATS=$(./restic-util.sh "{{ item.name }}" stats --mode raw-data)
+TOTAL_SIZE=$(echo "${STATS}" | grep "Total Size" | awk '{ printf("%s %s", $3, $4); }')
+SNAPSHOT_COUNT=$(echo "${STATS}" | grep "Snapshots processed" | awk '{ print $3; }')
+LAST_SNAPSHOT=$(/srv/backups/restic-util.sh "{{ item.name }}" snapshots --latest 1 --compact | grep ID -A 2 | tail -n 1 | awk '{ printf("%s %s", $2, $3); }')
+echo "{{ item.name }}"
+echo "  Kind: restic"
+echo "  Total Size: ${TOTAL_SIZE}"
+echo "  Snapshot Count: ${SNAPSHOT_COUNT}"
+echo "  Last Snapshot: ${LAST_SNAPSHOT}"
+echo "--------------------"
+
+{% elif item.op == 'sync' %}
+SIZE=$(sshpass -f /srv/backups/password \
+  ssh -p23 -o StrictHostKeyChecking=no \
+  "{{ backup_target.user }}@{{ backup_target.hostname }}" \
+  "du -sh {{ item.name }}/" | awk '{ print $1; }')
+
+echo "{{ item.name }}"
+echo "  Kind: sync"
+echo "  Disk Usage: ${SIZE}"
+echo "--------------------"
+
+{% endif %}
+{% endfor %}
+
+TOTAL_SIZE=$(sshpass -f /srv/backups/password \
+  ssh -p23 -o StrictHostKeyChecking=no \
+  "{{ backup_target.user }}@{{ backup_target.hostname }}" \
+  "du -sh ." | awk '{ print $1; }')
+echo ""
+echo "Total Disk Usage: ${TOTAL_SIZE}"
