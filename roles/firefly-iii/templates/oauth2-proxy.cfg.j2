@@ -1,0 +1,20 @@
+http_address = "0.0.0.0:4180"
+
+reverse_proxy = true
+
+upstreams = [
+  "http://firefly-iii:8080"
+]
+
+pass_user_headers = true
+
+provider = "oidc"
+provider_display_name = "Pocket ID"
+oidc_issuer_url = "https://pocket-id.srv.simpson.id"
+client_id = "{{ sso_clients.firefly_iii.id }}"
+client_secret = "{{ sso_clients.firefly_iii.secret }}"
+scope = "openid email profile"
+email_domains = ["*"]
+insecure_oidc_allow_unverified_email = true
+
+cookie_secret = "{{ firefly_iii.cookie_secret }}"

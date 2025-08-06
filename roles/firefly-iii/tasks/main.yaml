@@ -1,0 +1,86 @@
+- name: Firefly III data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0755'
+  loop:
+    - /srv/containers/storage/ssd/firefly-iii
+    - /srv/containers/storage/ssd/firefly-iii/upload
+    - /srv/containers/storage/ssd/firefly-iii/db
+- name: Firefly II OAuth2 Proxy config file
+  ansible.builtin.template:
+    src: oauth2-proxy.cfg.j2
+    dest: /srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg
+    owner: app
+    group: app
+    mode: '0644'
+- name: Firefly III OAuth2 Proxy
+  include_role:
+    name: docker-service
+  vars:
+    id: "firefly-oauth2-proxy"
+    description: "Firefly III OAuth2 Proxy"
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.11.0
+    network: source_default
+    user: "568"
+    group: "568"
+    command: "oauth2-proxy --config=/oauth2-proxy.cfg"
+    volumes:
+      - "/srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
+- name: Firefly III Database
+  include_role:
+    name: docker-service
+  vars:
+    id: "firefly-iii-db"
+    description: "Firefly III MariaDB"
+    image: mariadb:11.8
+    network: source_default
+    user: "568"
+    group: "568"
+    env_vars:
+      MYSQL_USER: firefly
+      MYSQL_DATABASE: firefly
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_PASSWORD: "{{ firefly_iii.db_password }}"
+    volumes:
+      - "/srv/containers/storage/ssd/firefly-iii/db:/var/lib/mysql:rw"
+- name: Firefly III
+  include_role:
+    name: docker-service
+  vars:
+    id: "firefly-iii"
+    description: "Firefly III App"
+    image: fireflyiii/core:version-6.2
+    network: source_default
+    env_vars:
+      TZ: Europe/London
+      SITE_OWNER: "{{ main_email }}"
+      APP_KEY: "{{ firefly_iii.app_key}}"
+      DB_CONNECTION: "mysql"
+      DB_HOST: "firefly-iii-db"
+      DB_DATABASE: "firefly"
+      DB_USERNAME: "firefly"
+      DB_PASSWORD: "{{ firefly_iii.db_password }}"
+      AUTHENTICATION_GUARD: "remote_user_guard"
+      AUTHENTICATION_GUARD_HEADER: "HTTP_X_FORWARDED_PREFERRED_USERNAME"
+      AUTHENTICATION_GUARD_EMAIL: "HTTP_X_FORWARDED_EMAIL"
+      APP_URL: "https://firefly.srv.simpson.id"
+      TRUSTED_PROXIES: "*"
+- name: Firefly III Data Importer
+  include_role:
+    name: docker-service
+  vars:
+    id: "firefly-iii-data-importer"
+    description: "Firefly III Data Importer"
+    image: fireflyiii/data-importer:version-1.7
+    network: source_default
+    env_vars:
+      TZ: Europe/London
+      FIREFLY_III_URL: "http://firefly-iii:8080"
+      VANITY_URL: "https://firefly.srv.simpson.id"
+      FIREFLY_III_ACCESS_TOKEN: "{{ firefly_iii.data_importer_pat }}"
+      NORDIGEN_ID: "{{ firefly_iii.gocardless_id }}"
+      NORDIGEN_KEY: "{{ firefly_iii.gocardless_secret }}"
+      TRUSTED_PROXIES: "*"

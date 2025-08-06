@@ -20,6 +20,9 @@
       ansible.builtin.include_tasks: apps/freshrss.yaml
     - name: Arr apps
       ansible.builtin.include_tasks: apps/arr.yaml
+    - name: Firefly III
+      include_role:
+        name: firefly-iii
     - name: Duplicacy user
       ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
     - name: Backup
