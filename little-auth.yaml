@@ -1,4 +1,5 @@
-- hosts: little
+- name: Little (auth)
+  hosts: little
   vars_files:
     - secret.yaml
   become: true

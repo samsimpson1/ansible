@@ -28,10 +28,10 @@
     name: "Prune {{ item.op }} {{ item.name }}"
     user: root
     job: "/srv/backups/{{ item.op }}-prune-{{ item.name }}.sh"
-    minute: "{{ item.prune_cron.minute | default('27')}}"
+    minute: "{{ item.prune_cron.minute | default('27') }}"
     hour: "{{ item.prune_cron.hour | default('3') }}"
     day: "{{ item.prune_cron.day | default('*') }}"
     month: "{{ item.prune_cron.month | default('*') }}"
-    weekday: "{{ item.pruneCron.weekday | default('6') }}"
+    weekday: "{{ item.prune_cron.weekday | default('6') }}"
   loop: "{{ backup_jobs }}"
   when: item.op == 'restic'

@@ -42,7 +42,7 @@
     name: "Backup {{ item.op }} {{ item.name }}"
     user: root
     job: "/srv/backups/{{ item.op }}-{{ item.name }}.sh"
-    minute: "{{ item.cron.minute | default('0')}}"
+    minute: "{{ item.cron.minute | default('0') }}"
     hour: "{{ item.cron.hour | default('*') }}"
     day: "{{ item.cron.day | default('*') }}"
     month: "{{ item.cron.month | default('*') }}"

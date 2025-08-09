@@ -1,4 +1,5 @@
-- hosts: little
+- name: Little (infra)
+  hosts: little
   vars_files:
     - secret.yaml
   become: true
@@ -9,7 +10,7 @@
     - name: Docker
       ansible.builtin.include_role:
         name: docker-host
-    - name: sSMTP
+    - name: SSMTP
       ansible.builtin.include_role:
         name: ssmtp
     - name: Caddy external
