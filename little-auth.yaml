@@ -1,0 +1,7 @@
+- hosts: little
+  vars_files:
+    - secret.yaml
+  become: true
+  tasks:
+    - name: Pocket ID
+      ansible.builtin.include_tasks: apps/pocket-id.yaml

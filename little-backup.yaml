@@ -1,0 +1,56 @@
+- hosts: little
+  vars_files:
+    - secret.yaml
+  become: true
+  tasks:
+    - name: Duplicacy user
+      ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
+    - name: Backup
+      ansible.builtin.include_role:
+        name: backup
+      vars:
+        backup_target:
+          hostname: "u478928-sub1.your-storagebox.de"
+          user: "u478928-sub1"
+          repository_password: !vault |
+            $ANSIBLE_VAULT;1.2;AES256;ansible-vault
+            62613637333733646535363637303861356365343637613362666638616138653236626430383830
+            3630636130323161623730313533373766356434396433610a383263663730373130653361663164
+            33666539376462326266356336633735613465656330373333336134633632383666353335366535
+            6139306537303663330a626362343936383335316538363030663831346235636435623466363134
+            31366665336136303731656637376262316664323531363931376664663563623964366563653135
+            61646237303136663361353438623634383636303037326562643635316331386665356637623838
+            36336233343135623365666365313235336636636164343061653764383862636338646439663066
+            61653230343330666233
+          password: !vault |
+            $ANSIBLE_VAULT;1.2;AES256;ansible-vault
+            35303635613933333562663235396630663630313239343831326235353130646237393264333936
+            3030333334303832663263333232313163663761653065350a306139313763353431393064643465
+            35346630613339393132376333386138303231303138666539303332326536613262306634353635
+            3463666139346335390a376162353938356638626562363165316236383861353636333262343961
+            31306234366666383739336363366337626561373331643535346234653832313164
+        backup_jobs:
+          - name: duplicacy
+            op: sync
+            path: /srv/containers/storage/hdd/duplicacy-backup/
+            cron:
+              minute: "30"
+              hour: "*/6"
+          - name: karakeep
+            op: restic
+            path: /srv/containers/storage/ssd/karakeep/
+            cron:
+              minute: "14"
+              hour: "*/2"
+          - name: pocket-id
+            op: restic
+            path: /srv/containers/storage/ssd/pocket-id/
+            cron:
+              minute: "18"
+              hour: "*/2"
+          - name: stonks
+            op: restic
+            path: /srv/containers/storage/ssd/stonks/
+            cron:
+              minute: "16"
+              hour: "*/4"

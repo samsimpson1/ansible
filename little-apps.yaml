@@ -1,0 +1,17 @@
+- hosts: little
+  vars_files:
+    - secret.yaml
+  become: true
+  tasks:
+    - name: ECG notify
+      ansible.builtin.include_role:
+        name: ecg-notify
+    - name: Karakeep
+      ansible.builtin.include_tasks: apps/karakeep.yaml
+    - name: FreshRSS
+      ansible.builtin.include_tasks: apps/freshrss.yaml
+    - name: Arr apps
+      ansible.builtin.include_tasks: apps/arr.yaml
+    - name: Firefly III
+      ansible.builtin.include_role:
+        name: firefly-iii
