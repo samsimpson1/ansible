@@ -39,7 +39,7 @@ All commands use 1Password CLI for vault password retrieval via `onepassword-cli
 
 ### Key Roles
 
-#### docker-service
+#### docker_service
 Central role for managing containerized services via systemd. Creates systemd unit files that run Docker containers with configurable:
 - Network settings
 - Port mappings  
@@ -59,7 +59,7 @@ Reverse proxy and web server role that builds custom Caddy images with DNS plugi
 - **Custom Docker image** - Builds Caddy with Cloudflare DNS plugin using xcaddy
 - **Configurable instances** - Supports multiple Caddy instances with unique IDs
 - **Automatic TLS** - Built-in HTTPS with Let's Encrypt integration
-- **Service integration** - Uses docker-service role for systemd management
+- **Service integration** - Uses docker_service role for systemd management
 
 ### Authentication
 Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Applications like FreshRSS and Firefly III are configured with OIDC authentication.
@@ -78,11 +78,11 @@ Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Appl
 ## Important Patterns
 
 ### Service Definitions
-Services follow a consistent pattern using the `docker-service` role:
+Services follow a consistent pattern using the `docker_service` role:
 ```yaml
 - name: Service Name
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "service-name"
     description: "Service Description"
@@ -133,6 +133,7 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 - **Legacy playbooks**: `little.yaml` (monolithic)
 - **Application-specific tasks**: `apps/` directory
 - **Reusable roles**: `roles/` directory
+- **Configuration**: `ansible.cfg` (inventory path, vault settings)
 - **Host inventory**: `inventory.yaml`
 - **Encrypted secrets**: `secret.yaml`
 
@@ -142,7 +143,7 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 3. **For full deployments**: Use `make little-full` or individual components in sequence
 4. **Use fully qualified Ansible module names** (e.g., `ansible.builtin.include_role`)
 5. **Vault integration** requires 1Password CLI (`op`) to be configured
-6. **Service configurations** should leverage the `docker-service` role for consistency
+6. **Service configurations** should leverage the `docker_service` role for consistency
 
 ## Split Playbook Dependencies
 - **little-infrastructure.yaml**: Must run first (provides Docker, networking)
