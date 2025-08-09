@@ -11,7 +11,7 @@
     - data
 - name: Dockerfile
   ansible.builtin.template:
-    src: Dockerfile
+    src: Dockerfile.j2
     dest: /srv/containers/storage/ssd/caddy/{{ caddy_id }}/Dockerfile
     owner: app
     group: app
