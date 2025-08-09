@@ -18,7 +18,7 @@
     mode: '0644'
 - name: Firefly III OAuth2 Proxy
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "firefly-oauth2-proxy"
     description: "Firefly III OAuth2 Proxy"
@@ -31,7 +31,7 @@
       - "/srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
 - name: Firefly III Database
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "firefly-iii-db"
     description: "Firefly III MariaDB"
@@ -48,7 +48,7 @@
       - "/srv/containers/storage/ssd/firefly-iii/db:/var/lib/mysql:rw"
 - name: Firefly III
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "firefly-iii"
     description: "Firefly III App"
@@ -57,7 +57,7 @@
     env_vars:
       TZ: Europe/London
       SITE_OWNER: "{{ main_email }}"
-      APP_KEY: "{{ firefly_iii.app_key}}"
+      APP_KEY: "{{ firefly_iii.app_key }}"
       DB_CONNECTION: "mysql"
       DB_HOST: "firefly-iii-db"
       DB_DATABASE: "firefly"
@@ -70,7 +70,7 @@
       TRUSTED_PROXIES: "*"
 - name: Firefly III Data Importer
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "firefly-iii-data-importer"
     description: "Firefly III Data Importer"

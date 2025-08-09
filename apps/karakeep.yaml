@@ -7,7 +7,7 @@
     group: app
 - name: Karakeep Meilisearch service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "karakeep-meilisearch"
     description: "Karakeep Meilisearch"
@@ -20,7 +20,7 @@
       - "/srv/containers/storage/ssd/karakeep/meilisearch:/meili_data"
 - name: Karakeep Chrome service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "karakeep-chrome"
     description: "Karakeep Chrome"
@@ -29,7 +29,7 @@
     command: --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --hide-scrollbars
 - name: Karakeep web service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "karakeep-web"
     description: "Karakeep Web"

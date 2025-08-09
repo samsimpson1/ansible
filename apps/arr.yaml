@@ -11,7 +11,7 @@
     - sonarr
 - name: Prowlarr service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "prowlarr"
     description: "Prowlarr"
@@ -26,7 +26,7 @@
       - "/srv/containers/storage/ssd/prowlarr:/config:rw"
 - name: Radarr service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "radarr"
     description: "Radarr"
@@ -42,7 +42,7 @@
       - "/srv/containers/storage/hdd/media:/media:rw"
 - name: Sonarr service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "sonarr"
     description: "Sonarr"

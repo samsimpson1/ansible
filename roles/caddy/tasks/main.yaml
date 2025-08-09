@@ -29,7 +29,7 @@
     mode: '0644'
 - name: Caddy service
   ansible.builtin.include_role:
-    name: docker-service
+    name: docker_service
   vars:
     id: "caddy-{{ caddy_id }}"
     description: "Caddy {{ caddy_id }}"

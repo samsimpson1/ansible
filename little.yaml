@@ -6,13 +6,13 @@
   tasks:
     - name: ECG notify
       ansible.builtin.include_role:
-        name: ecg-notify
+        name: ecg_notify
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
     - name: Docker
       ansible.builtin.include_role:
-        name: docker-host
+        name: docker_host
     - name: SSMTP
       ansible.builtin.include_role:
         name: ssmtp
@@ -26,7 +26,7 @@
       ansible.builtin.include_tasks: apps/arr.yaml
     - name: Firefly III
       ansible.builtin.include_role:
-        name: firefly-iii
+        name: firefly_iii
     - name: Duplicacy user
       ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
     - name: Backup
