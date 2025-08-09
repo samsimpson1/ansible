@@ -1,0 +1,24 @@
+- name: Install jq
+  ansible.builtin.package:
+    name: jq
+    state: present
+- name: Last modified file
+  ansible.builtin.file:
+    path: /srv/ecg-last-modified.txt
+    state: touch
+    owner: app
+    group: app
+    mode: '0644'
+- name: Notification script
+  ansible.builtin.template:
+    src: script.sh.j2
+    dest: /srv/ecg-notify.sh
+    owner: app
+    group: app
+    mode: '0755'
+- name: Notification cron
+  ansible.builtin.cron:
+    name: "ECG notify"
+    user: app
+    minute: "*/10"
+    job: "/usr/bin/env bash /srv/ecg-notify.sh"

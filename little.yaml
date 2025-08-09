@@ -3,6 +3,9 @@
     - secret.yaml
   become: true
   tasks:
+    - name: ECG notify
+      include_role:
+        name: ecg-notify
     - name: Tailscale
       include_role:
         name: tailscale
