@@ -14,6 +14,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip3 install ansible
+      
+      - name: Install Ansible requirements
+        run: |
+          ansible-galaxy install -r requirements.yaml
+
       - name: Install 1Password CLI
         run: |
           curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
@@ -30,6 +40,6 @@ jobs:
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main
         with:
-          setup_python: "true"
+          setup_python: "false"
           working_directory: "."
           args: "--exclude .github/workflows/"
