@@ -1,0 +1,138 @@
+- name: Caddy external
+  ansible.builtin.include_role:
+    name: caddy
+  vars:
+    caddy_id: "external"
+    caddy_ports:
+      - "6996:6996"
+      - "6997:6997"
+    caddy_env_vars:
+      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    caddy_caddyfile: |
+      {
+        acme_dns cloudflare {env.CADDY_CLOUDFLARE_API_KEY}
+        email acme@sams.wtf
+        acme_ca https://acme-v02.api.letsencrypt.org/directory
+        storage file_system /data
+        http_port 6996
+        https_port 6997
+        debug
+      }
+
+      *.srv.simpson.id {
+
+        @audiobookshelf host audiobookshelf.srv.simpson.id
+        handle @audiobookshelf {
+          reverse_proxy http://audiobookshelf:8080
+        }
+
+        @barassistant host bar.srv.simpson.id
+        handle @barassistant {
+          handle_path /bar* {
+            reverse_proxy http://ba-bar-assistant:8080
+          }
+          handle_path /search* {
+            reverse_proxy http://ba-meilisearch:7700
+          }
+          handle_path /* {
+            reverse_proxy http://ba-salt-rim:8080
+          }
+        }
+
+        @karakeep host bookmarks.srv.simpson.id
+        handle @karakeep {
+          reverse_proxy http://karakeep-web:3000
+        }
+
+        @actual host budget.srv.simpson.id
+        handle @actual {
+          reverse_proxy http://actual:5006
+        }
+
+        @firefly host firefly.srv.simpson.id
+        handle @firefly {
+          reverse_proxy http://firefly-oauth2-proxy:4180
+        }
+
+        @grafana host grafana.srv.simpson.id
+        handle @grafana {
+          reverse_proxy http://grafana:3000
+        }
+
+        @hass host hass.srv.simpson.id
+        handle @hass {
+          reverse_proxy http://home-assistant:8123
+        }
+
+        @jellyfin host jellyfin.srv.simpson.id
+        handle @jellyfin {
+          reverse_proxy http://10.0.0.191:8096
+        }
+
+        @komga host comics.srv.simpson.id
+        handle @komga {
+          reverse_proxy http://komga:25600
+        }
+
+        @navidrome host navidrome.srv.simpson.id
+        handle @navidrome {
+          reverse_proxy http://navidrome:4533
+        }
+
+        @pathfinder host pathfinder.srv.simpson.id
+        handle @pathfinder {
+          reverse_proxy http://pathfinder:80
+        }
+
+        # TODO: oauth proxy for pinchflat
+        #@pinchflat host pinchflat.srv.simpson.id
+        #handle @pinchflat {
+        #  route {
+        #    authorize with pinchflat
+        #    reverse_proxy http://pinchflat:8945
+        #  }
+        #}
+
+        @pocketid host pocket-id.srv.simpson.id
+        handle @pocketid {
+          route {
+            reverse_proxy http://pocket-id:1411
+          }
+        }
+
+        @rss host rss.srv.simpson.id
+        handle @rss {
+          reverse_proxy http://freshrss:80
+        }
+
+        @requests host requests.srv.simpson.id
+        handle @requests {
+          reverse_proxy http://overseerr:80
+        }
+
+        @sharex host sharex.srv.simpson.id
+        handle @sharex {
+          root * /sharex
+          file_server
+        }
+
+        handle {
+          respond "Nothing to see here"
+        }
+      }
+
+      sams.wtf {
+        respond "Nope"
+      }
+
+      s3.sams.wtf {
+        reverse_proxy http://10.0.0.191:3900
+      }
+
+      *.s3.sams.wtf {
+        reverse_proxy http://10.0.0.191:3900
+      }
+
+      *.site.s3.sams.wtf {
+        reverse_proxy http://10.0.0.191:3902
+      }

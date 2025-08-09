@@ -1,0 +1,18 @@
+- hosts: little
+  vars_files:
+    - secret.yaml
+  become: true
+  tasks:
+    - name: Tailscale
+      ansible.builtin.include_role:
+        name: tailscale
+    - name: Docker
+      ansible.builtin.include_role:
+        name: docker-host
+    - name: sSMTP
+      ansible.builtin.include_role:
+        name: ssmtp
+    - name: Caddy external
+      ansible.builtin.include_tasks: apps/caddy-external.yaml
+    - name: Caddy internal
+      ansible.builtin.include_tasks: apps/caddy-internal.yaml

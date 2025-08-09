@@ -1,0 +1,47 @@
+- name: Caddy data directories
+  ansible.builtin.file:
+    path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/{{ item }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+  loop:
+    - ""
+    - config
+    - data
+- name: Dockerfile
+  ansible.builtin.template:
+    src: Dockerfile
+    dest: /srv/containers/storage/ssd/caddy/{{ caddy_id }}/Dockerfile
+    owner: app
+    group: app
+    mode: '0644'
+- name: Caddy image
+  community.docker.docker_image_build:
+    name: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
+    path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}"
+- name: Caddyfile
+  ansible.builtin.copy:
+    content: "{{ caddy_caddyfile }}"
+    dest: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile"
+    owner: app
+    group: app
+    mode: '0644'
+- name: Caddy service
+  ansible.builtin.include_role:
+    name: docker-service
+  vars:
+    id: "caddy-{{ caddy_id }}"
+    description: "Caddy {{ caddy_id }}"
+    image: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
+    pull_policy: "never"
+    network: source_default
+    user: "568"
+    group: "568"
+    command: "caddy run -c /Caddyfile"
+    env_vars: "{{ caddy_env_vars }}"
+    ports: "{{ caddy_ports }}"
+    volumes:
+      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/config:/config"
+      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/data:/data"
+      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile:/Caddyfile"
