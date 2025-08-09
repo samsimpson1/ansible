@@ -20,41 +20,41 @@
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "firefly-oauth2-proxy"
-    description: "Firefly III OAuth2 Proxy"
-    image: quay.io/oauth2-proxy/oauth2-proxy:v7.11.0
-    network: source_default
-    user: "568"
-    group: "568"
-    command: "oauth2-proxy --config=/oauth2-proxy.cfg"
-    volumes:
+    docker_service_id: "firefly-oauth2-proxy"
+    docker_service_description: "Firefly III OAuth2 Proxy"
+    docker_service_image: quay.io/oauth2-proxy/oauth2-proxy:v7.11.0
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_command: "oauth2-proxy --config=/oauth2-proxy.cfg"
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
 - name: Firefly III Database
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "firefly-iii-db"
-    description: "Firefly III MariaDB"
-    image: mariadb:11.8
-    network: source_default
-    user: "568"
-    group: "568"
-    env_vars:
+    docker_service_id: "firefly-iii-db"
+    docker_service_description: "Firefly III MariaDB"
+    docker_service_image: mariadb:11.8
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
       MYSQL_USER: firefly
       MYSQL_DATABASE: firefly
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_PASSWORD: "{{ firefly_iii.db_password }}"
-    volumes:
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/firefly-iii/db:/var/lib/mysql:rw"
 - name: Firefly III
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "firefly-iii"
-    description: "Firefly III App"
-    image: fireflyiii/core:version-6.2
-    network: source_default
-    env_vars:
+    docker_service_id: "firefly-iii"
+    docker_service_description: "Firefly III App"
+    docker_service_image: fireflyiii/core:version-6.2
+    docker_service_network: source_default
+    docker_service_env_vars:
       TZ: Europe/London
       SITE_OWNER: "{{ main_email }}"
       APP_KEY: "{{ firefly_iii.app_key }}"
@@ -72,13 +72,13 @@
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "firefly-iii-data-importer"
-    description: "Firefly III Data Importer"
-    image: fireflyiii/data-importer:version-1.7
-    network: source_default
-    volumes:
+    docker_service_id: "firefly-iii-data-importer"
+    docker_service_description: "Firefly III Data Importer"
+    docker_service_image: fireflyiii/data-importer:version-1.7
+    docker_service_network: source_default
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/firefly-iii/import:/import:rw"
-    env_vars:
+    docker_service_env_vars:
       TZ: Europe/London
       FIREFLY_III_URL: "http://firefly-iii:8080"
       VANITY_URL: "https://firefly.srv.simpson.id"

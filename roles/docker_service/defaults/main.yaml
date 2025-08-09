@@ -1,12 +1,12 @@
-description: "Docker Service"
-id: docker_service
-image: hashicorp/http-echo:latest
-command: null
-pull_policy: always
-ports: []
-volumes: []
-env_vars: {}
-enabled: true
-network: null
-user: null
-group: null
+docker_service_description: "Docker Service"
+docker_service_id: docker_service
+docker_service_image: hashicorp/http-echo:latest
+docker_service_command: null
+docker_service_pull_policy: always
+docker_service_ports: []
+docker_service_volumes: []
+docker_service_env_vars: {}
+docker_service_enabled: true
+docker_service_network: null
+docker_service_user: null
+docker_service_group: null

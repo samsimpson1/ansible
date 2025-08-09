@@ -1,5 +1,5 @@
 [Unit]
-Description={{ description }}
+Description={{ docker_service_description }}
 After=docker.service
 Requires=docker.service
 
@@ -9,24 +9,24 @@ Restart=always
 RestartSec=10
 
 ExecStart=/usr/bin/docker run --rm \
-  --name {{ id }} \
-  {% if network %}--network {{ network }} \
+  --name {{ docker_service_id }} \
+  {% if docker_service_network %}--network {{ docker_service_network }} \
   {% endif -%}
-  {% if ports|length > 0 %}{{ '-p ' + ' -p '.join(ports) }} \
+  {% if docker_service_ports|length > 0 %}{{ '-p ' + ' -p '.join(docker_service_ports) }} \
   {% endif -%}
-  {% if volumes|length > 0 %}-v {{ ' -v '.join(volumes) }} \
+  {% if docker_service_volumes|length > 0 %}-v {{ ' -v '.join(docker_service_volumes) }} \
   {% endif -%}
-  {% if env_vars|length > 0 %}{% for k, v in env_vars.items() %}{{ '-e ' + k + '="' + v + '" ' }}{% endfor %} \
+  {% if docker_service_env_vars|length > 0 %}{% for k, v in docker_service_env_vars.items() %}{{ '-e ' + k + '="' + v + '" ' }}{% endfor %} \
   {% endif -%}
-  {% if user %}-u {{ user }}:{{ group }} \
+  {% if docker_service_user %}-u {{ docker_service_user }}:{{ docker_service_group }} \
   {% endif -%}
-  --pull {{ pull_policy }} \
-  {{ image }} {% if command %}\
-  {{ command }}
+  --pull {{ docker_service_pull_policy }} \
+  {{ docker_service_image }} {% if docker_service_command %}\
+  {{ docker_service_command }}
   {% endif %}
 
-ExecStop=/usr/bin/docker stop {{ id }}
-ExecReload=/usr/bin/docker restart {{ id }}
+ExecStop=/usr/bin/docker stop {{ docker_service_id }}
+ExecReload=/usr/bin/docker restart {{ docker_service_id }}
 
 [Install]
 WantedBy=multi-user.target

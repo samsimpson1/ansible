@@ -13,46 +13,46 @@
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "prowlarr"
-    description: "Prowlarr"
-    image: ghcr.io/home-operations/prowlarr:1.37
-    network: source_default
-    user: "568"
-    group: "568"
-    env_vars:
+    docker_service_id: "prowlarr"
+    docker_service_description: "Prowlarr"
+    docker_service_image: ghcr.io/home-operations/prowlarr:1.37
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
       TZ: Europe/London
       PROWLARR__PORT: "80"
-    volumes:
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/prowlarr:/config:rw"
 - name: Radarr service
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "radarr"
-    description: "Radarr"
-    image: ghcr.io/home-operations/radarr:5.26.2
-    network: source_default
-    user: "568"
-    group: "568"
-    env_vars:
+    docker_service_id: "radarr"
+    docker_service_description: "Radarr"
+    docker_service_image: ghcr.io/home-operations/radarr:5.26.2
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
       TZ: Europe/London
       RADARR__PORT: "80"
-    volumes:
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/radarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
 - name: Sonarr service
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "sonarr"
-    description: "Sonarr"
-    image: ghcr.io/home-operations/sonarr:4.0.15
-    network: source_default
-    user: "568"
-    group: "568"
-    env_vars:
+    docker_service_id: "sonarr"
+    docker_service_description: "Sonarr"
+    docker_service_image: ghcr.io/home-operations/sonarr:4.0.15
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
       TZ: Europe/London
       SONARR__PORT: "80"
-    volumes:
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/sonarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"

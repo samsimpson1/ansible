@@ -31,17 +31,17 @@
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "caddy-{{ caddy_id }}"
-    description: "Caddy {{ caddy_id }}"
-    image: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
-    pull_policy: "never"
-    network: source_default
-    user: "568"
-    group: "568"
-    command: "caddy run -c /Caddyfile"
-    env_vars: "{{ caddy_env_vars }}"
-    ports: "{{ caddy_ports }}"
-    volumes:
+    docker_service_id: "caddy-{{ caddy_id }}"
+    docker_service_description: "Caddy {{ caddy_id }}"
+    docker_service_image: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
+    docker_service_pull_policy: "never"
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_command: "caddy run -c /Caddyfile"
+    docker_service_env_vars: "{{ caddy_env_vars }}"
+    docker_service_ports: "{{ caddy_ports }}"
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/config:/config"
       - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/data:/data"
       - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile:/Caddyfile"

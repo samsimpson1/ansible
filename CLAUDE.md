@@ -80,10 +80,10 @@ Services follow a consistent pattern using the `docker_service` role:
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "service-name"
-    description: "Service Description"
-    image: "image:tag"
-    network: "network_name"
+    docker_service_id: "service-name"
+    docker_service_description: "Service Description"
+    docker_service_image: "image:tag"
+    docker_service_network: "network_name"
     # ... other service-specific configuration
 ```
 

@@ -9,11 +9,11 @@
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    id: "pocket-id"
-    description: "Pocket ID"
-    image: ghcr.io/pocket-id/pocket-id:v1
-    network: source_default
-    env_vars:
+    docker_service_id: "pocket-id"
+    docker_service_description: "Pocket ID"
+    docker_service_image: ghcr.io/pocket-id/pocket-id:v1
+    docker_service_network: source_default
+    docker_service_env_vars:
       APP_URL: "https://pocket-id.srv.simpson.id"
       TRUST_PROXY: "true"
       PUID: "568"
@@ -28,5 +28,5 @@
       SMTP_HOST: "{{ smtp_hostname }}"
       SMTP_PORT: "{{ smtp_port }}"
       SMTP_TLS: "{{ smtp_tls }}"
-    volumes:
+    docker_service_volumes:
       - "/srv/containers/storage/ssd/pocket-id:/data"
