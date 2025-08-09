@@ -6,6 +6,10 @@ upstreams = [
   "http://firefly-iii:8080"
 ]
 
+skip_auth_routes = [
+  "^/api"
+]
+
 pass_user_headers = true
 
 provider = "oidc"

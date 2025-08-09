@@ -6,7 +6,7 @@
     owner: app
     group: app
 - name: Pocket ID service
-  include_role:
+  ansible.builtin.include_role:
     name: docker-service
   vars:
     id: "pocket-id"

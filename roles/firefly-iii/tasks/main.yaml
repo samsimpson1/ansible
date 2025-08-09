@@ -17,7 +17,7 @@
     group: app
     mode: '0644'
 - name: Firefly III OAuth2 Proxy
-  include_role:
+  ansible.builtin.include_role:
     name: docker-service
   vars:
     id: "firefly-oauth2-proxy"
@@ -30,7 +30,7 @@
     volumes:
       - "/srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
 - name: Firefly III Database
-  include_role:
+  ansible.builtin.include_role:
     name: docker-service
   vars:
     id: "firefly-iii-db"
@@ -47,7 +47,7 @@
     volumes:
       - "/srv/containers/storage/ssd/firefly-iii/db:/var/lib/mysql:rw"
 - name: Firefly III
-  include_role:
+  ansible.builtin.include_role:
     name: docker-service
   vars:
     id: "firefly-iii"
@@ -69,13 +69,15 @@
       APP_URL: "https://firefly.srv.simpson.id"
       TRUSTED_PROXIES: "*"
 - name: Firefly III Data Importer
-  include_role:
+  ansible.builtin.include_role:
     name: docker-service
   vars:
     id: "firefly-iii-data-importer"
     description: "Firefly III Data Importer"
     image: fireflyiii/data-importer:version-1.7
     network: source_default
+    volumes:
+      - "/srv/containers/storage/ssd/firefly-iii/import:/import:rw"
     env_vars:
       TZ: Europe/London
       FIREFLY_III_URL: "http://firefly-iii:8080"
@@ -84,3 +86,12 @@
       NORDIGEN_ID: "{{ firefly_iii.gocardless_id }}"
       NORDIGEN_KEY: "{{ firefly_iii.gocardless_secret }}"
       TRUSTED_PROXIES: "*"
+      IMPORT_DIR_ALLOWLIST: "/import"
+- name: Firefly III Data Import Job
+  ansible.builtin.cron:
+    name: "Firefly III Data Import Job"
+    user: app
+    minute: "0"
+    hour: "3"
+    job: "/usr/bin/env docker exec firefly-iii-data-importer php artisan importer:auto-import /import >> /var/log/firefly-iii-data-importer.log 2>&1"
+    state: present

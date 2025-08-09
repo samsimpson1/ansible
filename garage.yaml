@@ -4,11 +4,11 @@
   become: true
   tasks:
     - name: Tailscale
-      include_role:
+      ansible.builtin.include_role:
         name: tailscale
     - name: Samba
-      include_role:
+      ansible.builtin.include_role:
         name: smb-shares
     - name: Garage
-      include_role:
+      ansible.builtin.include_role:
         name: garage

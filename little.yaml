@@ -4,16 +4,16 @@
   become: true
   tasks:
     - name: ECG notify
-      include_role:
+      ansible.builtin.include_role:
         name: ecg-notify
     - name: Tailscale
-      include_role:
+      ansible.builtin.include_role:
         name: tailscale
     - name: Docker
-      include_role:
+      ansible.builtin.include_role:
         name: docker-host
     - name: sSMTP
-      include_role:
+      ansible.builtin.include_role:
         name: ssmtp
     - name: Pocket ID
       ansible.builtin.include_tasks: apps/pocket-id.yaml
@@ -24,12 +24,12 @@
     - name: Arr apps
       ansible.builtin.include_tasks: apps/arr.yaml
     - name: Firefly III
-      include_role:
+      ansible.builtin.include_role:
         name: firefly-iii
     - name: Duplicacy user
       ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
     - name: Backup
-      include_role:
+      ansible.builtin.include_role:
         name: backup
       vars:
         backup_target:
