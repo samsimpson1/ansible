@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is an Ansible infrastructure-as-code repository for managing home lab infrastructure across two hosts: `little` and `garage`. The setup includes container services, backups, SSO authentication, and various self-hosted applications.
+This is an Ansible infrastructure-as-code repository for managing home lab infrastructure for the `little` host. The setup includes container services, backups, SSO authentication, and various self-hosted applications.
 
 ## Key Commands
 
@@ -25,20 +25,17 @@ This is an Ansible infrastructure-as-code repository for managing home lab infra
 
 #### Legacy/Fallback
 - `make little` - Deploy using original monolithic playbook (kept for fallback)
-- `make garage` - Deploy full configuration to the garage host
 - `make little-check` - Dry-run with diff for little host (monolithic)
-- `make garage-check` - Dry-run with diff for garage host
 
 ### Vault Management
 - `make vault-edit` - Edit encrypted secrets using 1Password CLI integration
 
-All commands use 1Password CLI for vault password retrieval via `onepassword-client.sh`.
+All commands use 1Password CLI for vault password retrieval via `onepassword-client.sh`. The inventory file and vault configuration are specified in `ansible.cfg`.
 
 ## Architecture
 
 ### Host Structure
 - **little** (10.0.0.191) - Main application host running containerized services
-- **garage** - Secondary host for storage and Garage S3-compatible storage
 
 ### Key Roles
 
@@ -72,13 +69,11 @@ Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Appl
 - **Personal Finance** - Firefly III with OAuth2 proxy and data importer
 - **Knowledge Management** - Karakeep with Meilisearch backend
 - **RSS/Feed Reading** - FreshRSS with OIDC
-- **Storage** - Garage S3-compatible storage system
 
 ### Infrastructure Services
 - **Tailscale** - Mesh networking
 - **Docker** - Container runtime
 - **sSMTP** - Mail relay configuration
-- **Samba** - File sharing (garage host)
 
 ## Important Patterns
 
@@ -135,7 +130,7 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 
 ## File Structure Notes
 - **Split playbooks**: `little-infrastructure.yaml`, `little-auth.yaml`, `little-apps.yaml`, `little-backup.yaml`
-- **Legacy playbooks**: `little.yaml`, `garage.yaml` (monolithic)
+- **Legacy playbooks**: `little.yaml` (monolithic)
 - **Application-specific tasks**: `apps/` directory
 - **Reusable roles**: `roles/` directory
 - **Host inventory**: `inventory.yaml`
