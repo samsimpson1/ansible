@@ -3,13 +3,6 @@
 vault-edit:
 	ansible-vault edit secret.yaml
 
-# Original monolithic playbook (kept for fallback)
-little:
-	ansible-playbook little.yaml
-
-little-check:
-	ansible-playbook little.yaml --check --diff
-
 # Split playbook components
 little-infra:
 	ansible-playbook little-infrastructure.yaml

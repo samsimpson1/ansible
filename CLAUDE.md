@@ -15,17 +15,13 @@ This is an Ansible infrastructure-as-code repository for managing home lab infra
 - `make little-auth` - Deploy authentication services (Pocket ID)
 - `make little-apps` - Deploy applications (ECG notify, Karakeep, FreshRSS, Arr apps, Firefly III)
 - `make little-backup` - Deploy backup configuration
-- `make little-full` - Deploy all components in sequence (equivalent to old `make little`)
+- `make little-full` - Deploy all components in sequence
 
 #### Check Targets
 - `make little-infra-check` - Dry-run infrastructure changes
 - `make little-auth-check` - Dry-run authentication changes  
 - `make little-apps-check` - Dry-run application changes
 - `make little-backup-check` - Dry-run backup changes
-
-#### Legacy/Fallback
-- `make little` - Deploy using original monolithic playbook (kept for fallback)
-- `make little-check` - Dry-run with diff for little host (monolithic)
 
 ### Vault Management
 - `make vault-edit` - Edit encrypted secrets using 1Password CLI integration
@@ -129,8 +125,7 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 - Sensitive configuration like API keys, passwords, and tokens are vaulted
 
 ## File Structure Notes
-- **Split playbooks**: `little-infrastructure.yaml`, `little-auth.yaml`, `little-apps.yaml`, `little-backup.yaml`
-- **Legacy playbooks**: `little.yaml` (monolithic)
+- **Playbooks**: `little-infrastructure.yaml`, `little-auth.yaml`, `little-apps.yaml`, `little-backup.yaml`
 - **Application-specific tasks**: `apps/` directory
 - **Reusable roles**: `roles/` directory
 - **Configuration**: `ansible.cfg` (inventory path, vault settings)
