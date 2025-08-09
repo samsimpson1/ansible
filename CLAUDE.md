@@ -57,6 +57,13 @@ Comprehensive backup system supporting:
 - **Automated reporting** - Email reports every 2 days
 - **Scheduled jobs** - Cron-based backup scheduling
 
+#### caddy
+Reverse proxy and web server role that builds custom Caddy images with DNS plugins:
+- **Custom Docker image** - Builds Caddy with Cloudflare DNS plugin using xcaddy
+- **Configurable instances** - Supports multiple Caddy instances with unique IDs
+- **Automatic TLS** - Built-in HTTPS with Let's Encrypt integration
+- **Service integration** - Uses docker-service role for systemd management
+
 ### Authentication
 Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Applications like FreshRSS and Firefly III are configured with OIDC authentication.
 
@@ -99,6 +106,26 @@ backup_jobs:
     cron:
       minute: "15"
       hour: "*/4"
+```
+
+### Caddy Configuration
+Caddy instances are configured with customizable IDs and Caddyfile content:
+```yaml
+- name: Deploy Caddy
+  ansible.builtin.include_role:
+    name: caddy
+  vars:
+    caddy_id: "my-proxy"
+    caddy_version: "2.10"
+    caddy_caddyfile: |
+      example.com {
+        reverse_proxy localhost:8080
+      }
+    caddy_ports:
+      - "80:80"
+      - "443:443"
+    caddy_env_vars:
+      CLOUDFLARE_API_TOKEN: "{{ vault_cloudflare_token }}"
 ```
 
 ### Secrets Management
