@@ -1,0 +1,129 @@
+- name: Create media frontend data directories
+  ansible.builtin.file:
+    state: directory
+    path: "/srv/containers/storage/ssd/{{ item }}"
+    mode: "0750"
+    owner: "app"
+    group: "app"
+  loop:
+    - audiobookshelf
+    - audiobookshelf/config
+    - audiobookshelf/metadata
+    - audiobookshelf/cache
+    - plex
+    - jellyfin
+    - jellyfin/config
+    - jellyfin/cache
+    - lms
+    - lms/config
+    - lms/playlists
+    - navidrome
+
+- name: Create transcode directory
+  ansible.builtin.file:
+    state: directory
+    path: "/tmp/plex_transcode"
+    mode: "0755"
+    owner: "app"
+    group: "app"
+
+- name: Audiobookshelf service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "audiobookshelf"
+    docker_service_description: "Audiobookshelf"
+    docker_service_image: ghcr.io/advplyr/audiobookshelf:2.20.0
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      TZ: Europe/London
+      PORT: "8080"
+      AUDIOBOOKSHELF_UID: "568"
+      AUDIOBOOKSHELF_GID: "568"
+    docker_service_volumes:
+      - "/srv/containers/storage/hdd/media:/media:rw"
+      - "/srv/containers/storage/ssd/audiobookshelf/config:/config:rw"
+      - "/srv/containers/storage/ssd/audiobookshelf/metadata:/metadata:rw"
+      - "/srv/containers/storage/ssd/audiobookshelf/cache:/cache:rw"
+
+- name: Plex service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "plex"
+    docker_service_description: "Plex Media Server"
+    docker_service_image: ghcr.io/onedr0p/plex:rolling
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_network: host
+    docker_service_volumes:
+      - "/srv/containers/storage/hdd/media:/media:ro"
+      - "/srv/containers/storage/ssd/plex:/config:rw"
+      - "/tmp/plex_transcode:/transcode:rw"
+    docker_service_devices:
+      - "/dev/dri:/dev/dri"
+
+- name: Jellyfin service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "jellyfin"
+    docker_service_description: "Jellyfin Media Server"
+    docker_service_image: jellyfin/jellyfin:latest
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_network: host
+    docker_service_env_vars:
+      JELLYFIN_PublishedServerUrl: "https://jellyfin.srv.simpson.id"
+    docker_service_volumes:
+      - "/srv/containers/storage/hdd/media:/media:ro"
+      - "/srv/containers/storage/ssd/jellyfin/config:/config:rw"
+      - "/srv/containers/storage/ssd/jellyfin/cache:/cache:rw"
+    docker_service_devices:
+      - "/dev/dri:/dev/dri"
+
+- name: Lyrion Music Server service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "lms"
+    docker_service_description: "Lyrion Music Server"
+    docker_service_image: lmscommunity/lyrionmusicserver:9.1.0
+    docker_service_network: host
+    docker_service_env_vars:
+      PUID: "568"
+      PGID: "568"
+    docker_service_ports:
+      - "9002:9002/tcp"
+      - "9090:9090/tcp"
+      - "3483:3483/tcp"
+      - "3483:3483/udp"
+    docker_service_volumes:
+      - "/srv/containers/storage/hdd/media/music:/music:ro"
+      - "/srv/containers/storage/ssd/lms/config:/config:rw"
+      - "/srv/containers/storage/ssd/lms/playlists:/playlists:rw"
+
+- name: Navidrome service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "navidrome"
+    docker_service_description: "Navidrome Music Server"
+    docker_service_image: deluan/navidrome:latest
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      TZ: Europe/London
+      ND_BASEURL: "https://navidrome.srv.simpson.id"
+      ND_SCANSCHEDULE: "1h"
+      ND_LOGLEVEL: "info"
+      ND_SESSIONTIMEOUT: "24h"
+      ND_MUSICFOLDER: "/media/music"
+      ND_DATAFOLDER: "/config"
+      ND_CACHEFOLDER: "/config/cache"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/navidrome:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"

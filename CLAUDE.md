@@ -145,3 +145,5 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 - **little-auth.yaml**: Requires infrastructure (provides SSO for apps)
 - **little-apps.yaml**: Requires infrastructure and auth
 - **little-backup.yaml**: Independent, can run anytime after infrastructure
+- Ansible YAML files must always end in a new line
+- Ansible task names should always start with an upper case letter

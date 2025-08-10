@@ -13,6 +13,10 @@
       ansible.builtin.include_tasks: apps/freshrss.yaml
     - name: Arr apps
       ansible.builtin.include_tasks: apps/arr.yaml
+    - name: Downloader apps
+      ansible.builtin.include_tasks: apps/downloaders.yaml
+    - name: Media frontend apps
+      ansible.builtin.include_tasks: apps/media-frontend.yaml
     - name: Firefly III
       ansible.builtin.include_role:
         name: firefly_iii

@@ -1,0 +1,46 @@
+- name: Create downloader data directories
+  ansible.builtin.file:
+    state: directory
+    path: "/srv/containers/storage/ssd/{{ item }}"
+    mode: "0750"
+    owner: "app"
+    group: "app"
+  loop:
+    - qbittorrent
+    - sabnzbd
+- name: QBittorrent service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "qbittorrent"
+    docker_service_description: "qBittorrent"
+    docker_service_image: ghcr.io/onedr0p/qbittorrent:5.0.1
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      TZ: Europe/London
+      QBITTORRENT__PORT: "80"
+      QBITTORRENT__BT_PORT: "32760"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/qbittorrent:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
+    docker_service_ports:
+      - "32760:32760"
+- name: SABnzbd service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "sabnzbd"
+    docker_service_description: "SABnzbd"
+    docker_service_image: ghcr.io/onedr0p/sabnzbd:4.3.3
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      TZ: Europe/London
+      SABNZBD__PORT: "80"
+      SABNZBD__HOST_WHITELIST_ENTRIES: "sabnzbd, sabnzbd.int.simpson.id"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/sabnzbd:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
