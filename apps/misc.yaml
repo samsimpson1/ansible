@@ -1,0 +1,7 @@
+- name: Nutrition data directory
+  ansible.builtin.file:
+    path: /srv/containers/storage/ssd/nutrition
+    state: directory
+    owner: me
+    group: me
+    mode: '0755'
