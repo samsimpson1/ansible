@@ -18,6 +18,9 @@
     - lms/config
     - lms/playlists
     - navidrome
+    - komga
+    - overseerr
+    - pinchflat
 
 - name: Create transcode directory
   ansible.builtin.file:
@@ -127,3 +130,51 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/navidrome:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Komga service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "komga"
+    docker_service_description: "Komga Comics Server"
+    docker_service_image: ghcr.io/gotson/komga:1.14.1
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/komga:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Overseerr service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "overseerr"
+    docker_service_description: "Overseerr"
+    docker_service_image: ghcr.io/sct/overseerr:1.33.2
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      TZ: Europe/London
+      LOG_LEVEL: info
+      PORT: "80"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/overseerr:/app/config:rw"
+
+- name: Pinchflat service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "pinchflat"
+    docker_service_description: "Pinchflat"
+    docker_service_image: ghcr.io/kieraneglin/pinchflat:v2025.3.17
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      TZ: Europe/London
+      EXPOSE_FEED_ENDPOINTS: "true"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/pinchflat:/config:rw"
+      - "/srv/containers/storage/hdd/media/youtube:/downloads:rw"

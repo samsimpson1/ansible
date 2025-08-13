@@ -8,6 +8,7 @@
   loop:
     - qbittorrent
     - sabnzbd
+    - slskd
 - name: QBittorrent service
   ansible.builtin.include_role:
     name: docker_service
@@ -43,4 +44,41 @@
       SABNZBD__HOST_WHITELIST_ENTRIES: "sabnzbd, sabnzbd.int.simpson.id"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/sabnzbd:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Unpackerr service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "unpackerr"
+    docker_service_description: "Unpackerr"
+    docker_service_image: ghcr.io/unpackerr/unpackerr:0.14.5
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_file: "/srv/containers/storage/ssd/secrets/Unpackerr.env"
+    docker_service_env_vars:
+      UN_RADARR_0_URL: "https://radarr.int.simpson.id"
+      UN_RADARR_0_PATHS_0: "/media/torrent"
+      UN_SONARR_0_URL: "https://sonarr.int.simpson.id"
+      UN_SONARR_0_PATHS_0: "/media/torrent"
+    docker_service_volumes:
+      - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Slskd service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "slskd"
+    docker_service_description: "Slskd"
+    docker_service_image: slskd/slskd:0.21.4
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_group: "568"
+    docker_service_env_vars:
+      SLSKD_REMOTE_CONFIGURATION: "true"
+    docker_service_ports:
+      - "34000:34000"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/slskd:/app:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
