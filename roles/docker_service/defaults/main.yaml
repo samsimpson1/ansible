@@ -12,3 +12,4 @@ docker_service_user: null
 docker_service_group: null
 docker_service_devices: []
 docker_service_privileged: false
+docker_service_pid: null
