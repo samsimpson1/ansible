@@ -20,6 +20,10 @@ ExecStart=/usr/bin/docker run --rm \
   {% endif -%}
   {% if docker_service_user %}-u {{ docker_service_user }}:{{ docker_service_group }} \
   {% endif -%}
+  {% if docker_service_devices|length > 0 %}--device {{ ' --device '.join(docker_service_devices) }} \
+  {% endif -%}
+  {% if docker_service_privileged %}--privileged \
+  {% endif -%}
   --pull {{ docker_service_pull_policy }} \
   {{ docker_service_image }} {% if docker_service_command %}\
   {{ docker_service_command }}
