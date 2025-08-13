@@ -4,6 +4,8 @@
     - secret.yaml
   become: true
   tasks:
+    - name: Wiki
+      ansible.builtin.include_tasks: apps/wiki.yaml
     - name: ECG notify
       ansible.builtin.include_role:
         name: ecg_notify

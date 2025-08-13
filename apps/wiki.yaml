@@ -1,0 +1,11 @@
+- name: Wiki data directory
+  ansible.builtin.file:
+    path: /srv/containers/storage/hdd/wiki
+    state: directory
+    owner: app
+    group: app
+    mode: '0755'
+- name: Install bzip2
+  ansible.builtin.package:
+    name: bzip2
+    state: present
