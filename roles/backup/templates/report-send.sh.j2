@@ -3,4 +3,4 @@
 set -o pipefail
 set -e
 
-/srv/backups/report-generate.sh | ssmtp "{{ smtp_to }}"
+/srv/backups/report-generate.py | ssmtp "{{ smtp_to }}"

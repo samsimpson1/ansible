@@ -56,7 +56,7 @@
     owner: root
     group: root
   loop:
-    - report-generate.sh
+    - report-generate.py
     - report-send.sh
 - name: Schedule report job
   ansible.builtin.cron:
