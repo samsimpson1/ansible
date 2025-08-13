@@ -33,9 +33,3 @@ little-backup-check:
 	ansible-playbook little-backup.yaml --check --diff
 
 little-full-check: little-infra-check little-auth-check little-apps-check little-backup-check
-
-garage-check:
-	ansible-playbook garage.yaml --check --diff
-
-garage:
-	ansible-playbook garage.yaml
