@@ -24,3 +24,5 @@
         name: firefly_iii
     - name: Home Assistant
       ansible.builtin.include_tasks: apps/home-assistant.yaml
+    - name: Monitoring
+      ansible.builtin.include_tasks: apps/monitoring.yaml

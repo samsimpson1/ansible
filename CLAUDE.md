@@ -13,7 +13,7 @@ This is an Ansible infrastructure-as-code repository for managing home lab infra
 #### Split Playbooks (Recommended)
 - `make little-infra` - Deploy base infrastructure (Tailscale, Docker, sSMTP)
 - `make little-auth` - Deploy authentication services (Pocket ID)
-- `make little-apps` - Deploy applications (ECG notify, Karakeep, FreshRSS, Arr apps, Firefly III)
+- `make little-apps` - Deploy applications (ECG notify, Karakeep, FreshRSS, Arr apps, Firefly III, Home Assistant, Monitoring stack)
 - `make little-backup` - Deploy backup configuration
 - `make little-full` - Deploy all components in sequence
 
@@ -25,6 +25,9 @@ This is an Ansible infrastructure-as-code repository for managing home lab infra
 
 ### Vault Management
 - `make vault-edit` - Edit encrypted secrets using 1Password CLI integration
+
+### Code Quality
+- `make lint` - Run ansible-lint on all playbooks
 
 All commands use 1Password CLI for vault password retrieval via `onepassword-client.sh`. The inventory file and vault configuration are specified in `ansible.cfg`.
 
@@ -42,6 +45,9 @@ Central role for managing containerized services via systemd. Creates systemd un
 - Volume mounts
 - Environment variables
 - User/group settings
+- Device mappings (`docker_service_devices`)
+- Privileged mode (`docker_service_privileged`)
+- PID namespace (`docker_service_pid`)
 
 #### backup
 Comprehensive backup system supporting:
@@ -61,10 +67,13 @@ Reverse proxy and web server role that builds custom Caddy images with DNS plugi
 Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Applications like FreshRSS and Firefly III are configured with OIDC authentication.
 
 ### Application Categories
-- **Media Management** - Arr stack (Prowlarr, Radarr, Sonarr)
+- **Media Management** - Arr stack (Prowlarr, Radarr, Sonarr), Komga, Overseerr, Pinchflat
+- **Downloads** - qBittorrent, SABnzbd, Unpackerr, Slskd
 - **Personal Finance** - Firefly III with OAuth2 proxy and data importer
 - **Knowledge Management** - Karakeep with Meilisearch backend
 - **RSS/Feed Reading** - FreshRSS with OIDC
+- **Home Automation** - Home Assistant with Zigbee USB device support
+- **Monitoring** - Prometheus, Grafana, Node Exporter
 
 ### Infrastructure Services
 - **Tailscale** - Mesh networking
@@ -145,5 +154,8 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 - **little-auth.yaml**: Requires infrastructure (provides SSO for apps)
 - **little-apps.yaml**: Requires infrastructure and auth
 - **little-backup.yaml**: Independent, can run anytime after infrastructure
+
+# Style Requirements
+
 - Ansible YAML files must always end in a new line
 - Ansible task names should always start with an upper case letter
