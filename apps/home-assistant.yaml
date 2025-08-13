@@ -1,0 +1,21 @@
+- name: Create Home Assistant data directory
+  ansible.builtin.file:
+    state: directory
+    path: "/srv/containers/storage/ssd/home-assistant"
+    mode: "0750"
+    owner: "app"
+    group: "app"
+
+- name: Home Assistant service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "home-assistant"
+    docker_service_description: "Home Assistant"
+    docker_service_image: ghcr.io/home-assistant/home-assistant:2024.10.4
+    docker_service_network: host
+    docker_service_privileged: true
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/home-assistant:/config:rw"
+    docker_service_devices:
+      - "/dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/ttyUSB0"

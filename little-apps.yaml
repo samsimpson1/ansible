@@ -22,3 +22,5 @@
     - name: Firefly III
       ansible.builtin.include_role:
         name: firefly_iii
+    - name: Home Assistant
+      ansible.builtin.include_tasks: apps/home-assistant.yaml
