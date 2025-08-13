@@ -1,4 +1,4 @@
-.PHONY: little edit-vault little-infra little-auth little-apps little-backup little-full
+.PHONY: little edit-vault little-infra little-auth little-apps little-backup little-full lint
 
 vault-edit:
 	ansible-vault edit secret.yaml
@@ -33,3 +33,7 @@ little-backup-check:
 	ansible-playbook little-backup.yaml --check --diff
 
 little-full-check: little-infra-check little-auth-check little-apps-check little-backup-check
+
+# Linting
+lint:
+	ansible-lint little-infrastructure.yaml little-auth.yaml little-apps.yaml little-backup.yaml
