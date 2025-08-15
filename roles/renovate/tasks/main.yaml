@@ -1,0 +1,30 @@
+- name: Renovate directory
+  ansible.builtin.file:
+    path: /srv/renovate
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+- name: Renovate config file
+  ansible.builtin.copy:
+    content: |
+      {
+        "repositories": [ "samsimpson1/ansible" ]
+      }
+    dest: /srv/renovate/config.json
+    owner: app
+    group: app
+    mode: "0640"
+- name: Renovate start script
+  ansible.builtin.template:
+    src: start.sh.j2
+    dest: /srv/renovate/start.sh
+    owner: app
+    group: app
+    mode: "0750"
+- name: Renovate cron job
+  ansible.builtin.cron:
+    name: "Renovate"
+    user: app
+    minute: "28"
+    job: "/srv/renovate/start.sh"

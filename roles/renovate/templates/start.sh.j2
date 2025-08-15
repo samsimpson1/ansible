@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+docker run --rm \
+  -v /srv/renovate/config.json:/config.json:ro \
+  --user "568:568" \
+  -e RENOVATE_CONFIG_FILE=/config.json \
+  -e RENOVATE_PLATFORM=github \
+  -e RENOVATE_TOKEN="{{ renovate_github_pat }}" \
+  -e RENOVATE_GIT_AUTHOR="Renovate Bot <samsimpson1@users.noreply.github.com>" \
+  -e RENOVATE_AUTODISCOVER="false" \
+  ghcr.io/renovatebot/renovate:41.60
