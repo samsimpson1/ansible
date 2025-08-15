@@ -61,7 +61,7 @@
 
         @hass host hass.srv.simpson.id
         handle @hass {
-          reverse_proxy http://home-assistant:8123
+          reverse_proxy http://10.0.0.191:8123
         }
 
         @jellyfin host jellyfin.srv.simpson.id
