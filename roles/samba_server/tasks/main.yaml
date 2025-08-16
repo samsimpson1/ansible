@@ -1,0 +1,23 @@
+- name: Samba config file
+  ansible.builtin.template:
+    src: config.json.j2
+    dest: /srv/containers/storage/ssd/samba.json
+    mode: "0640"
+    owner: "root"
+    group: "root"
+- name: Samba service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "samba"
+    docker_service_description: "Samba"
+    docker_service_image: quay.io/samba.org/samba-server:latest
+    docker_service_network: source_default
+    docker_service_ports: ["445:445"]
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/samba.json:/config.json:ro"
+      - "/srv/containers/storage/hdd/media:/media:rw"
+      - "/srv/containers/storage/ssd/sharex:/sharex:rw"
+    docker_service_env_vars:
+      SAMBACC_CONFIG: "/config.json"
+      SAMBA_CONTAINER_ID: "general"

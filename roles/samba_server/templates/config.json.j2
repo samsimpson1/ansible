@@ -1,0 +1,55 @@
+{
+  "samba-container-config": "v0",
+  "globals": {
+    "default": {
+      "options": {
+        "server min protocol": "NT1",
+        "ntlm auth": "ntlmv1-permitted",
+        "security": "user",
+        "log level": "1",
+        "guest ok": "no"
+      }
+    }
+  },
+  "shares": {
+    "media": {
+      "options": {
+        "path": "/media",
+        "valid users": "media",
+        "force user": "media",
+        "read only": "no"
+      }
+    },
+    "sharex": {
+      "options": {
+        "path": "/sharex",
+        "valid users": "media",
+        "force user": "media",
+        "read only": "no"
+      }
+    }
+  },
+  "users": {
+    "all_entries": [
+      {
+        "name": "media",
+        "password": "media",
+        "uid": 568,
+        "gid": 568
+      }
+    ]
+  },
+  "configs": {
+    "general": {
+      "instance_name": "SAMBA",
+      "instance_features": [],
+      "shares": [
+        "media",
+        "sharex"
+      ],
+      "globals": [
+        "default"
+      ]
+    }
+  }
+}
