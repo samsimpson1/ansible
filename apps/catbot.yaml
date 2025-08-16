@@ -1,0 +1,28 @@
+- name: Catbot config file
+  ansible.builtin.copy:
+    content: |
+      guild_id: "{{ catbot.guild_id}}"
+      channel_name: time
+      client_id: "{{ catbot.client_id }}"
+      client_secret: "{{ catbot.client_secret }}"
+      time_zones:
+        - name: Server Time (UTC)
+          tz: UTC
+        - name: Central European Time
+          tz: CET
+        - name: United Kingdom
+          tz: Europe/London
+    dest: /srv/containers/storage/ssd/catbot.yaml
+    mode: "0640"
+    owner: "app"
+    group: "app"
+- name: Catbot service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "catbot"
+    docker_service_description: "Catbot"
+    docker_service_image: ghcr.io/samsimpson1/catbot:latest
+    docker_service_network: source_default
+    docker_service_volumes:
+      - /srv/containers/storage/ssd/catbot.yaml:/app/config.yaml:ro
