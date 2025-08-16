@@ -1,4 +1,4 @@
-FROM alpine:3.21
+FROM alpine:3.22
 
 RUN apk update && apk add python3 py3-websocket-client py3-requests py3-mongo
 
