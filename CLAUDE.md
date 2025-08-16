@@ -28,6 +28,7 @@ This is an Ansible infrastructure-as-code repository for managing home lab infra
 
 ### Code Quality
 - `make lint` - Run ansible-lint on all playbooks
+- `make little-full-check` - Dry-run all components in sequence
 
 All commands use 1Password CLI for vault password retrieval via `onepassword-client.sh`. The inventory file and vault configuration are specified in `ansible.cfg`.
 
@@ -70,10 +71,11 @@ Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Appl
 - **Media Management** - Arr stack (Prowlarr, Radarr, Sonarr), Komga, Overseerr, Pinchflat
 - **Downloads** - qBittorrent, SABnzbd, Unpackerr, Slskd
 - **Personal Finance** - Firefly III with OAuth2 proxy and data importer
-- **Knowledge Management** - Karakeep with Meilisearch backend
+- **Knowledge Management** - Karakeep with Meilisearch backend, Wiki
 - **RSS/Feed Reading** - FreshRSS with OIDC
 - **Home Automation** - Home Assistant with Zigbee USB device support
 - **Monitoring** - Prometheus, Grafana, Node Exporter
+- **Communication** - Catbot Discord bot with timezone support
 
 ### Infrastructure Services
 - **Tailscale** - Mesh networking
@@ -159,3 +161,8 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
 
 - Ansible YAML files must always end in a new line
 - Ansible task names should always start with an upper case letter
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.

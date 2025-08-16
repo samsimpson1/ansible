@@ -31,3 +31,11 @@
     - name: Renovate
       ansible.builtin.include_role:
         name: renovate
+    - name: Catbot
+      ansible.builtin.include_tasks: apps/catbot.yaml
+    - name: Samba server
+      ansible.builtin.include_role:
+        name: samba_server
+    - name: Stonks scraper
+      ansible.builtin.include_role:
+        name: stonks_scraper
