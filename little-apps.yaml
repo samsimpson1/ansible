@@ -37,5 +37,4 @@
       ansible.builtin.include_role:
         name: samba_server
     - name: Stonks scraper
-      ansible.builtin.include_role:
-        name: stonks_scraper
+      ansible.builtin.include_tasks: apps/stonks-scraper.yaml
