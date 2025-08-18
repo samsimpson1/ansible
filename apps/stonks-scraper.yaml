@@ -11,7 +11,7 @@
   vars:
     docker_service_id: "stonks-scraper"
     docker_service_description: "Stonks scraper"
-    docker_service_image: "ghcr.io/samsimpson1/stonks:20250816213324"
+    docker_service_image: "ghcr.io/samsimpson1/stonks:latest"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
