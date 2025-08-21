@@ -37,6 +37,12 @@
             cron:
               minute: "30"
               hour: "*/6"
+          - name: file-storage
+            op: restic
+            path: /srv/containers/storage/hdd/files/
+            cron:
+              minute: "19"
+              hour: "*/2"
           - name: karakeep
             op: restic
             path: /srv/containers/storage/ssd/karakeep/
