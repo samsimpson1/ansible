@@ -27,6 +27,12 @@
     owner: app
     group: app
     mode: '0644'
+- name: Set caddy volumes
+  ansible.builtin.set_fact:
+    caddy_volumes_standard:
+      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/config:/config"
+      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/data:/data"
+      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile:/Caddyfile"
 - name: Caddy service
   ansible.builtin.include_role:
     name: docker_service
@@ -41,7 +47,4 @@
     docker_service_command: "caddy run -c /Caddyfile"
     docker_service_env_vars: "{{ caddy_env_vars }}"
     docker_service_ports: "{{ caddy_ports }}"
-    docker_service_volumes:
-      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/config:/config"
-      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/data:/data"
-      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile:/Caddyfile"
+    docker_service_volumes: "{{ caddy_volumes_standard + caddy_volumes }}"

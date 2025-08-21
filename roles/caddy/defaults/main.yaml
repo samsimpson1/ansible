@@ -5,3 +5,4 @@ caddy_ports:
   - "80:80"
   - "443:443"
 caddy_env_vars: {}
+caddy_volumes: []
