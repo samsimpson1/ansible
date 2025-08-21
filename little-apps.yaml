@@ -38,3 +38,5 @@
         name: samba_server
     - name: Stonks scraper
       ansible.builtin.include_tasks: apps/stonks-scraper.yaml
+    - name: File storage
+      ansible.builtin.include_tasks: apps/file-storage.yaml

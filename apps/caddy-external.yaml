@@ -8,6 +8,8 @@
       - "6997:6997"
     caddy_env_vars:
       CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    caddy_volumes:
+      - "/srv/containers/storage/hdd/files:/webdav-files"
     caddy_caddyfile: |
       {
         acme_dns cloudflare {env.CADDY_CLOUDFLARE_API_KEY}
@@ -47,6 +49,18 @@
         @actual host budget.srv.simpson.id
         handle @actual {
           reverse_proxy http://actual:5006
+        }
+
+        @files host files.srv.simpson.id
+        handle @files {
+          route {
+            basic_auth {
+              me {{ webdav_basic_auth_password_hash }}
+            }
+            webdav {
+              root /webdav-files
+            }
+          }
         }
 
         @firefly host firefly.srv.simpson.id
