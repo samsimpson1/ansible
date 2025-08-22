@@ -178,3 +178,19 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/pinchflat:/config:rw"
       - "/srv/containers/storage/hdd/media/youtube:/downloads:rw"
+
+- name: Pinchflat OAuth2 Proxy service
+  ansible.builtin.include_role:
+    name: oauth2_proxy
+  vars:
+    oauth2_proxy_id: "pinchflat"
+    oauth2_proxy_upstreams:
+      - "http://pinchflat:8945"
+    oauth2_proxy_client_id: "{{ sso_clients.pinchflat.id }}"
+    oauth2_proxy_client_secret: "{{ sso_clients.pinchflat.secret }}"
+    oauth2_proxy_cookie_secret: "{{ sso_clients.pinchflat.cookie_secret }}"
+    oauth2_proxy_skip_auth_routes:
+      - "/feed.xml$"
+      - "/feed_image.jpg$"
+      - "/stream.mp4$"
+      - "/episode_image.jpg$"

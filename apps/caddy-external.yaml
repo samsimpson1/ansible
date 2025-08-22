@@ -98,14 +98,10 @@
           reverse_proxy http://pathfinder:80
         }
 
-        # TODO: oauth proxy for pinchflat
-        #@pinchflat host pinchflat.srv.simpson.id
-        #handle @pinchflat {
-        #  route {
-        #    authorize with pinchflat
-        #    reverse_proxy http://pinchflat:8945
-        #  }
-        #}
+        @pinchflat host pinchflat.srv.simpson.id
+        handle @pinchflat {
+          reverse_proxy http://pinchflat-oauth2-proxy:4180
+        }
 
         @pocketid host pocket-id.srv.simpson.id
         handle @pocketid {
