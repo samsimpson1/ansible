@@ -1,0 +1,38 @@
+http_address = "0.0.0.0:{{ oauth2_proxy_port }}"
+
+reverse_proxy = true
+
+upstreams = [
+{% for upstream in oauth2_proxy_upstreams %}
+  "{{ upstream }}"{{ "," if not loop.last else "" }}
+{% endfor %}
+]
+
+{% if oauth2_proxy_skip_auth_routes | length > 0 %}
+skip_auth_routes = [
+{% for route in oauth2_proxy_skip_auth_routes %}
+  "{{ route }}"{{ "," if not loop.last else "" }}
+{% endfor %}
+]
+
+{% endif %}
+pass_user_headers = true
+
+provider = "oidc"
+provider_display_name = "{{ oauth2_proxy_provider_name }}"
+oidc_issuer_url = "{{ oauth2_proxy_oidc_issuer }}"
+client_id = "{{ oauth2_proxy_client_id }}"
+client_secret = "{{ oauth2_proxy_client_secret }}"
+scope = "{{ oauth2_proxy_scopes }}"
+email_domains = [
+{% for domain in oauth2_proxy_email_domains %}
+  "{{ domain }}"{{ "," if not loop.last else "" }}
+{% endfor %}
+]
+insecure_oidc_allow_unverified_email = true
+
+cookie_secret = "{{ oauth2_proxy_cookie_secret }}"
+{% if oauth2_proxy_extra_config %}
+
+{{ oauth2_proxy_extra_config }}
+{% endif %}

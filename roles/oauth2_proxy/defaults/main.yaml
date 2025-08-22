@@ -1,0 +1,13 @@
+---
+oauth2_proxy_image: "quay.io/oauth2-proxy/oauth2-proxy:v7.11.0"
+oauth2_proxy_network: "source_default"
+oauth2_proxy_user: "568"
+oauth2_proxy_group: "568"
+oauth2_proxy_port: "4180"
+oauth2_proxy_oidc_issuer: "https://pocket-id.srv.simpson.id"
+oauth2_proxy_provider_name: "Pocket ID"
+oauth2_proxy_scopes: "openid email profile"
+oauth2_proxy_skip_auth_routes: []
+oauth2_proxy_email_domains:
+  - "*"
+oauth2_proxy_extra_config: ""

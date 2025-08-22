@@ -9,26 +9,18 @@
     - /srv/containers/storage/ssd/firefly-iii
     - /srv/containers/storage/ssd/firefly-iii/upload
     - /srv/containers/storage/ssd/firefly-iii/db
-- name: Firefly II OAuth2 Proxy config file
-  ansible.builtin.template:
-    src: oauth2-proxy.cfg.j2
-    dest: /srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg
-    owner: app
-    group: app
-    mode: '0644'
 - name: Firefly III OAuth2 Proxy
   ansible.builtin.include_role:
-    name: docker_service
+    name: oauth2_proxy
   vars:
-    docker_service_id: "firefly-oauth2-proxy"
-    docker_service_description: "Firefly III OAuth2 Proxy"
-    docker_service_image: quay.io/oauth2-proxy/oauth2-proxy:v7.11.0
-    docker_service_network: source_default
-    docker_service_user: "568"
-    docker_service_group: "568"
-    docker_service_command: "oauth2-proxy --config=/oauth2-proxy.cfg"
-    docker_service_volumes:
-      - "/srv/containers/storage/ssd/firefly-iii/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
+    oauth2_proxy_id: "firefly"
+    oauth2_proxy_upstreams:
+      - "http://firefly-iii:8080"
+    oauth2_proxy_skip_auth_routes:
+      - "^/api"
+    oauth2_proxy_client_id: "{{ sso_clients.firefly_iii.id }}"
+    oauth2_proxy_client_secret: "{{ sso_clients.firefly_iii.secret }}"
+    oauth2_proxy_cookie_secret: "{{ firefly_iii.cookie_secret }}"
 - name: Firefly III Database
   ansible.builtin.include_role:
     name: docker_service
