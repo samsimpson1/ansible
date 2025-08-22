@@ -32,6 +32,9 @@ email_domains = [
 insecure_oidc_allow_unverified_email = true
 
 cookie_secret = "{{ oauth2_proxy_cookie_secret }}"
+
+skip_provider_button = true
+
 {% if oauth2_proxy_extra_config %}
 
 {{ oauth2_proxy_extra_config }}
