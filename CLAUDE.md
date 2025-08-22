@@ -64,6 +64,13 @@ Reverse proxy and web server role that builds custom Caddy images with DNS plugi
 - **Automatic TLS** - Built-in HTTPS with Let's Encrypt integration
 - **Service integration** - Uses docker_service role for systemd management
 
+#### oauth2_proxy
+Reusable OAuth2 proxy role for SSO integration with applications:
+- **Service isolation** - Creates `{id}-oauth2-proxy` service and data directory to avoid conflicts
+- **Flexible configuration** - Configurable upstreams, skip auth routes, and OIDC settings
+- **Pocket ID integration** - Pre-configured for Pocket ID SSO provider
+- **Template-based config** - Generates oauth2-proxy.cfg from Jinja2 template
+
 ### Authentication
 Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Applications like FreshRSS and Firefly III are configured with OIDC authentication.
 
@@ -128,6 +135,23 @@ Caddy instances are configured with customizable IDs and Caddyfile content:
       - "443:443"
     caddy_env_vars:
       CLOUDFLARE_API_TOKEN: "{{ vault_cloudflare_token }}"
+```
+
+### OAuth2 Proxy Configuration
+OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
+```yaml
+- name: Service OAuth2 Proxy
+  ansible.builtin.include_role:
+    name: oauth2_proxy
+  vars:
+    oauth2_proxy_id: "service-name"
+    oauth2_proxy_upstreams:
+      - "http://service-name:8080"
+    oauth2_proxy_skip_auth_routes:
+      - "^/api"
+    oauth2_proxy_client_id: "{{ sso_clients.service_name.id }}"
+    oauth2_proxy_client_secret: "{{ sso_clients.service_name.secret }}"
+    oauth2_proxy_cookie_secret: "{{ service_name.cookie_secret }}"
 ```
 
 ### Secrets Management
