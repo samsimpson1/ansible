@@ -29,3 +29,10 @@
     mode: "0750"
     owner: duplicacy-backup
     group: duplicacy-backup
+- name: Restic backup directory
+  ansible.builtin.file:
+    state: directory
+    path: /srv/containers/storage/hdd/restic-backup
+    mode: "0750"
+    owner: me
+    group: me

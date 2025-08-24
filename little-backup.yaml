@@ -55,6 +55,12 @@
             cron:
               minute: "18"
               hour: "*/2"
+          - name: desktop-restic
+            op: sync
+            path: /srv/containers/storage/hdd/restic-backup/
+            cron:
+              minute: "49"
+              hour: "*/6"
           - name: stonks
             op: restic
             path: /srv/containers/storage/ssd/stonks/
