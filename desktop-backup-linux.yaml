@@ -65,30 +65,28 @@
           set -e
           set -x
 
-          source $HOME/.restic-backup/env
+          RESTIC="/home/sam/.restic-backup/restic.sh"
 
           # copy Steam user data out of .local
           mkdir -p /home/sam/.steam-user-data
           rsync -avz --delete /home/sam/.local/share/Steam/userdata /home/sam/.steam-user-data
 
-          r() {
-              restic $@ -o sftp.command="${SFTP_COMMAND}"
-          }
-
-          if ! r cat config; then
+          if ! $RESTIC cat config; then
               echo "repository doesn't exist. creating"
-              r init
+              $RESTIC init
           else
               echo "repository already exists"
           fi
 
-          r backup --exclude-file $HOME/.restic-backup/excludes.txt "/home/sam"
+          $RESTIC backup --exclude-file $HOME/.restic-backup/excludes.txt "/home/sam"
+
+          $RESTIC forget -H 24 -d 7 -w 8 -m 12 -y 2
         mode: "0700"
         owner: sam
         group: sam
-    - name: Restic util script
+    - name: Restic script
       ansible.builtin.copy:
-        dest: /home/sam/.restic-backup/util.sh
+        dest: /home/sam/.restic-backup/restic.sh
         content: |
           #!/usr/bin/env bash
 
@@ -111,3 +109,56 @@
         type: ed25519
         owner: sam
         group: sam
+    - name: Ensure systemd user directory exists
+      ansible.builtin.file:
+        path: /home/sam/.config/systemd/user
+        state: directory
+        mode: '0755'
+        owner: sam
+        group: sam
+    - name: Create restic backup systemd user service
+      ansible.builtin.copy:
+        dest: /home/sam/.config/systemd/user/restic-backup.service
+        content: |
+          [Unit]
+          Description=Restic Backup Service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/home/sam/.restic-backup/backup.sh
+          WorkingDirectory=/home/sam
+          Restart=no
+        mode: '0644'
+        owner: sam
+        group: sam
+      notify: Reload systemd user
+    - name: Create restic backup systemd user timer
+      ansible.builtin.copy:
+        dest: /home/sam/.config/systemd/user/restic-backup.timer
+        content: |
+          [Unit]
+          Description=Run restic backup every 2 hours
+          Requires=restic-backup.service
+
+          [Timer]
+          OnCalendar=00/2:49
+          Persistent=true
+
+          [Install]
+          WantedBy=timers.target
+        mode: '0644'
+        owner: sam
+        group: sam
+      notify: Reload systemd user
+    - name: Enable and start restic backup timer
+      ansible.builtin.systemd:
+        name: restic-backup.timer
+        enabled: true
+        state: started
+        scope: user
+        daemon_reload: true
+  handlers:
+    - name: Reload systemd user
+      ansible.builtin.systemd:
+        daemon_reload: true
+        scope: user
