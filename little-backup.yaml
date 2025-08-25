@@ -13,6 +13,7 @@
         backup_target:
           hostname: "u478928-sub1.your-storagebox.de"
           user: "u478928-sub1"
+          port: "23"
           repository_password: !vault |
             $ANSIBLE_VAULT;1.2;AES256;ansible-vault
             62613637333733646535363637303861356365343637613362666638616138653236626430383830
