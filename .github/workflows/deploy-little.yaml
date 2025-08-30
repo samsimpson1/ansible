@@ -1,4 +1,4 @@
-name: Deploy to Little Host
+name: Deploy to little
 
 on:
   push:
@@ -33,17 +33,19 @@ jobs:
       - name: Configure 1Password CLI
         run: |
           echo "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" >> $GITHUB_ENV
-      
+
+      - name: Get SSH key
+        run: |
+          op user get --me
+          op read "op://Infrastructure/GitHub Actions SSH/private key" > ssh_key
+          chmod 600 ssh_key
+
       - name: Install Ansible
         run: |
           sudo apt update
           sudo apt install -y python3-pip
           pip3 install ansible
       
-      - name: Test 1Password CLI vault access
+      - name: Test SSH access
         run: |
-          ./onepassword-client.sh dummy ansible-vault
-      
-      - name: Verify Tailscale connectivity
-        run: |
-          tailscale ping 10.0.0.191
+          ssh -i ssh_key -o StrictHostKeyChecking=no me@10.0.0.191 echo test
