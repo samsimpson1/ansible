@@ -1,3 +1,8 @@
+- name: ShareX SSH key
+  ansible.posix.authorized_key:
+    user: app
+    state: present
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMSjn6O+qaATVQ9r5ZZJol840Q1uKVu0ZrwErYNNTNvM sam@sampc"
 - name: Caddy external
   ansible.builtin.include_role:
     name: caddy
@@ -10,6 +15,7 @@
       CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
     caddy_volumes:
       - "/srv/containers/storage/hdd/files:/webdav-files"
+      - "/srv/containers/storage/ssd/sharex:/sharex"
     caddy_caddyfile: |
       {
         acme_dns cloudflare {env.CADDY_CLOUDFLARE_API_KEY}
