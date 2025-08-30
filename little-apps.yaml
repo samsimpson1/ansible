@@ -4,6 +4,9 @@
     - secret.yaml
   become: true
   tasks:
+    - name: Renovate
+      ansible.builtin.include_role:
+        name: renovate
     - name: Wiki
       ansible.builtin.include_tasks: apps/wiki.yaml
     - name: ECG notify
@@ -28,9 +31,6 @@
       ansible.builtin.include_tasks: apps/monitoring.yaml
     - name: Miscellaneous
       ansible.builtin.include_tasks: apps/misc.yaml
-    - name: Renovate
-      ansible.builtin.include_role:
-        name: renovate
     - name: Catbot
       ansible.builtin.include_tasks: apps/catbot.yaml
     - name: Samba server
