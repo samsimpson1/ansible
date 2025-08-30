@@ -9,4 +9,4 @@ docker run --rm \
   -e RENOVATE_PLATFORM=github \
   -e RENOVATE_TOKEN="${TOKEN}" \
   -e RENOVATE_AUTODISCOVER="false" \
-  ghcr.io/renovatebot/renovate:41.60
+  {{ container_images.renovate }}

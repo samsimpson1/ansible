@@ -16,6 +16,14 @@
         "\\W+docker_service_image: (?<depName>.+):(?<currentValue>.+)"
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": "container-images.yaml",
+      "matchStrings": [
+        "\\W+.+: (?<depName>.+):(?<currentValue>.+)"
+      ],
+      "datasourceTemplate": "docker"
     }
   ]
 }
