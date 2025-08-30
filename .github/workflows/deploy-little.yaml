@@ -1,5 +1,9 @@
 name: Deploy to little
 
+concurrency:
+  group: deploy-little
+  cancel-in-progress: false
+
 on:
   push:
     branches:
@@ -50,4 +54,4 @@ jobs:
       
       - name: Run Ansible
         run: |
-          make little-infra-check
+          make little-full-check
