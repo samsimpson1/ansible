@@ -34,11 +34,13 @@ jobs:
         run: |
           echo "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" >> $GITHUB_ENV
 
-      - name: Get SSH key
+      - name: Set up SSH
         run: |
           op user get --me
           op read "op://Infrastructure/GitHub Actions SSH/private key" > ssh_key
           chmod 600 ssh_key
+          echo "ANSIBLE_PRIVATE_KEY_FILE=ssh_key" >> $GITHUB_ENV
+          echo "ANSIBLE_HOST_KEY_CHECKING=false" >> $GITHUB_ENV
 
       - name: Install Ansible
         run: |
@@ -46,6 +48,6 @@ jobs:
           sudo apt install -y python3-pip
           pip3 install ansible
       
-      - name: Test SSH access
+      - name: Run Ansible
         run: |
-          ssh -i ssh_key -o StrictHostKeyChecking=no me@10.0.0.191 echo test
+          make little-infra-check
