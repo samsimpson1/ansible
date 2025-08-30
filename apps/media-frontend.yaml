@@ -151,7 +151,7 @@
   vars:
     docker_service_id: "overseerr"
     docker_service_description: "Overseerr"
-    docker_service_image: ghcr.io/sct/overseerr:1.33.2
+    docker_service_image: ghcr.io/sct/overseerr:1.34.0
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
