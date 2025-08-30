@@ -15,7 +15,7 @@
   vars:
     docker_service_id: "qbittorrent"
     docker_service_description: "qBittorrent"
-    docker_service_image: ghcr.io/onedr0p/qbittorrent:5.0.1
+    docker_service_image: ghcr.io/home-operations/qbittorrent:5.1.2
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
@@ -34,7 +34,7 @@
   vars:
     docker_service_id: "sabnzbd"
     docker_service_description: "SABnzbd"
-    docker_service_image: ghcr.io/onedr0p/sabnzbd:4.3.3
+    docker_service_image: ghcr.io/home-operations/sabnzbd:4.5.3
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"

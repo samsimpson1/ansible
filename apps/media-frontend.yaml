@@ -57,7 +57,7 @@
   vars:
     docker_service_id: "plex"
     docker_service_description: "Plex Media Server"
-    docker_service_image: ghcr.io/onedr0p/plex:rolling
+    docker_service_image: ghcr.io/home-operations/plex:rolling
     docker_service_user: "568"
     docker_service_group: "568"
     docker_service_network: host
