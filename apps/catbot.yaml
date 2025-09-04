@@ -1,7 +1,7 @@
 - name: Catbot config file
   ansible.builtin.copy:
     content: |
-      guild_id: "{{ catbot.guild_id}}"
+      guild_id: "{{ catbot.guild_id }}"
       channel_name: time
       client_id: "{{ catbot.client_id }}"
       client_secret: "{{ catbot.client_secret }}"
