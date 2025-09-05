@@ -23,11 +23,23 @@
     github_account: samsimpson1
     github_repo: ansible
 
+- name: Get current 1Password version
+  ansible.builtin.command:
+    cmd: |
+      bash -c "command -v /srv/app/github-actions/bin/op > /dev/null 2>&1 || { exit 0; } && /srv/app/github-actions/bin/op --version"
+  register: onepassword_version_current
+
+- name: Set 1Password version facts
+  ansible.builtin.set_fact:
+    onepassword_version_desired: "2.32.0"
+    onepassword_version_current: "{{ onepassword_version_current['stdout'] }}"
+
 - name: Download 1Password CLI
   ansible.builtin.get_url:
-    url: https://cache.agilebits.com/dist/1P/op2/pkg/v2.32.0/op_linux_amd64_v2.32.0.zip
+    url: https://cache.agilebits.com/dist/1P/op2/pkg/v{{ onepassword_version_desired }}/op_linux_amd64_v{{ onepassword_version_desired }}.zip
     dest: /tmp/op_linux_amd64.zip
     mode: "0644"
+  when: "onepassword_version_current != onepassword_version_desired"
 
 - name: Extract 1Password CLI
   ansible.builtin.unarchive:
@@ -35,6 +47,7 @@
     dest: /tmp/
     remote_src: true
     creates: /tmp/op
+  when: "onepassword_version_current != onepassword_version_desired"
 
 - name: Install 1Password CLI to github-actions bin directory
   ansible.builtin.copy:
@@ -44,6 +57,7 @@
     group: github-actions
     mode: "0755"
     remote_src: true
+  when: "onepassword_version_current != onepassword_version_desired"
 
 - name: Clean up downloaded files
   ansible.builtin.file:
@@ -52,3 +66,4 @@
   loop:
     - /tmp/op_linux_amd64.zip
     - /tmp/op
+  when: "onepassword_version_current != onepassword_version_desired"
