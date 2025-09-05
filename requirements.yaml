@@ -1,4 +1,8 @@
 collections:
   - name: community.docker
     version: "4.7.0"
-    source: https://galaxy.ansible.com
+    src: https://galaxy.ansible.com
+roles:
+  - name: monolithprojects.github_actions_runner
+    version: "1.26.0"
+    src: git+https://github.com/MonolithProjects/ansible-github_actions_runner.git

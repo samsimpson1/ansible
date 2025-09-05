@@ -1,0 +1,54 @@
+- name: Install tools
+  ansible.builtin.package:
+    name: unzip
+    state: present
+
+- name: Create github-actions user
+  ansible.builtin.user:
+    name: github-actions
+    state: present
+    shell: /bin/bash
+    createhome: yes
+    home: /srv/app/github-actions
+    groups: [docker]
+
+- name: GitHub Actions runner
+  ansible.builtin.include_role:
+    name: monolithprojects.github_actions_runner
+  vars:
+    runner_user: github-actions
+    runner_dir: /srv/app/github-actions
+    access_token: "{{ github_actions_runner_pat }}"
+    runner_name: home
+    github_account: samsimpson1
+    github_repo: ansible
+
+- name: Download 1Password CLI
+  ansible.builtin.get_url:
+    url: https://cache.agilebits.com/dist/1P/op2/pkg/v2.32.0/op_linux_amd64_v2.32.0.zip
+    dest: /tmp/op_linux_amd64.zip
+    mode: "0644"
+
+- name: Extract 1Password CLI
+  ansible.builtin.unarchive:
+    src: /tmp/op_linux_amd64.zip
+    dest: /tmp/
+    remote_src: yes
+    creates: /tmp/op
+
+- name: Install 1Password CLI to github-actions bin directory
+  ansible.builtin.copy:
+    src: /tmp/op
+    dest: /srv/app/github-actions/bin/op
+    owner: github-actions
+    group: github-actions
+    mode: "0755"
+    remote_src: yes
+
+- name: Clean up downloaded files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /tmp/op_linux_amd64.zip
+    - /tmp/op

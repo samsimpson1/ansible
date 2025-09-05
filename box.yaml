@@ -4,29 +4,59 @@
     - secret.yaml
   become: true
   tasks:
-    - name: GitHub Actions SSH key
-      ansible.posix.authorized_key:
-        user: me
-        state: present
-        key: |
-          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDU+u/PFliD7KGHt2STyQ2qnwuB+QOxLMoP9DunwAKsR9+CgEIZOvYzZIDmfnwINWHxnQxTiuM+G26W06ZjZ1t8BR63UYwr/GE3HgRG+llb2YeOpv5f4L/wIYQKuRWJtTaScn0p8ydRCXsIat5+DDL7WqvR7iw8NXavHpFU/VazPHrVzH/bjN6qMD8fux0n9Hl0IrYxV1zm5X1bvQ2PCceSLm4tN/rZ5HOfUW/wiAShVbF+/XOC/vj7QTRkbDcExBKwaLfq0YdIj1ABehk2KU9/D/Exu6tweShIkgMP1jyIqsfst1Wgsa9HhUhpqFZuVCnuT94KiL66BbsA30N5QBV9+uPF5XZfXOxqJfqi9S198e2qRMBYbdEeojSbJeOW86S7eYCyXLUHkq3lTC0K5+QT5RFXi7dPBzDKsTgE9k0IEIqRJY07SbHASJPmTS0G/zTI3wKAbVRC6Q2oaatVXlyIM7vHaFfbXBi/dRJgWHioD45iiKLjRy6DJC6Pcdc2NYbzMhKOIwqrqP3V0FsIpP0hOrLHL8vjo+eH/7z2ZEaG2ShydKthNz5RrHq0B9eHh3MVYzqV0Iu16aPr4tqNMZwouVNOZYspVoQgGaFYFW4MNbgz8WbY/wwyQMo77koT7UaidQd/meRRbZJg54vadP9HYytmGS1Xs3cu1uErq/qoow== github-actions
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
+
     - name: Docker
       ansible.builtin.include_role:
         name: docker_host
-    - name: App data directory
+
+    - name: App data disk directory
       ansible.builtin.file:
         path: /mnt/app
         state: directory
         owner: root
         group: root
         mode: "0755"
+
     - name: Mount app data device
       ansible.posix.mount:
         path: /mnt/app
         src: UUID=050ce107-d3d2-448a-a5bf-1f8fe15e3c3f
-        state: present
+        state: mounted
         fstype: ext4
         opts: defaults,noatime
+
+    - name: Root app data directory
+      ansible.builtin.file:
+        path: /mnt/app/data
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: App data directory
+      ansible.builtin.file:
+        path: /srv/app
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: App data bind mount
+      ansible.posix.mount:
+        path: /srv/app
+        src: /mnt/app/data
+        state: mounted
+        fstype: none
+        opts: bind
+
+    - name: GitHub Actions SSH key
+      ansible.posix.authorized_key:
+        user: me
+        state: present
+        key: "{{ lookup('file', 'github-actions.pub') }}"
+
+    - name: GitHub Actions Runner
+      ansible.builtin.include_tasks: apps/github-actions-runner.yaml
