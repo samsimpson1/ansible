@@ -8,7 +8,7 @@
     name: github-actions
     state: present
     shell: /bin/bash
-    createhome: yes
+    createhome: true
     home: /srv/app/github-actions
     groups: [docker]
 
@@ -33,7 +33,7 @@
   ansible.builtin.unarchive:
     src: /tmp/op_linux_amd64.zip
     dest: /tmp/
-    remote_src: yes
+    remote_src: true
     creates: /tmp/op
 
 - name: Install 1Password CLI to github-actions bin directory
@@ -43,7 +43,7 @@
     owner: github-actions
     group: github-actions
     mode: "0755"
-    remote_src: yes
+    remote_src: true
 
 - name: Clean up downloaded files
   ansible.builtin.file:
