@@ -3,7 +3,7 @@
     src: service.j2
     dest: /etc/systemd/system/{{ docker_service_id }}.service
     mode: "0644"
-  notify: Restart systemd service
+  notify: "Restart {{ docker_service_id }} service"
 - name: Reload systemd daemon
   ansible.builtin.systemd:
     daemon_reload: true
