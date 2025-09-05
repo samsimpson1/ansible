@@ -168,7 +168,7 @@
   vars:
     docker_service_id: "pinchflat"
     docker_service_description: "Pinchflat"
-    docker_service_image: ghcr.io/kieraneglin/pinchflat:v2025.3.17
+    docker_service_image: ghcr.io/kieraneglin/pinchflat:v2025.6.6
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
