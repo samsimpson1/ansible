@@ -1,7 +1,7 @@
-name: Deploy to little
+name: Deploy playbooks
 
 concurrency:
-  group: deploy-little
+  group: deploy-playbooks
   cancel-in-progress: false
 
 on:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Infrastructure
+    name: Deploy Ansible
     runs-on: self-hosted
     container: ghcr.io/samsimpson1/ansible-container:latest
 
@@ -35,4 +35,4 @@ jobs:
         run: |
           ansible-galaxy role install -r requirements.yaml
           ansible-galaxy collection install -r requirements.yaml
-          make little-full-check
+          ansible-playbook play-*.yaml
