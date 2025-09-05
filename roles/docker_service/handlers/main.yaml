@@ -1,0 +1,4 @@
+- name: Restart systemd service
+  ansible.builtin.service:
+    name: "{{ docker_service_id }}"
+    state: restarted
