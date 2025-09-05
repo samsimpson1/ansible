@@ -1,0 +1,38 @@
+name: Deploy to little
+
+concurrency:
+  group: deploy-little
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Infrastructure
+    runs-on: self-hosted
+    container: ghcr.io/samsimpson1/ansible-container:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure 1Password CLI
+        run: |
+          echo "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Set up SSH
+        run: |
+          op user get --me
+          op read "op://Infrastructure/GitHub Actions SSH/private key" > ssh_key
+          chmod 600 ssh_key
+          echo "ANSIBLE_PRIVATE_KEY_FILE=ssh_key" >> $GITHUB_ENV
+          echo "ANSIBLE_HOST_KEY_CHECKING=false" >> $GITHUB_ENV
+
+      - name: Run Ansible
+        run: |
+          ansible-galaxy role install -r requirements.yaml
+          ansible-galaxy collection install -r requirements.yaml
+          make little-full-check
