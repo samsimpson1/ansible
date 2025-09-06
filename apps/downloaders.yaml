@@ -71,7 +71,7 @@
   vars:
     docker_service_id: "slskd"
     docker_service_description: "Slskd"
-    docker_service_image: slskd/slskd:0.21.4
+    docker_service_image: slskd/slskd:0.23.2
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
