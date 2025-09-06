@@ -25,5 +25,15 @@
       ],
       "datasourceTemplate": "docker"
     }
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "ghcr.io/home-operations/prowlarr",
+        "ghcr.io/home-operations/radarr",
+        "ghcr.io/home-operations/sonarr"
+      ],
+      "automerge": true
+    }
   ]
 }
