@@ -8,8 +8,7 @@
       ansible.posix.authorized_key:
         user: me
         state: present
-        key: |
-          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDU+u/PFliD7KGHt2STyQ2qnwuB+QOxLMoP9DunwAKsR9+CgEIZOvYzZIDmfnwINWHxnQxTiuM+G26W06ZjZ1t8BR63UYwr/GE3HgRG+llb2YeOpv5f4L/wIYQKuRWJtTaScn0p8ydRCXsIat5+DDL7WqvR7iw8NXavHpFU/VazPHrVzH/bjN6qMD8fux0n9Hl0IrYxV1zm5X1bvQ2PCceSLm4tN/rZ5HOfUW/wiAShVbF+/XOC/vj7QTRkbDcExBKwaLfq0YdIj1ABehk2KU9/D/Exu6tweShIkgMP1jyIqsfst1Wgsa9HhUhpqFZuVCnuT94KiL66BbsA30N5QBV9+uPF5XZfXOxqJfqi9S198e2qRMBYbdEeojSbJeOW86S7eYCyXLUHkq3lTC0K5+QT5RFXi7dPBzDKsTgE9k0IEIqRJY07SbHASJPmTS0G/zTI3wKAbVRC6Q2oaatVXlyIM7vHaFfbXBi/dRJgWHioD45iiKLjRy6DJC6Pcdc2NYbzMhKOIwqrqP3V0FsIpP0hOrLHL8vjo+eH/7z2ZEaG2ShydKthNz5RrHq0B9eHh3MVYzqV0Iu16aPr4tqNMZwouVNOZYspVoQgGaFYFW4MNbgz8WbY/wwyQMo77koT7UaidQd/meRRbZJg54vadP9HYytmGS1Xs3cu1uErq/qoow== github-actions
+        key: "{{ lookup('file', 'github-actions.pub') }}"
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale

@@ -8,9 +8,7 @@
       ansible.posix.authorized_key:
         user: me
         state: present
-        key: "{{ item }}"
-      with_file:
-        - github-actions.pub
+        key: "{{ lookup('file', 'github-actions.pub') }}"
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
