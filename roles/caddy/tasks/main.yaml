@@ -16,10 +16,12 @@
     owner: app
     group: app
     mode: '0644'
+  notify: "Restart {{ caddy_id }} caddy"
 - name: Caddy image
   community.docker.docker_image_build:
     name: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
     path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}"
+  notify: "Restart {{ caddy_id }} caddy"
 - name: Caddyfile
   ansible.builtin.copy:
     content: "{{ caddy_caddyfile }}"
@@ -27,6 +29,7 @@
     owner: app
     group: app
     mode: '0644'
+  notify: "Restart {{ caddy_id }} caddy"
 - name: Set caddy volumes
   ansible.builtin.set_fact:
     caddy_volumes_standard:
