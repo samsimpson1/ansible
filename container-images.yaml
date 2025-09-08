@@ -1,2 +1,2 @@
 container_images:
-  renovate: ghcr.io/renovatebot/renovate:41.91
+  renovate: ghcr.io/renovatebot/renovate:41.98
