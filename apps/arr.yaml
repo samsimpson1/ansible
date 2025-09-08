@@ -30,7 +30,7 @@
   vars:
     docker_service_id: "radarr"
     docker_service_description: "Radarr"
-    docker_service_image: ghcr.io/home-operations/radarr:5.27.5
+    docker_service_image: ghcr.io/home-operations/radarr:5.28.0
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
