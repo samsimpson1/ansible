@@ -1,0 +1,12 @@
+- name: Monitoring
+  hosts: home
+  vars_files:
+    - secret.yaml
+  become: true
+  tasks:
+    - name: SSMTP
+      ansible.builtin.include_role:
+        name: ssmtp
+    - name: Include monitoring tasks
+      ansible.builtin.include_role:
+        name: monitoring

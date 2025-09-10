@@ -1,0 +1,77 @@
+- name: Install monitoring dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ monitoring_packages }}"
+
+- name: Enable cron daemon
+  ansible.builtin.systemd:
+    name: cron
+    state: started
+    enabled: true
+
+- name: Create monitoring directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ monitoring_directory }}"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create monitoring state directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ monitoring_directory }}/state"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create disk monitoring script
+  ansible.builtin.template:
+    src: monitor-disk.sh.j2
+    dest: "{{ monitoring_directory }}/monitor-disk.sh"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create service monitoring script
+  ansible.builtin.template:
+    src: monitor-services.sh.j2
+    dest: "{{ monitoring_directory }}/monitor-services.sh"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create email alert script
+  ansible.builtin.template:
+    src: alert-email.sh.j2
+    dest: "{{ monitoring_directory }}/alert-email.sh"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Create main monitoring script
+  ansible.builtin.template:
+    src: monitor-main.sh.j2
+    dest: "{{ monitoring_directory }}/monitor-main.sh"
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Schedule monitoring cron job
+  ansible.builtin.cron:
+    name: "System monitoring"
+    user: root
+    job: "{{ monitoring_directory }}/monitor-main.sh"
+    minute: "{{ monitoring_interval.split(' ')[0] }}"
+    hour: "{{ monitoring_interval.split(' ')[1] if monitoring_interval.split(' ')|length > 1 else '*' }}"
+    day: "{{ monitoring_interval.split(' ')[2] if monitoring_interval.split(' ')|length > 2 else '*' }}"
+    month: "{{ monitoring_interval.split(' ')[3] if monitoring_interval.split(' ')|length > 3 else '*' }}"
+    weekday: "{{ monitoring_interval.split(' ')[4] if monitoring_interval.split(' ')|length > 4 else '*' }}"
+  when: monitoring_enabled
+
+- name: Remove monitoring cron job when disabled
+  ansible.builtin.cron:
+    name: "System monitoring"
+    state: absent
+  when: not monitoring_enabled

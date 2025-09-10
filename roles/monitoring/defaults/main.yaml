@@ -1,0 +1,27 @@
+# Simple monitoring role defaults
+# Focus on disk status and service status only
+
+# General configuration
+monitoring_enabled: true
+monitoring_interval: "*/15"  # Every 15 minutes
+monitoring_email: "{{ main_email }}"
+monitoring_directory: "/srv/monitoring"
+
+# Disk monitoring
+disk_usage_critical: 90     # Alert when disk usage exceeds this percentage
+
+# Service monitoring
+service_restart_threshold: 3  # Alert if service restarted more than X times in last hour
+
+# Services to monitor (override per host as needed)
+monitored_services:
+  - ssh
+  - cron
+
+# Alert configuration
+alert_rate_limit_minutes: 60  # Minimum time between same alert types
+
+# Required packages
+monitoring_packages:
+  - smartmontools  # For disk health checks
+  - cron          # For scheduling

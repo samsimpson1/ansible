@@ -1,0 +1,64 @@
+#!/bin/bash
+# Main monitoring orchestrator script
+# Runs all monitoring checks and handles alerting
+
+set -euo pipefail
+
+MONITORING_DIR="{{ monitoring_directory }}"
+LOG_FILE="{{ monitoring_directory }}/monitoring.log"
+HOSTNAME=$(hostname)
+
+# Ensure monitoring directory exists
+mkdir -p "$MONITORING_DIR"
+
+# Function to log messages
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [MAIN] $1" | tee -a "$LOG_FILE"
+}
+
+# Function to run a monitoring script and capture alerts
+run_monitor() {
+    local script_name=$1
+    local script_path="$MONITORING_DIR/$script_name"
+    
+    if [[ -x "$script_path" ]]; then
+        log_message "Running $script_name"
+        "$script_path" 2>&1 | tee -a "$LOG_FILE"
+    else
+        log_message "Warning: $script_name not found or not executable"
+    fi
+}
+
+# Main execution
+main() {
+    log_message "Starting monitoring cycle on $HOSTNAME"
+    
+    # Collect all alerts from monitoring scripts
+    local all_alerts=""
+    
+    # Run disk monitoring
+    if [[ -x "$MONITORING_DIR/monitor-disk.sh" ]]; then
+        log_message "Running disk monitoring"
+        disk_output=$(bash "$MONITORING_DIR/monitor-disk.sh" 2>&1 || true)
+        echo "$disk_output" >> "$LOG_FILE"
+        all_alerts+="$disk_output"$'\n'
+    fi
+    
+    # Run service monitoring
+    if [[ -x "$MONITORING_DIR/monitor-services.sh" ]]; then
+        log_message "Running service monitoring"
+        service_output=$(bash "$MONITORING_DIR/monitor-services.sh" 2>&1 || true)
+        echo "$service_output" >> "$LOG_FILE"
+        all_alerts+="$service_output"$'\n'
+    fi
+    
+    # Process alerts through email system
+    if [[ -n "$all_alerts" ]]; then
+        echo "$all_alerts" | grep "^ALERT|" | bash "$MONITORING_DIR/alert-email.sh" || true
+    fi
+    
+    log_message "Monitoring cycle completed on $HOSTNAME"
+}
+
+# Run main function
+main "$@"

@@ -1,0 +1,124 @@
+#!/bin/bash
+# Email alert system for monitoring
+# Integrates with sSMTP to send notifications
+
+set -euo pipefail
+
+HOSTNAME=$(hostname)
+MONITORING_EMAIL="{{ monitoring_email }}"
+RATE_LIMIT_MINUTES={{ alert_rate_limit_minutes }}
+STATE_DIR="{{ monitoring_directory }}/state"
+ALERT_LOG="{{ monitoring_directory }}/alerts.log"
+
+# Ensure state directory exists
+mkdir -p "$STATE_DIR"
+
+# Function to log alert activity
+log_alert() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') $1" >> "$ALERT_LOG"
+}
+
+# Function to check if we should rate limit this alert
+should_rate_limit() {
+    local alert_type=$1
+    local rate_limit_file="$STATE_DIR/rate_limit_$alert_type"
+    
+    if [[ -f "$rate_limit_file" ]]; then
+        local last_alert=$(cat "$rate_limit_file")
+        local current_time=$(date +%s)
+        local time_diff=$((current_time - last_alert))
+        local rate_limit_seconds=$((RATE_LIMIT_MINUTES * 60))
+        
+        if [[ $time_diff -lt $rate_limit_seconds ]]; then
+            return 0  # Should rate limit
+        fi
+    fi
+    
+    return 1  # Should not rate limit
+}
+
+# Function to update rate limit timestamp
+update_rate_limit() {
+    local alert_type=$1
+    local rate_limit_file="$STATE_DIR/rate_limit_$alert_type"
+    date +%s > "$rate_limit_file"
+}
+
+# Function to send email via sSMTP
+send_email() {
+    local subject=$1
+    local body=$2
+    
+    # Create email content
+    cat << EOF | ssmtp "$MONITORING_EMAIL"
+To: $MONITORING_EMAIL
+Subject: $subject
+
+$body
+
+--
+Monitoring System
+Host: $HOSTNAME
+Time: $(date)
+EOF
+}
+
+# Function to process alerts from monitoring scripts
+process_alerts() {
+    local alerts_found=0
+    local email_body=""
+    local alert_types=()
+    
+    # Read alerts from stdin
+    while IFS='|' read -r alert_type severity component hostname message; do
+        if [[ "$alert_type" == "ALERT" ]]; then
+            alerts_found=1
+            
+            # Check rate limiting for this component
+            local rate_limit_key="${component}_${severity}"
+            
+            if should_rate_limit "$rate_limit_key"; then
+                log_alert "Rate limited: $component $severity - $message"
+                continue
+            fi
+            
+            # Add to email body
+            email_body+="[$severity] $component: $message"$'\n'
+            alert_types+=("$rate_limit_key")
+            
+            log_alert "Alert sent: $component $severity - $message"
+        fi
+    done
+    
+    # Send email if we have alerts
+    if [[ $alerts_found -eq 1 ]] && [[ -n "$email_body" ]]; then
+        local subject="[MONITORING] Issues detected on $HOSTNAME"
+        
+        local full_body="Monitoring has detected the following issues on $HOSTNAME:"$'\n\n'
+        full_body+="$email_body"$'\n'
+        full_body+="Please investigate these issues as soon as possible."$'\n'
+        
+        send_email "$subject" "$full_body"
+        
+        # Update rate limits for sent alerts
+        for alert_type in "${alert_types[@]}"; do
+            update_rate_limit "$alert_type"
+        done
+        
+        log_alert "Email sent to $MONITORING_EMAIL"
+    fi
+}
+
+# Main execution
+main() {
+    if [[ -t 0 ]]; then
+        echo "Usage: monitoring_script | $0"
+        echo "This script processes alert output from monitoring scripts"
+        exit 1
+    fi
+    
+    process_alerts
+}
+
+# Run main function
+main "$@"
