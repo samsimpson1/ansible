@@ -33,7 +33,7 @@
   vars:
     docker_service_id: "karakeep-web"
     docker_service_description: "Karakeep Web"
-    docker_service_image: ghcr.io/karakeep-app/karakeep:0.26.0
+    docker_service_image: ghcr.io/karakeep-app/karakeep:0.27.1
     docker_service_network: source_default
     docker_service_env_vars:
       MEILI_ADDR: http://karakeep-meilisearch:7700
