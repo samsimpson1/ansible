@@ -19,4 +19,4 @@ else
     echo "repository already exists"
 fi
 
-r backup "{{ item.path }}"
+r backup "{{ item.path }}" {% if item.excludes is defined %}--exclude-file /srv/backups/restic-{{ item.name }}-excludes.txt{% endif %}

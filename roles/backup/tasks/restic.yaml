@@ -23,6 +23,15 @@
     mode: "0750"
     owner: root
     group: root
+- name: Create restic excludes file
+  ansible.builtin.copy:
+    dest: /srv/backups/restic-{{ item.name }}-excludes.txt
+    content: "{{ item.excludes }}"
+    mode: "0640"
+    owner: root
+    group: root
+  loop: "{{ backup_jobs }}"
+  when: item.op == 'restic' and item.excludes is defined
 - name: Schedule prune jobs
   ansible.builtin.cron:
     name: "Prune {{ item.op }} {{ item.name }}"
