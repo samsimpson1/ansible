@@ -62,6 +62,13 @@
             cron:
               minute: "49"
               hour: "*/6"
+          - name: sabnzbd
+            op: restic
+            path: /srv/containers/storage/ssd/sabnzbd/
+            cron:
+              minute: "17"
+              hour: "5"
+            excludes: "/srv/containers/storage/ssd/sabnzbd/Downloads/*"
           - name: stonks
             op: restic
             path: /srv/containers/storage/ssd/stonks/
