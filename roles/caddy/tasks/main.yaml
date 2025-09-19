@@ -23,19 +23,23 @@
     path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}"
   notify: "Restart {{ caddy_id }} caddy"
 - name: Caddyfile
-  ansible.builtin.copy:
-    content: "{{ caddy_caddyfile }}"
+  ansible.builtin.template:
+    src: Caddyfile.j2
     dest: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile"
     owner: app
     group: app
     mode: '0644'
+    lstrip_blocks: true
   notify: "Restart {{ caddy_id }} caddy"
-- name: Set caddy volumes
+- name: Set caddy facts
   ansible.builtin.set_fact:
     caddy_volumes_standard:
       - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/config:/config"
       - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/data:/data"
       - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile:/Caddyfile"
+    caddy_ports:
+      - "{{ caddy_http_port }}:{{ caddy_http_port }}"
+      - "{{ caddy_https_port }}:{{ caddy_https_port }}"
 - name: Caddy service
   ansible.builtin.include_role:
     name: docker_service

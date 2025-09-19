@@ -3,65 +3,29 @@
     name: caddy
   vars:
     caddy_id: "internal"
-    caddy_ports:
-      - "80:80"
-      - "443:443"
+    caddy_https_port: "443"
+    caddy_http_port: "80"
     caddy_env_vars:
       CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
-    caddy_caddyfile: |
-      {
-        acme_dns cloudflare {env.CADDY_CLOUDFLARE_API_KEY}
-        email acme@sams.wtf
-        acme_ca https://acme-v02.api.letsencrypt.org/directory
-        storage file_system /data
-        http_port 80
-        https_port 443
-        debug
-      }
-
-      *.int.simpson.id {
-        @firefly-di host firefly-di.int.simpson.id
-        handle @firefly-di {
-          reverse_proxy http://firefly-iii-data-importer:8080
-        }
-
-        @garage host garage.int.simpson.id
-        handle @garage {
-          reverse_proxy http://10.0.0.191:3903
-        }
-
-        @prowlarr host prowlarr.int.simpson.id
-        handle @prowlarr {
-          reverse_proxy http://prowlarr:80
-        }
-
-        @qbittorrent host torrent.int.simpson.id
-        handle @qbittorrent {
-          reverse_proxy http://qbittorrent:80
-        }
-
-        @radarr host radarr.int.simpson.id
-        handle @radarr {
-          reverse_proxy http://radarr:80
-        }
-
-        @sabnzbd host sabnzbd.int.simpson.id
-        handle @sabnzbd {
-          reverse_proxy http://sabnzbd:80
-        }
-
-        @slskd host slskd.int.simpson.id
-        handle @slskd {
-          reverse_proxy http://slskd:5030
-        }
-
-        @sonarr host sonarr.int.simpson.id
-        handle @sonarr {
-          reverse_proxy http://sonarr:8989
-        }
-
-        @prometheus host prometheus.int.simpson.id
-        handle @prometheus {
-          reverse_proxy http://prometheus:9090
-        }
-      }
+    caddy_hosts:
+      - name: "int.simpson.id"
+        wildcard: true
+        sites:
+          - name: firefly-di
+            target: "http://firefly-iii-data-importer:8080"
+          - name: garage
+            target: "http://10.0.0.191:3903"
+          - name: prowlarr
+            target: "http://prowlarr:80"
+          - name: torrent
+            target: "http://qbittorrent:80"
+          - name: radarr
+            target: "http://radarr:80"
+          - name: sabnzbd
+            target: "http://sabnzbd:80"
+          - name: slskd
+            target: "http://slskd:5030"
+          - name: sonarr
+            target: "http://sonarr:8989"
+          - name: prometheus
+            target: "http://prometheus:9090"

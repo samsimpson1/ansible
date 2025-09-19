@@ -1,8 +1,7 @@
 caddy_id: caddy-example
 caddy_version: "2.10"
-caddy_caddyfile: ""
-caddy_ports:
-  - "80:80"
-  - "443:443"
+caddy_http_port: "80"
+caddy_https_port: "443"
 caddy_env_vars: {}
 caddy_volumes: []
+caddy_hosts: []
