@@ -1,0 +1,19 @@
+- name: Install ha packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - keepalived
+- name: Create keepalived config file
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart keepalived service
+- name: Enable and start keepalived
+  ansible.builtin.service:
+    name: keepalived
+    enabled: true
+    state: started

@@ -1,0 +1,14 @@
+vrrp_instance VI_1 {
+    state {{ ha_proxy_state }}
+    interface {{ ha_proxy_interface }}
+    virtual_router_id 101
+    priority {{ ha_proxy_priority }}
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass {{ ha_proxy_password }}
+    }
+    virtual_ipaddress {
+        {{ ha_proxy_address }}
+    }
+}

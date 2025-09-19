@@ -1,0 +1,11 @@
+- name: HA Proxy
+  hosts:
+    - box
+    - little
+  vars_files:
+    - secret.yaml
+  become: true
+  tasks:
+    - name: HA Proxy Role
+      ansible.builtin.include_role:
+        name: ha_proxy
