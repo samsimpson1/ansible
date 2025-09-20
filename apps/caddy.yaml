@@ -16,7 +16,7 @@
     caddy_volumes:
       - "/srv/containers/storage/hdd/files:/webdav-files"
       - "/srv/containers/storage/ssd/sharex:/sharex"
-    caddy_hosts: "{{ sites[ansible_hostname] | selectattr('kind', 'equalto', 'external') }}"
+    caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
 
 - name: Caddy internal
   ansible.builtin.include_role:
@@ -27,4 +27,4 @@
     caddy_http_port: "80"
     caddy_env_vars:
       CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
-    caddy_hosts: "{{ sites[ansible_hostname] | selectattr('kind', 'equalto', 'internal') }}"
+    caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'internal') }}"
