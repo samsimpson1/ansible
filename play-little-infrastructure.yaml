@@ -2,6 +2,7 @@
   hosts: little
   vars_files:
     - secret.yaml
+    - vars/sites.yaml
   become: true
   tasks:
     - name: GitHub Actions SSH key
@@ -18,7 +19,5 @@
     - name: SSMTP
       ansible.builtin.include_role:
         name: ssmtp
-    - name: Caddy external
-      ansible.builtin.include_tasks: apps/caddy-external.yaml
-    - name: Caddy internal
-      ansible.builtin.include_tasks: apps/caddy-internal.yaml
+    - name: Caddy
+      ansible.builtin.include_tasks: apps/caddy.yaml

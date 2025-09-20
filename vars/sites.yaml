@@ -1,0 +1,86 @@
+sites:
+  box: {}
+  little:
+    - name: sams.wtf
+      kind: external
+      routes: []
+      fallback: |
+        handle {
+          respond "Nothing to see here."
+        }
+
+    - name: srv.simpson.id
+      kind: external
+      wildcard: true
+      routes:
+        - name: audiobookshelf
+          target: "http://audiobookshelf:8080"
+        - name: bookmarks
+          target: "http://karakeep-web:3000"
+        - name: budget
+          target: "http://actual:5006"
+        - name: files
+          custom: |
+            @files host files.srv.simpson.id
+            handle @files {
+              route {
+                basic_auth {
+                  me {{ webdav_basic_auth_password_hash }}
+                }
+                webdav {
+                  root /webdav-files
+                }
+              }
+            }
+        - name: firefly
+          target: "http://firefly-oauth2-proxy:4180"
+        - name: grafana
+          target: "http://grafana:3000"
+        - name: hass
+          target: "http://10.0.0.191:8123"
+        - name: jellyfin
+          target: "http://10.0.0.191:8096"
+        - name: comics
+          target: "http://komga:25600"
+        - name: navidrome
+          target: "http://navidrome:4533"
+        - name: pathfinder
+          target: "http://pathfinder:80"
+        - name: pinchflat
+          target: "http://pinchflat-oauth2-proxy:4180"
+        - name: pocket-id
+          target: "http://pocket-id:1411"
+        - name: rss
+          target: "http://freshrss:80"
+        - name: requests
+          target: "http://overseerr:80"
+        - name: sharex
+          custom: |
+            @sharex host sharex.srv.simpson.id
+            handle @sharex {
+              root * /sharex
+              file_server
+            }
+            
+    - name: int.simpson.id
+      kind: internal
+      wildcard: true
+      routes:
+        - name: firefly-di
+          target: "http://firefly-iii-data-importer:8080"
+        - name: garage
+          target: "http://10.0.0.191:3903"
+        - name: prowlarr
+          target: "http://prowlarr:80"
+        - name: torrent
+          target: "http://qbittorrent:80"
+        - name: radarr
+          target: "http://radarr:80"
+        - name: sabnzbd
+          target: "http://sabnzbd:80"
+        - name: slskd
+          target: "http://slskd:5030"
+        - name: sonarr
+          target: "http://sonarr:8989"
+        - name: prometheus
+          target: "http://prometheus:9090"

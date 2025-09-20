@@ -7,25 +7,4 @@
     caddy_http_port: "80"
     caddy_env_vars:
       CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
-    caddy_hosts:
-      - name: "int.simpson.id"
-        wildcard: true
-        sites:
-          - name: firefly-di
-            target: "http://firefly-iii-data-importer:8080"
-          - name: garage
-            target: "http://10.0.0.191:3903"
-          - name: prowlarr
-            target: "http://prowlarr:80"
-          - name: torrent
-            target: "http://qbittorrent:80"
-          - name: radarr
-            target: "http://radarr:80"
-          - name: sabnzbd
-            target: "http://sabnzbd:80"
-          - name: slskd
-            target: "http://slskd:5030"
-          - name: sonarr
-            target: "http://sonarr:8989"
-          - name: prometheus
-            target: "http://prometheus:9090"
+    caddy_hosts: "{{ sites[ansible_hostname] | selectattr('kind', 'equalto', 'internal') }}"

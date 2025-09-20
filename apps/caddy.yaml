@@ -1,0 +1,30 @@
+- name: ShareX SSH key
+  ansible.posix.authorized_key:
+    user: app
+    state: present
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMSjn6O+qaATVQ9r5ZZJol840Q1uKVu0ZrwErYNNTNvM sam@sampc"
+
+- name: Caddy external
+  ansible.builtin.include_role:
+    name: caddy
+  vars:
+    caddy_id: "external"
+    caddy_https_port: "6997"
+    caddy_http_port: "6996"
+    caddy_env_vars:
+      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    caddy_volumes:
+      - "/srv/containers/storage/hdd/files:/webdav-files"
+      - "/srv/containers/storage/ssd/sharex:/sharex"
+    caddy_hosts: "{{ sites[ansible_hostname] | selectattr('kind', 'equalto', 'external') }}"
+
+- name: Caddy internal
+  ansible.builtin.include_role:
+    name: caddy
+  vars:
+    caddy_id: "internal"
+    caddy_https_port: "443"
+    caddy_http_port: "80"
+    caddy_env_vars:
+      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    caddy_hosts: "{{ sites[ansible_hostname] | selectattr('kind', 'equalto', 'internal') }}"

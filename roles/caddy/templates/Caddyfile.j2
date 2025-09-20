@@ -9,7 +9,7 @@
 
 {% for host in caddy_hosts %}
 {{ '*.' if host.wildcard is defined and host.wildcard }}{{ host.name }} {
-  {% for site in host.sites %}
+  {% for site in host.routes %}
   {% if site.custom is defined %}
   {{ site.custom | indent(width=2, first=False) }}
   {% else %}
