@@ -2,3 +2,7 @@
   ansible.builtin.systemd_service:
     name: keepalived
     state: restarted
+- name: Restart caddy ha service
+  ansible.builtin.systemd_service:
+    name: caddy-ha
+    state: restarted

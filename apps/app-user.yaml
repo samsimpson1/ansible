@@ -1,0 +1,14 @@
+- name: App group
+  ansible.builtin.group:
+    name: app
+    gid: 568
+    state: present
+- name: App user
+  ansible.builtin.user:
+    name: app
+    uid: 568
+    group: app
+    home: /home/app
+    shell: /bin/bash
+    create_home: true
+    state: present

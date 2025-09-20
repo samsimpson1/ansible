@@ -1,3 +1,14 @@
+- name: Caddy data directories
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}/{{ item }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+  loop:
+    - ""
+    - config
+    - data
 - name: Install ha packages
   ansible.builtin.package:
     name: "{{ item }}"
@@ -17,3 +28,44 @@
     name: keepalived
     enabled: true
     state: started
+- name: Dockerfile
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ ha_proxy_directory }}/Dockerfile"
+    owner: app
+    group: app
+    mode: '0644'
+  notify: "Restart caddy ha service"
+- name: Caddy image
+  community.docker.docker_image_build:
+    name: "localhost/caddy-ha:{{ caddy_version }}"
+    path: "{{ ha_proxy_directory }}"
+  notify: "Restart caddy ha service"
+- name: Caddy config file
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ ha_proxy_directory }}/Caddyfile"
+    owner: root
+    group: root
+    mode: '0644'
+    lstrip_blocks: true
+  notify: Restart caddy ha service
+- name: Caddy service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "caddy-ha"
+    docker_service_description: "Caddy ha"
+    docker_service_image: "localhost/caddy-ha:{{ caddy_version }}"
+    docker_service_pull_policy: "never"
+    docker_service_network: "host"
+    docker_service_command: "caddy run -c /Caddyfile"
+    docker_service_env_vars:
+      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    docker_service_ports:
+      - "6999:6999"
+      - "6998:6998"
+    docker_service_volumes:
+      - "{{ ha_proxy_directory }}/config:/config"
+      - "{{ ha_proxy_directory }}/data:/data"
+      - "{{ ha_proxy_directory }}/Caddyfile:/Caddyfile"

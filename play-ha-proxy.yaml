@@ -4,8 +4,11 @@
     - little
   vars_files:
     - secret.yaml
+    - vars/sites.yaml
   become: true
   tasks:
+    - name: App user
+      ansible.builtin.include_tasks: apps/app-user.yaml
     - name: HA Proxy Role
       ansible.builtin.include_role:
         name: ha_proxy

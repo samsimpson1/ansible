@@ -9,6 +9,6 @@ vrrp_instance VI_1 {
         auth_pass {{ ha_proxy_password }}
     }
     virtual_ipaddress {
-        {{ ha_proxy_address }}
+        {{ ha_proxy_address }}/{{ ha_proxy_netmask }}
     }
 }

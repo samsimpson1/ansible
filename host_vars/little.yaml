@@ -1,3 +1,4 @@
 ha_proxy_state: MASTER
 ha_proxy_interface: enp4s0
 ha_proxy_priority: "200"
+ha_proxy_directory: /srv/containers/storage/ssd/caddy/ha

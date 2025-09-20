@@ -1,3 +1,4 @@
 ha_proxy_state: BACKUP
 ha_proxy_interface: enp1s0
 ha_proxy_priority: "100"
+ha_proxy_directory: /srv/app/caddy-ha

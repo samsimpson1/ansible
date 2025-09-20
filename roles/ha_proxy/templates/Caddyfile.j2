@@ -1,0 +1,31 @@
+{
+  acme_dns cloudflare {env.CADDY_CLOUDFLARE_API_KEY}
+  email acme@sams.wtf
+  storage file_system /data
+  http_port 6998
+  https_port 6999
+  debug
+}
+
+{% for host in sites|selectattr('kind', 'equalto', 'external') %}
+{{ '*.' if host.wildcard is defined and host.wildcard }}{{ host.name }} {
+  bind {{ ha_proxy_address }}
+
+  {% for site in host.routes %}
+  @{{ site.name }} host {{ site.name }}.{{ host.name }}
+  handle @{{ site.name }} {
+    reverse_proxy {
+      to https://{{ site.host }}:6997
+      transport http {
+        tls_server_name {{ site.name }}.{{ host.name }}
+      }
+    }
+  }
+
+  {% endfor %}
+  {% if host.fallback is defined %}
+
+  {{ host.fallback | indent(width=2, first=False) }}
+  {% endif %}
+}
+{% endfor %}
