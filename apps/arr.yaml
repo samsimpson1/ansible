@@ -15,7 +15,7 @@
   vars:
     docker_service_id: "prowlarr"
     docker_service_description: "Prowlarr"
-    docker_service_image: ghcr.io/home-operations/prowlarr:1.37
+    docker_service_image: ghcr.io/home-operations/prowlarr:2.1
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
