@@ -3,9 +3,6 @@ home:
     little:
       ansible_host: 10.0.0.191
       ansible_user: me
-    charon:
-      ansible_host: 10.0.0.200
-      ansible_user: me
     box:
       ansible_host: 10.0.0.202
       ansible_user: me
