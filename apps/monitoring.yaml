@@ -57,7 +57,7 @@
   vars:
     docker_service_id: "grafana"
     docker_service_description: "Grafana"
-    docker_service_image: grafana/grafana:11.3.0
+    docker_service_image: grafana/grafana:12.2.0
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
