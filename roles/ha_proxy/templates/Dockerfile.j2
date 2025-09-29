@@ -1,10 +1,10 @@
-FROM caddy:{{ caddy_version }}-builder AS builder
+FROM {{ container_images.caddy }}-builder AS builder
 
 RUN xcaddy build \
   --with github.com/caddy-dns/cloudflare \
   --with github.com/mholt/caddy-webdav
 
-FROM caddy:{{ caddy_version }}
+FROM {{ container_images.caddy }}
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 

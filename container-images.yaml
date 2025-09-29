@@ -1,2 +1,3 @@
 container_images:
+  caddy: caddy:2.10
   renovate: ghcr.io/renovatebot/renovate:41.98

@@ -19,7 +19,7 @@
   notify: "Restart {{ caddy_id }} caddy"
 - name: Caddy image
   community.docker.docker_image_build:
-    name: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
+    name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
     path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}"
   notify: "Restart {{ caddy_id }} caddy"
 - name: Caddyfile
@@ -46,7 +46,7 @@
   vars:
     docker_service_id: "caddy-{{ caddy_id }}"
     docker_service_description: "Caddy {{ caddy_id }}"
-    docker_service_image: "localhost/caddy-{{ caddy_id }}:{{ caddy_version }}"
+    docker_service_image: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
     docker_service_pull_policy: "never"
     docker_service_network: source_default
     docker_service_user: "568"

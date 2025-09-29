@@ -38,7 +38,7 @@
   notify: "Restart caddy ha service"
 - name: Caddy image
   community.docker.docker_image_build:
-    name: "localhost/caddy-ha:{{ caddy_version }}"
+    name: "localhost/ha-{{ container_images.caddy }}"
     path: "{{ ha_proxy_directory }}"
   notify: "Restart caddy ha service"
 - name: Caddy config file
@@ -56,7 +56,7 @@
   vars:
     docker_service_id: "caddy-ha"
     docker_service_description: "Caddy ha"
-    docker_service_image: "localhost/caddy-ha:{{ caddy_version }}"
+    docker_service_image: "localhost/ha-{{ container_images.caddy }}"
     docker_service_pull_policy: "never"
     docker_service_network: "host"
     docker_service_command: "caddy run -c /Caddyfile"
