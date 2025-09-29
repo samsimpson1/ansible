@@ -8,6 +8,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'renovate.json'
+      - '.gitignore'
 
 jobs:
   deploy:
