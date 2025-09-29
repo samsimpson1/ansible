@@ -27,7 +27,7 @@
   vars:
     docker_service_id: "firefly-iii-db"
     docker_service_description: "Firefly III MariaDB"
-    docker_service_image: mariadb:11.8
+    docker_service_image: mariadb:12.0
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_group: "568"
