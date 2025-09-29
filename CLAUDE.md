@@ -10,25 +10,25 @@ This is an Ansible infrastructure-as-code repository for managing home lab infra
 
 ### Running Playbooks
 
-#### Split Playbooks (Recommended)
-- `make little-infra` - Deploy base infrastructure (Tailscale, Docker, sSMTP)
-- `make little-auth` - Deploy authentication services (Pocket ID)
-- `make little-apps` - Deploy applications (ECG notify, Karakeep, FreshRSS, Arr apps, Firefly III, Home Assistant, Monitoring stack)
-- `make little-backup` - Deploy backup configuration
-- `make little-full` - Deploy all components in sequence
+#### Direct Playbook Execution
+- `ansible-playbook play-little-infrastructure.yaml` - Deploy base infrastructure (Tailscale, Docker, sSMTP, Caddy)
+- `ansible-playbook play-little-auth.yaml` - Deploy authentication services (Pocket ID)
+- `ansible-playbook play-little-apps.yaml` - Deploy applications (ECG notify, Karakeep, FreshRSS, Arr apps, Firefly III, Home Assistant, Monitoring stack)
+- `ansible-playbook play-little-backup.yaml` - Deploy backup configuration
 
-#### Check Targets
-- `make little-infra-check` - Dry-run infrastructure changes
-- `make little-auth-check` - Dry-run authentication changes  
-- `make little-apps-check` - Dry-run application changes
-- `make little-backup-check` - Dry-run backup changes
+#### Dry-run (Check Mode)
+Add `--check` flag to any playbook command for dry-run mode:
+- `ansible-playbook play-little-infrastructure.yaml --check`
+- `ansible-playbook play-little-auth.yaml --check`
+- `ansible-playbook play-little-apps.yaml --check`
+- `ansible-playbook play-little-backup.yaml --check`
+
+#### Install Requirements
+- `ansible-galaxy role install -r requirements.yaml` - Install required Ansible roles
+- `ansible-galaxy collection install -r requirements.yaml` - Install required Ansible collections
 
 ### Vault Management
-- `make vault-edit` - Edit encrypted secrets using 1Password CLI integration
-
-### Code Quality
-- `make lint` - Run ansible-lint on all playbooks
-- `make little-full-check` - Dry-run all components in sequence
+- `ansible-vault edit secret.yaml` - Edit encrypted secrets (uses 1Password CLI via onepassword-client.sh)
 
 All commands use 1Password CLI for vault password retrieval via `onepassword-client.sh`. The inventory file and vault configuration are specified in `ansible.cfg`.
 
@@ -159,27 +159,37 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 - 1Password CLI integration for vault password retrieval
 - Sensitive configuration like API keys, passwords, and tokens are vaulted
 
+### Container Image Versions
+- Container image versions are centrally managed in `container-images.yaml`
+- Reference images using `{{ container_images.service_name }}` in playbooks
+- Currently managed: Caddy, Renovate
+
 ## File Structure Notes
-- **Playbooks**: `little-infrastructure.yaml`, `little-auth.yaml`, `little-apps.yaml`, `little-backup.yaml`
+- **Playbooks**: `play-little-infrastructure.yaml`, `play-little-auth.yaml`, `play-little-apps.yaml`, `play-little-backup.yaml`
 - **Application-specific tasks**: `apps/` directory
 - **Reusable roles**: `roles/` directory
 - **Configuration**: `ansible.cfg` (inventory path, vault settings)
 - **Host inventory**: `inventory.yaml`
 - **Encrypted secrets**: `secret.yaml`
+- **Container versions**: `container-images.yaml`
 
 ## Development Workflow
-1. **For faster iterations**: Use split playbooks (`make little-apps` for app changes, `make little-infra` for system changes)
-2. **Test changes**: Use appropriate check targets (`make little-apps-check`) before applying
-3. **For full deployments**: Use `make little-full` or individual components in sequence
-4. **Use fully qualified Ansible module names** (e.g., `ansible.builtin.include_role`)
-5. **Vault integration** requires 1Password CLI (`op`) to be configured
-6. **Service configurations** should leverage the `docker_service` role for consistency
+1. **For faster iterations**: Use split playbooks (e.g., `ansible-playbook play-little-apps.yaml` for app changes, `ansible-playbook play-little-infrastructure.yaml` for system changes)
+2. **Test changes**: Use `--check` flag before applying (e.g., `ansible-playbook play-little-apps.yaml --check`)
+3. **Use fully qualified Ansible module names** (e.g., `ansible.builtin.include_role`)
+4. **Vault integration** requires 1Password CLI (`op`) to be configured
+5. **Service configurations** should leverage the `docker_service` role for consistency
+
+## Automated Deployment
+- GitHub Actions automatically deploys all playbooks (`play-*.yaml`) on push to main branch
+- Uses self-hosted runner with 1Password service account for secrets
+- Workflow file: `.github/workflows/deploy-ansible.yaml`
 
 ## Split Playbook Dependencies
-- **little-infrastructure.yaml**: Must run first (provides Docker, networking)
-- **little-auth.yaml**: Requires infrastructure (provides SSO for apps)
-- **little-apps.yaml**: Requires infrastructure and auth
-- **little-backup.yaml**: Independent, can run anytime after infrastructure
+- **play-little-infrastructure.yaml**: Must run first (provides Docker, networking, Caddy)
+- **play-little-auth.yaml**: Requires infrastructure (provides SSO for apps)
+- **play-little-apps.yaml**: Requires infrastructure and auth
+- **play-little-backup.yaml**: Independent, can run anytime after infrastructure
 
 # Style Requirements
 
