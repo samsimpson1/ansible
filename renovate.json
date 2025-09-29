@@ -37,6 +37,10 @@
         "ghcr.io/sct/overseerr"
       ],
       "groupName": "Media apps"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
     }
   ]
 }
