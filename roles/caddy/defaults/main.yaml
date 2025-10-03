@@ -5,3 +5,5 @@ caddy_https_port: "443"
 caddy_env_vars: {}
 caddy_volumes: []
 caddy_hosts: []
+caddy_data_directory: "/srv/containers/storage/ssd/caddy"
+caddy_networks: ["source_default"]

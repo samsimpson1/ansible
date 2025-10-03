@@ -1,6 +1,6 @@
 - name: Caddy data directories
   ansible.builtin.file:
-    path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/{{ item }}"
+    path: "{{ caddy_data_directory }}/{{ caddy_id }}/{{ item }}"
     state: directory
     owner: app
     group: app
@@ -12,7 +12,7 @@
 - name: Dockerfile
   ansible.builtin.template:
     src: Dockerfile.j2
-    dest: /srv/containers/storage/ssd/caddy/{{ caddy_id }}/Dockerfile
+    dest: "{{ caddy_data_directory }}/{{ caddy_id }}/Dockerfile"
     owner: app
     group: app
     mode: '0644'
@@ -20,12 +20,12 @@
 - name: Caddy image
   community.docker.docker_image_build:
     name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
-    path: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}"
+    path: "{{ caddy_data_directory }}/{{ caddy_id }}"
   notify: "Restart {{ caddy_id }} caddy"
 - name: Caddyfile
   ansible.builtin.template:
     src: Caddyfile.j2
-    dest: "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile"
+    dest: "{{ caddy_data_directory }}/{{ caddy_id }}/Caddyfile"
     owner: app
     group: app
     mode: '0644'
@@ -34,9 +34,9 @@
 - name: Set caddy facts
   ansible.builtin.set_fact:
     caddy_volumes_standard:
-      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/config:/config"
-      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/data:/data"
-      - "/srv/containers/storage/ssd/caddy/{{ caddy_id }}/Caddyfile:/Caddyfile"
+      - "{{ caddy_data_directory }}/{{ caddy_id }}/config:/config"
+      - "{{ caddy_data_directory }}/{{ caddy_id }}/data:/data"
+      - "{{ caddy_data_directory }}/{{ caddy_id }}/Caddyfile:/Caddyfile"
     caddy_ports:
       - "{{ caddy_http_port }}:{{ caddy_http_port }}"
       - "{{ caddy_https_port }}:{{ caddy_https_port }}"
@@ -48,7 +48,7 @@
     docker_service_description: "Caddy {{ caddy_id }}"
     docker_service_image: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
     docker_service_pull_policy: "never"
-    docker_service_network: source_default
+    docker_service_network: "{{ caddy_networks[0] }}"
     docker_service_user: "568"
     docker_service_group: "568"
     docker_service_command: "caddy run -c /Caddyfile"
