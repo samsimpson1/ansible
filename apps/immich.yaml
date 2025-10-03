@@ -1,0 +1,90 @@
+- name: Immich group
+  ansible.builtin.group:
+    name: immich
+    state: present
+
+- name: Immich user
+  ansible.builtin.user:
+    name: immich
+    group: immich
+    shell: /usr/sbin/nologin
+    create_home: false
+    state: present
+  register: immich_user
+
+- name: Create Immich data directories
+  ansible.builtin.file:
+    state: directory
+    path: "/srv/app/immich/{{ item }}"
+    mode: "0750"
+    owner: immich
+    group: immich
+  loop:
+    - postgres-data
+    - model-cache
+    - upload
+
+- name: Create Immich Docker network
+  community.docker.docker_network:
+    name: immich
+    state: present
+
+- name: Immich PostgreSQL service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "immich-postgres"
+    docker_service_description: "Immich PostgreSQL Database"
+    docker_service_image: "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:41eacbe83eca995561fe43814fd4891e16e39632806253848efaf04d3c8a8b84"
+    docker_service_network: immich
+    docker_service_user: "{{ immich_user.uid }}"
+    docker_service_group: "{{ immich_user.group }}"
+    docker_service_env_vars:
+      POSTGRES_PASSWORD: "{{ immich.db_password }}"
+      POSTGRES_USER: "{{ immich.db_username }}"
+      POSTGRES_DB: "{{ immich.db_database_name }}"
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    docker_service_volumes:
+      - "/srv/app/immich/postgres-data:/var/lib/postgresql/data:rw"
+
+- name: Immich Redis service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "immich-redis"
+    docker_service_description: "Immich Redis"
+    docker_service_image: "docker.io/valkey/valkey:8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571"
+    docker_service_network: immich
+
+- name: Immich Server service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "immich-server"
+    docker_service_description: "Immich Server"
+    docker_service_image: "ghcr.io/immich-app/immich-server:v2.0.1"
+    docker_service_network: immich
+    docker_service_user: "{{ immich_user.uid }}"
+    docker_service_group: "{{ immich_user.group }}"
+    docker_service_env_vars:
+      DB_HOSTNAME: immich-postgres
+      DB_USERNAME: "{{ immich.db_username }}"
+      DB_PASSWORD: "{{ immich.db_password }}"
+      DB_DATABASE_NAME: "{{ immich.db_database_name }}"
+      REDIS_HOSTNAME: immich-redis
+    docker_service_volumes:
+      - "/srv/app/immich/upload:/data:rw"
+      - "/etc/localtime:/etc/localtime:ro"
+
+- name: Immich Machine Learning service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "immich-machine-learning"
+    docker_service_description: "Immich Machine Learning"
+    docker_service_image: "ghcr.io/immich-app/immich-machine-learning:v2.0.1"
+    docker_service_network: immich
+    docker_service_user: "{{ immich_user.uid }}"
+    docker_service_group: "{{ immich_user.group }}"
+    docker_service_volumes:
+      - "/srv/app/immich/model-cache:/cache:rw"

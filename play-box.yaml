@@ -1,9 +1,14 @@
 - name: Box
   hosts: box
   vars_files:
+    - container-images.yaml
     - secret.yaml
+    - vars/sites.yaml
   become: true
   tasks:
+    - name: App user
+      ansible.builtin.include_tasks: apps/app-user.yaml
+    
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
@@ -60,3 +65,19 @@
 
     - name: GitHub Actions Runner
       ansible.builtin.include_tasks: apps/github-actions-runner.yaml
+
+    - name: Caddy external
+      ansible.builtin.include_role:
+        name: caddy
+      vars:
+        caddy_id: "external"
+        caddy_https_port: "6997"
+        caddy_http_port: "6996"
+        caddy_env_vars:
+          CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+        caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
+        caddy_data_directory: "/srv/app/caddy"
+        caddy_networks: ["immich"]
+
+    - name: Immich
+      ansible.builtin.include_tasks: apps/immich.yaml

@@ -49,6 +49,9 @@ sites:
       - name: comics
         target: "http://komga:25600"
         host: little
+      - name: immich
+        target: "http://immich-server:2283"
+        host: box
       - name: navidrome
         target: "http://navidrome:4533"
         host: little
