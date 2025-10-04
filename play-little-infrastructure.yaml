@@ -20,5 +20,11 @@
     - name: SSMTP
       ansible.builtin.include_role:
         name: ssmtp
+    - name: ACME Manager
+      ansible.builtin.include_role:
+        name: acme_manager
+      vars:
+        acme_manager_cloudflare_account_id: "{{ cloudflare_account_id }}"
+        acme_manager_cloudflare_account_token: "{{ cloudflare_account_token }}"
     - name: Caddy
       ansible.builtin.include_tasks: apps/caddy.yaml

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+rsync -avz --delete \
+  -e "ssh -o StrictHostKeyChecking=no" \
+  {{ acme_client_source_user }}@{{ acme_client_source_host }}:{{ acme_client_cert_dir }}/ \
+  {{ acme_client_cert_dir }}/
+
+echo "Certificate sync completed at $(date)"

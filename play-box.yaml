@@ -66,6 +66,10 @@
     - name: GitHub Actions Runner
       ansible.builtin.include_tasks: apps/github-actions-runner.yaml
 
+    - name: ACME Client
+      ansible.builtin.include_role:
+        name: acme_client
+
     - name: Caddy external
       ansible.builtin.include_role:
         name: caddy
@@ -73,8 +77,7 @@
         caddy_id: "external"
         caddy_https_port: "6997"
         caddy_http_port: "6996"
-        caddy_env_vars:
-          CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+        caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["immich"]
