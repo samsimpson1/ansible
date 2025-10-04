@@ -45,7 +45,7 @@
     docker_service_image: prom/prometheus:v2.55.1
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_command: "--storage.tsdb.path /data --storage.tsdb.retention.size 10GB --config.file /config.yaml"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/prometheus:/data:rw"
@@ -60,7 +60,7 @@
     docker_service_image: grafana/grafana:11.3.0
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       GF_SERVER_ROOT_URL: "https://grafana.srv.simpson.id"
     docker_service_volumes:

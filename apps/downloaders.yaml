@@ -18,7 +18,7 @@
     docker_service_image: ghcr.io/home-operations/qbittorrent:5.1.2
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       QBITTORRENT__PORT: "80"
@@ -37,7 +37,7 @@
     docker_service_image: ghcr.io/home-operations/sabnzbd:4.5.3
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       SABNZBD__PORT: "80"
@@ -55,7 +55,7 @@
     docker_service_image: ghcr.io/unpackerr/unpackerr:0.14.5
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_file: "/srv/containers/storage/ssd/secrets/Unpackerr.env"
     docker_service_env_vars:
       UN_RADARR_0_URL: "https://radarr.int.simpson.id"
@@ -74,7 +74,7 @@
     docker_service_image: slskd/slskd:0.23.2
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       SLSKD_REMOTE_CONFIGURATION: "true"
     docker_service_ports:

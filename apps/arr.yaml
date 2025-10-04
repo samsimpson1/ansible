@@ -18,7 +18,7 @@
     docker_service_image: ghcr.io/home-operations/prowlarr:2.1
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       PROWLARR__PORT: "80"
@@ -33,7 +33,7 @@
     docker_service_image: ghcr.io/home-operations/radarr:6.0.0
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       RADARR__PORT: "80"
@@ -49,7 +49,7 @@
     docker_service_image: ghcr.io/home-operations/sonarr:4.0.15
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       SONARR__PORT: "80"

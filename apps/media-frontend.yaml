@@ -39,7 +39,7 @@
     docker_service_image: ghcr.io/advplyr/audiobookshelf:2.20.0
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       PORT: "8080"
@@ -59,7 +59,7 @@
     docker_service_description: "Plex Media Server"
     docker_service_image: ghcr.io/home-operations/plex:rolling
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_network: host
     docker_service_volumes:
       - "/srv/containers/storage/hdd/media:/media:ro"
@@ -76,7 +76,7 @@
     docker_service_description: "Jellyfin Media Server"
     docker_service_image: jellyfin/jellyfin:latest
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_network: host
     docker_service_env_vars:
       JELLYFIN_PublishedServerUrl: "https://jellyfin.srv.simpson.id"
@@ -117,7 +117,7 @@
     docker_service_image: deluan/navidrome:latest
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       ND_BASEURL: "https://navidrome.srv.simpson.id"
@@ -140,7 +140,7 @@
     docker_service_image: ghcr.io/gotson/komga:1.14.1
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_volumes:
       - "/srv/containers/storage/ssd/komga:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
@@ -154,7 +154,7 @@
     docker_service_image: ghcr.io/sct/overseerr:1.33.2
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       LOG_LEVEL: info
@@ -171,7 +171,7 @@
     docker_service_image: ghcr.io/kieraneglin/pinchflat:v2025.6.6
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_env_vars:
       TZ: Europe/London
       EXPOSE_FEED_ENDPOINTS: "true"

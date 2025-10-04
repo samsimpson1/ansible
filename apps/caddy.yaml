@@ -11,8 +11,7 @@
     caddy_id: "external"
     caddy_https_port: "6997"
     caddy_http_port: "6996"
-    caddy_env_vars:
-      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    caddy_env_vars: {}
     caddy_volumes:
       - "/srv/containers/storage/hdd/files:/webdav-files"
       - "/srv/containers/storage/ssd/sharex:/sharex"
@@ -25,6 +24,5 @@
     caddy_id: "internal"
     caddy_https_port: "443"
     caddy_http_port: "80"
-    caddy_env_vars:
-      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    caddy_env_vars: {}
     caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'internal') }}"

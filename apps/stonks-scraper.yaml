@@ -14,6 +14,6 @@
     docker_service_image: "ghcr.io/samsimpson1/stonks:latest"
     docker_service_network: source_default
     docker_service_user: "568"
-    docker_service_group: "568"
+    docker_service_groups: ["568"]
     docker_service_volumes:
       - "/srv/containers/storage/ssd/stonks:/data:rw"

@@ -23,7 +23,7 @@
     docker_service_image: "{{ oauth2_proxy_image }}"
     docker_service_network: "{{ oauth2_proxy_network }}"
     docker_service_user: "{{ oauth2_proxy_user }}"
-    docker_service_group: "{{ oauth2_proxy_group }}"
+    docker_service_groups: ["{{ oauth2_proxy_group }}"]
     docker_service_command: "oauth2-proxy --config=/oauth2-proxy.cfg"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
