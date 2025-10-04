@@ -1,7 +1,4 @@
 {
-  acme_dns cloudflare {env.CADDY_CLOUDFLARE_API_KEY}
-  email acme@sams.wtf
-  storage file_system /data
   http_port {{ caddy_http_port }}
   https_port {{ caddy_https_port }}
   debug
@@ -9,6 +6,8 @@
 
 {% for host in caddy_hosts %}
 {{ '*.' if host.wildcard is defined and host.wildcard }}{{ host.name }} {
+  tls /certificates/{{ host.name }}/fullchain.pem /certificates/{{ host.name }}/key.pem
+
   {% for site in host.routes|selectattr('host', 'equalto', ansible_hostname) %}
   {% if site.custom is defined %}
   {{ site.custom | indent(width=2, first=False) }}

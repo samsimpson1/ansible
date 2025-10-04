@@ -7,3 +7,5 @@ caddy_volumes: []
 caddy_hosts: []
 caddy_data_directory: "/srv/containers/storage/ssd/caddy"
 caddy_networks: ["source_default"]
+caddy_groups: ["568"]
+caddy_additional_group_names: ["acme"]
