@@ -60,8 +60,7 @@
     docker_service_pull_policy: "never"
     docker_service_network: "host"
     docker_service_command: "caddy run -c /Caddyfile"
-    docker_service_env_vars:
-      CADDY_CLOUDFLARE_API_KEY: "{{ cloudflare_api_key }}"
+    docker_service_env_vars: {}
     docker_service_ports:
       - "6999:6999"
       - "6998:6998"
@@ -69,3 +68,4 @@
       - "{{ ha_proxy_directory }}/config:/config"
       - "{{ ha_proxy_directory }}/data:/data"
       - "{{ ha_proxy_directory }}/Caddyfile:/Caddyfile"
+      - "/srv/certificates:/certificates:ro"
