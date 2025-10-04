@@ -18,7 +18,10 @@ ExecStart=/usr/bin/docker run --rm \
   {% endif -%}
   {% if docker_service_env_vars|length > 0 %}{% for k, v in docker_service_env_vars.items() %}{{ '-e ' + k + '="' + v + '" ' }}{% endfor %} \
   {% endif -%}
-  {% if docker_service_user %}-u {{ docker_service_user }}:{{ docker_service_group }} \
+  {% if docker_service_user and docker_service_groups|length > 0 %}-u {{ docker_service_user }}:{{ docker_service_groups[0] }} \
+  {% elif docker_service_user %}-u {{ docker_service_user }} \
+  {% endif -%}
+  {% if docker_service_groups|length > 1 %}{% for group in docker_service_groups[1:] %}{{ '--group-add ' + group + ' ' }}{% endfor %}\
   {% endif -%}
   {% if docker_service_devices|length > 0 %}--device {{ ' --device '.join(docker_service_devices) }} \
   {% endif -%}
