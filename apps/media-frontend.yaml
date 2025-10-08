@@ -137,7 +137,7 @@
   vars:
     docker_service_id: "komga"
     docker_service_description: "Komga Comics Server"
-    docker_service_image: ghcr.io/gotson/komga:1.14.1
+    docker_service_image: ghcr.io/gotson/komga:1.23.5
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
