@@ -36,7 +36,7 @@
   vars:
     docker_service_id: "audiobookshelf"
     docker_service_description: "Audiobookshelf"
-    docker_service_image: ghcr.io/advplyr/audiobookshelf:2.20.0
+    docker_service_image: ghcr.io/advplyr/audiobookshelf:2.30.0
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
