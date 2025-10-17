@@ -11,3 +11,4 @@ oauth2_proxy_skip_auth_routes: []
 oauth2_proxy_email_domains:
   - "*"
 oauth2_proxy_extra_config: ""
+oauth2_proxy_state: present
