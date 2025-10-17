@@ -42,7 +42,7 @@
   vars:
     docker_service_id: "prometheus"
     docker_service_description: "Prometheus"
-    docker_service_image: prom/prometheus:v2.55.1
+    docker_service_image: prom/prometheus:v3.7.1
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
