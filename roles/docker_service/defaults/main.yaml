@@ -14,11 +14,3 @@ docker_service_devices: []
 docker_service_privileged: false
 docker_service_pid: null
 docker_service_state: present
-```
-<file_path>
-ansible/roles/docker_service/defaults/main.yaml
-</file_path>
-
-<edit_description>
-Overwrite defaults with docker_service_state variable added
-</edit_description>
