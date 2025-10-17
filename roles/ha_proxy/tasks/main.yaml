@@ -9,12 +9,16 @@
     - ""
     - config
     - data
+  when: ha_proxy_state == 'present'
+
 - name: Install ha packages
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
   loop:
     - keepalived
+  when: ha_proxy_state == 'present'
+
 - name: Create keepalived config file
   ansible.builtin.template:
     src: keepalived.conf.j2
@@ -23,11 +27,15 @@
     group: root
     mode: '0644'
   notify: Restart keepalived service
+  when: ha_proxy_state == 'present'
+
 - name: Enable and start keepalived
   ansible.builtin.service:
     name: keepalived
     enabled: true
     state: started
+  when: ha_proxy_state == 'present'
+
 - name: Dockerfile
   ansible.builtin.template:
     src: Dockerfile.j2
@@ -36,11 +44,15 @@
     group: app
     mode: '0644'
   notify: "Restart caddy ha service"
+  when: ha_proxy_state == 'present'
+
 - name: Caddy image
   community.docker.docker_image_build:
     name: "localhost/ha-{{ container_images.caddy }}"
     path: "{{ ha_proxy_directory }}"
   notify: "Restart caddy ha service"
+  when: ha_proxy_state == 'present'
+
 - name: Caddy config file
   ansible.builtin.template:
     src: Caddyfile.j2
@@ -50,6 +62,8 @@
     mode: '0644'
     lstrip_blocks: true
   notify: Restart caddy ha service
+  when: ha_proxy_state == 'present'
+
 - name: Caddy service
   ansible.builtin.include_role:
     name: docker_service
@@ -69,3 +83,44 @@
       - "{{ ha_proxy_directory }}/data:/data"
       - "{{ ha_proxy_directory }}/Caddyfile:/Caddyfile"
       - "/srv/certificates:/certificates:ro"
+    docker_service_state: "{{ ha_proxy_state }}"
+
+# Removal tasks
+- name: Remove Caddy service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "caddy-ha"
+    docker_service_state: "{{ ha_proxy_state }}"
+  when: ha_proxy_state == 'absent'
+
+- name: Stop and disable keepalived
+  ansible.builtin.service:
+    name: keepalived
+    enabled: false
+    state: stopped
+  when: ha_proxy_state == 'absent'
+
+- name: Remove keepalived config file
+  ansible.builtin.file:
+    path: /etc/keepalived/keepalived.conf
+    state: absent
+  when: ha_proxy_state == 'absent'
+
+- name: Remove Caddy config file
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}/Caddyfile"
+    state: absent
+  when: ha_proxy_state == 'absent'
+
+- name: Remove Dockerfile
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}/Dockerfile"
+    state: absent
+  when: ha_proxy_state == 'absent'
+
+- name: Remove Caddy data directories
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}"
+    state: absent
+  when: ha_proxy_state == 'absent'

@@ -5,6 +5,7 @@
       - socat
       - cron
     state: present
+  when: acme_manager_state == 'present'
 
 - name: Create acme user for certificate syncing
   ansible.builtin.user:
@@ -13,6 +14,7 @@
     shell: /bin/bash
     create_home: true
     home: /home/acme
+  when: acme_manager_state == 'present'
 
 - name: Create certificate directory
   ansible.builtin.file:
@@ -21,16 +23,19 @@
     owner: root
     group: root
     mode: '0755'
+  when: acme_manager_state == 'present'
 
 - name: Check if acme.sh is installed
   ansible.builtin.stat:
     path: "{{ acme_manager_install_dir }}/acme.sh"
   register: acme_sh_installed
+  when: acme_manager_state == 'present'
 
 - name: Install git
   ansible.builtin.package:
     name: git
     state: present
+  when: acme_manager_state == 'present'
 
 - name: Clone acme.sh repository
   ansible.builtin.git:
@@ -38,33 +43,37 @@
     dest: /tmp/acme.sh-repo
     version: master
     depth: 1
-  when: not acme_sh_installed.stat.exists
+  when: acme_manager_state == 'present' and not acme_sh_installed.stat.exists
 
 - name: Install acme.sh
   ansible.builtin.shell:
     cmd: cd /tmp/acme.sh-repo && ./acme.sh --install --home {{ acme_manager_install_dir }} --email {{ acme_manager_email }}
-  when: not acme_sh_installed.stat.exists
+  when: acme_manager_state == 'present' and not acme_sh_installed.stat.exists
 
 - name: Set Let's Encrypt as default CA
   ansible.builtin.command:
     cmd: "{{ acme_manager_install_dir }}/acme.sh --set-default-ca --server letsencrypt"
+  when: acme_manager_state == 'present'
 
 - name: Create acme group for certificate access
   ansible.builtin.group:
     name: acme
     system: true
+  when: acme_manager_state == 'present'
 
 - name: Add acme user to acme group
   ansible.builtin.user:
     name: acme
     groups: acme
     append: true
+  when: acme_manager_state == 'present'
 
 - name: Add app user to acme group
   ansible.builtin.user:
     name: app
     groups: acme
     append: true
+  when: acme_manager_state == 'present'
 
 - name: Create certificate subdirectories
   ansible.builtin.file:
@@ -74,6 +83,7 @@
     group: acme
     mode: '0750'
   loop: "{{ sites }}"
+  when: acme_manager_state == 'present'
 
 - name: Issue certificates for domains
   ansible.builtin.command:
@@ -91,6 +101,7 @@
   environment:
     CF_Account_ID: "{{ acme_manager_cloudflare_account_id }}"
     CF_Token: "{{ acme_manager_cloudflare_account_token }}"
+  when: acme_manager_state == 'present'
 
 - name: Set certificate directory permissions
   ansible.builtin.file:
@@ -101,6 +112,7 @@
     mode: '0750'
     recurse: true
   loop: "{{ sites }}"
+  when: acme_manager_state == 'present'
 
 - name: Set certificate file permissions
   ansible.builtin.file:
@@ -109,7 +121,7 @@
     group: acme
     mode: '0640'
   loop: "{{ sites | product(['cert.pem', 'key.pem', 'fullchain.pem']) }}"
-  when: "item[0].name is defined"
+  when: acme_manager_state == 'present' and item[0].name is defined
 
 - name: Create certificate renewal script
   ansible.builtin.template:
@@ -118,6 +130,7 @@
     owner: root
     group: root
     mode: '0755'
+  when: acme_manager_state == 'present'
 
 - name: Create cron job for certificate renewal
   ansible.builtin.cron:
@@ -126,3 +139,42 @@
     hour: "{{ acme_manager_renew_cron_hour }}"
     job: "{{ acme_manager_install_dir }}/renew-certs.sh >> /var/log/acme-renew.log 2>&1"
     user: root
+  when: acme_manager_state == 'present'
+
+- name: Remove cron job for certificate renewal
+  ansible.builtin.cron:
+    name: "Renew ACME certificates"
+    state: absent
+    user: root
+  when: acme_manager_state == 'absent'
+
+- name: Remove certificate renewal script
+  ansible.builtin.file:
+    path: "{{ acme_manager_install_dir }}/renew-certs.sh"
+    state: absent
+  when: acme_manager_state == 'absent'
+
+- name: Remove certificate directory
+  ansible.builtin.file:
+    path: "{{ acme_manager_cert_dir }}"
+    state: absent
+  when: acme_manager_state == 'absent'
+
+- name: Remove acme.sh installation
+  ansible.builtin.file:
+    path: "{{ acme_manager_install_dir }}"
+    state: absent
+  when: acme_manager_state == 'absent'
+
+- name: Remove acme user
+  ansible.builtin.user:
+    name: acme
+    state: absent
+    remove: true
+  when: acme_manager_state == 'absent'
+
+- name: Remove acme group
+  ansible.builtin.group:
+    name: acme
+    state: absent
+  when: acme_manager_state == 'absent'

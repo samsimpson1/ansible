@@ -1,6 +1,9 @@
 # Simple monitoring role defaults
 # Focus on disk status and service status only
 
+# State configuration
+monitoring_state: present
+
 # General configuration
 monitoring_enabled: true
 monitoring_interval: "*/15"  # Every 15 minutes

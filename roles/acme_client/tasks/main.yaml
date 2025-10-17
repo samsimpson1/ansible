@@ -5,6 +5,7 @@
     shell: /bin/bash
     create_home: true
     home: "/home/{{ acme_client_source_user }}"
+  when: acme_client_state == 'present'
 
 - name: Generate SSH key for acme user
   ansible.builtin.user:
@@ -12,26 +13,31 @@
     generate_ssh_key: true
     ssh_key_type: ed25519
     ssh_key_file: ".ssh/id_ed25519"
+  when: acme_client_state == 'present'
 
 - name: Fetch acme user public key
   ansible.builtin.slurp:
     src: "/home/{{ acme_client_source_user }}/.ssh/id_ed25519.pub"
   register: acme_pubkey
+  when: acme_client_state == 'present'
 
 - name: Display public key for manual configuration
   ansible.builtin.debug:
     msg: "Add this key to {{ acme_client_source_host }}:/home/{{ acme_client_source_user }}/.ssh/authorized_keys: {{ acme_pubkey.content | b64decode }}"
+  when: acme_client_state == 'present'
 
 - name: Create acme group for certificate access
   ansible.builtin.group:
     name: acme
     system: true
+  when: acme_client_state == 'present'
 
 - name: Add app user to acme group
   ansible.builtin.user:
     name: app
     groups: acme
     append: true
+  when: acme_client_state == 'present'
 
 - name: Create certificate directory
   ansible.builtin.file:
@@ -40,6 +46,7 @@
     owner: root
     group: acme
     mode: '0775'
+  when: acme_client_state == 'present'
 
 - name: Create certificate sync script
   ansible.builtin.template:
@@ -48,6 +55,7 @@
     owner: root
     group: root
     mode: '0755'
+  when: acme_client_state == 'present'
 
 - name: Create cron job for certificate sync
   ansible.builtin.cron:
@@ -56,3 +64,36 @@
     hour: "{{ acme_client_sync_cron_hour }}"
     job: "/opt/sync-certs.sh >> /var/log/acme-sync.log 2>&1"
     user: "{{ acme_client_source_user }}"
+  when: acme_client_state == 'present'
+
+- name: Remove cron job for certificate sync
+  ansible.builtin.cron:
+    name: "Sync ACME certificates from {{ acme_client_source_host }}"
+    state: absent
+    user: "{{ acme_client_source_user }}"
+  when: acme_client_state == 'absent'
+
+- name: Remove certificate sync script
+  ansible.builtin.file:
+    path: "/opt/sync-certs.sh"
+    state: absent
+  when: acme_client_state == 'absent'
+
+- name: Remove certificate directory
+  ansible.builtin.file:
+    path: "{{ acme_client_cert_dir }}"
+    state: absent
+  when: acme_client_state == 'absent'
+
+- name: Remove acme user
+  ansible.builtin.user:
+    name: "{{ acme_client_source_user }}"
+    state: absent
+    remove: true
+  when: acme_client_state == 'absent'
+
+- name: Remove acme group
+  ansible.builtin.group:
+    name: acme
+    state: absent
+  when: acme_client_state == 'absent'

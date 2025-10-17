@@ -5,6 +5,8 @@
     mode: "0640"
     owner: "root"
     group: "root"
+  when: samba_server_state == 'present'
+
 - name: Samba service
   ansible.builtin.include_role:
     name: docker_service
@@ -21,3 +23,19 @@
     docker_service_env_vars:
       SAMBACC_CONFIG: "/config.json"
       SAMBA_CONTAINER_ID: "general"
+    docker_service_state: "{{ samba_server_state }}"
+
+# Removal tasks
+- name: Remove Samba service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "samba"
+    docker_service_state: "{{ samba_server_state }}"
+  when: samba_server_state == 'absent'
+
+- name: Remove Samba config file
+  ansible.builtin.file:
+    path: /srv/containers/storage/ssd/samba.json
+    state: absent
+  when: samba_server_state == 'absent'

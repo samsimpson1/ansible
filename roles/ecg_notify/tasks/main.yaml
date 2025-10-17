@@ -2,6 +2,8 @@
   ansible.builtin.package:
     name: jq
     state: present
+  when: ecg_notify_state == 'present'
+
 - name: Last modified file
   ansible.builtin.file:
     path: /srv/ecg-last-modified.txt
@@ -9,6 +11,8 @@
     owner: app
     group: app
     mode: '0644'
+  when: ecg_notify_state == 'present'
+
 - name: Notification script
   ansible.builtin.template:
     src: script.sh.j2
@@ -16,9 +20,32 @@
     owner: app
     group: app
     mode: '0755'
+  when: ecg_notify_state == 'present'
+
 - name: Notification cron
   ansible.builtin.cron:
     name: "ECG notify"
     user: app
     minute: "*/10"
     job: "/usr/bin/env bash /srv/ecg-notify.sh"
+  when: ecg_notify_state == 'present'
+
+# Removal tasks
+- name: Remove notification cron
+  ansible.builtin.cron:
+    name: "ECG notify"
+    user: app
+    state: absent
+  when: ecg_notify_state == 'absent'
+
+- name: Remove notification script
+  ansible.builtin.file:
+    path: /srv/ecg-notify.sh
+    state: absent
+  when: ecg_notify_state == 'absent'
+
+- name: Remove last modified file
+  ansible.builtin.file:
+    path: /srv/ecg-last-modified.txt
+    state: absent
+  when: ecg_notify_state == 'absent'

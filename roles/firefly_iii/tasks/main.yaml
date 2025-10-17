@@ -9,6 +9,8 @@
     - /srv/containers/storage/ssd/firefly-iii
     - /srv/containers/storage/ssd/firefly-iii/upload
     - /srv/containers/storage/ssd/firefly-iii/db
+  when: firefly_iii_state == 'present'
+
 - name: Firefly III OAuth2 Proxy
   ansible.builtin.include_role:
     name: oauth2_proxy
@@ -21,6 +23,9 @@
     oauth2_proxy_client_id: "{{ sso_clients.firefly_iii.id }}"
     oauth2_proxy_client_secret: "{{ sso_clients.firefly_iii.secret }}"
     oauth2_proxy_cookie_secret: "{{ firefly_iii.cookie_secret }}"
+    oauth2_proxy_state: "{{ firefly_iii_state }}"
+  when: firefly_iii_state == 'present'
+
 - name: Firefly III Database
   ansible.builtin.include_role:
     name: docker_service
@@ -38,6 +43,8 @@
       MYSQL_PASSWORD: "{{ firefly_iii.db_password }}"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/firefly-iii/db:/var/lib/mysql:rw"
+    docker_service_state: "{{ firefly_iii_state }}"
+
 - name: Firefly III
   ansible.builtin.include_role:
     name: docker_service
@@ -60,6 +67,8 @@
       AUTHENTICATION_GUARD_EMAIL: "HTTP_X_FORWARDED_EMAIL"
       APP_URL: "https://firefly.srv.simpson.id"
       TRUSTED_PROXIES: "*"
+    docker_service_state: "{{ firefly_iii_state }}"
+
 - name: Firefly III Data Importer
   ansible.builtin.include_role:
     name: docker_service
@@ -79,6 +88,8 @@
       NORDIGEN_KEY: "{{ firefly_iii.gocardless_secret }}"
       TRUSTED_PROXIES: "*"
       IMPORT_DIR_ALLOWLIST: "/import"
+    docker_service_state: "{{ firefly_iii_state }}"
+
 - name: Firefly III Data Import Job
   ansible.builtin.cron:
     name: "Firefly III Data Import Job"
@@ -87,3 +98,55 @@
     hour: "3"
     job: "/usr/bin/env docker exec firefly-iii-data-importer php artisan importer:auto-import /import >> /var/log/firefly-iii-data-importer.log 2>&1"
     state: present
+  when: firefly_iii_state == 'present'
+
+# Removal tasks
+- name: Remove Firefly III Data Import Job
+  ansible.builtin.cron:
+    name: "Firefly III Data Import Job"
+    user: app
+    state: absent
+  when: firefly_iii_state == 'absent'
+
+- name: Remove Firefly III Data Importer
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "firefly-iii-data-importer"
+    docker_service_state: "{{ firefly_iii_state }}"
+  when: firefly_iii_state == 'absent'
+
+- name: Remove Firefly III
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "firefly-iii"
+    docker_service_state: "{{ firefly_iii_state }}"
+  when: firefly_iii_state == 'absent'
+
+- name: Remove Firefly III Database
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "firefly-iii-db"
+    docker_service_state: "{{ firefly_iii_state }}"
+  when: firefly_iii_state == 'absent'
+
+- name: Remove Firefly III OAuth2 Proxy
+  ansible.builtin.include_role:
+    name: oauth2_proxy
+  vars:
+    oauth2_proxy_id: "firefly"
+    oauth2_proxy_state: "{{ firefly_iii_state }}"
+  when: firefly_iii_state == 'absent'
+
+- name: Remove Firefly III data directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /srv/containers/storage/ssd/firefly-iii/upload
+    - /srv/containers/storage/ssd/firefly-iii/import
+    - /srv/containers/storage/ssd/firefly-iii/db
+    - /srv/containers/storage/ssd/firefly-iii
+  when: firefly_iii_state == 'absent'

@@ -5,6 +5,8 @@
     owner: app
     group: app
     mode: '0750'
+  when: renovate_state == 'present'
+
 - name: Renovate config file
   ansible.builtin.copy:
     content: |
@@ -15,6 +17,8 @@
     owner: app
     group: app
     mode: "0640"
+  when: renovate_state == 'present'
+
 - name: Renovate GitHub App key
   ansible.builtin.copy:
     src: github_app.pem
@@ -22,6 +26,8 @@
     owner: app
     group: app
     mode: '0600'
+  when: renovate_state == 'present'
+
 - name: Renovate GitHub App installation token script
   ansible.builtin.template:
     src: installation_token.sh.j2
@@ -29,6 +35,8 @@
     owner: app
     group: app
     mode: "0750"
+  when: renovate_state == 'present'
+
 - name: Renovate start script
   ansible.builtin.template:
     src: start.sh.j2
@@ -36,9 +44,50 @@
     owner: app
     group: app
     mode: "0750"
+  when: renovate_state == 'present'
+
 - name: Renovate cron job
   ansible.builtin.cron:
     name: "Renovate"
     user: app
     minute: "28"
     job: "/srv/renovate/start.sh"
+  when: renovate_state == 'present'
+
+# Removal tasks
+- name: Remove Renovate cron job
+  ansible.builtin.cron:
+    name: "Renovate"
+    user: app
+    state: absent
+  when: renovate_state == 'absent'
+
+- name: Remove Renovate start script
+  ansible.builtin.file:
+    path: /srv/renovate/start.sh
+    state: absent
+  when: renovate_state == 'absent'
+
+- name: Remove Renovate GitHub App installation token script
+  ansible.builtin.file:
+    path: /srv/renovate/installation_token.sh
+    state: absent
+  when: renovate_state == 'absent'
+
+- name: Remove Renovate GitHub App key
+  ansible.builtin.file:
+    path: /srv/renovate/github_app.pem
+    state: absent
+  when: renovate_state == 'absent'
+
+- name: Remove Renovate config file
+  ansible.builtin.file:
+    path: /srv/renovate/config.json
+    state: absent
+  when: renovate_state == 'absent'
+
+- name: Remove Renovate directory
+  ansible.builtin.file:
+    path: /srv/renovate
+    state: absent
+  when: renovate_state == 'absent'

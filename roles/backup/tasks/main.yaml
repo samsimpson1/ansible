@@ -7,11 +7,13 @@
     - restic
     - rsync
     - sshpass
+  when: backup_state == 'present'
 - name: Enable cron daemon
   ansible.builtin.systemd:
     name: cron
     state: started
     enabled: true
+  when: backup_state == 'present'
 - name: Create backup directory
   ansible.builtin.file:
     state: directory
@@ -19,6 +21,7 @@
     mode: "0750"
     owner: root
     group: root
+  when: backup_state == 'present'
 - name: Create password file
   ansible.builtin.copy:
     dest: /srv/backups/password
@@ -26,6 +29,7 @@
     mode: "0600"
     owner: root
     group: root
+  when: backup_state == 'present'
 - name: Create repository password file
   ansible.builtin.copy:
     dest: /srv/backups/repository-password
@@ -33,10 +37,13 @@
     mode: "0600"
     owner: root
     group: root
+  when: backup_state == 'present'
 - name: Sync jobs
   ansible.builtin.include_tasks: sync.yaml
+  when: backup_state == 'present'
 - name: Restic jobs
   ansible.builtin.include_tasks: restic.yaml
+  when: backup_state == 'present'
 - name: Schedule jobs
   ansible.builtin.cron:
     name: "Backup {{ item.op }} {{ item.name }}"
@@ -48,6 +55,7 @@
     month: "{{ item.cron.month | default('*') }}"
     weekday: "{{ item.cron.weekday | default('*') }}"
   loop: "{{ backup_jobs }}"
+  when: backup_state == 'present'
 - name: Create backup configuration file
   ansible.builtin.template:
     src: config.json.j2
@@ -55,6 +63,7 @@
     mode: "0640"
     owner: root
     group: root
+  when: backup_state == 'present'
 - name: Create report send script
   ansible.builtin.template:
     src: report-send.sh.j2
@@ -62,6 +71,7 @@
     mode: "0750"
     owner: root
     group: root
+  when: backup_state == 'present'
 - name: Create report generation script
   ansible.builtin.copy:
     src: report-generate.py
@@ -69,6 +79,7 @@
     mode: "0750"
     owner: root
     group: root
+  when: backup_state == 'present'
 - name: Schedule report job
   ansible.builtin.cron:
     name: "Backup report"
@@ -77,3 +88,33 @@
     minute: "0"
     hour: "12"
     day: "*/2"
+  when: backup_state == 'present'
+
+- name: Remove backup job cron entries
+  ansible.builtin.cron:
+    name: "Backup {{ item.op }} {{ item.name }}"
+    state: absent
+    user: root
+  loop: "{{ backup_jobs }}"
+  when: backup_state == 'absent'
+
+- name: Remove prune job cron entries
+  ansible.builtin.cron:
+    name: "Prune {{ item.op }} {{ item.name }}"
+    state: absent
+    user: root
+  loop: "{{ backup_jobs }}"
+  when: backup_state == 'absent' and item.op == 'restic'
+
+- name: Remove report job cron entry
+  ansible.builtin.cron:
+    name: "Backup report"
+    state: absent
+    user: root
+  when: backup_state == 'absent'
+
+- name: Remove backup directory
+  ansible.builtin.file:
+    path: /srv/backups
+    state: absent
+  when: backup_state == 'absent'

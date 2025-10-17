@@ -3,12 +3,14 @@
     name: "{{ item }}"
     state: present
   loop: "{{ monitoring_packages }}"
+  when: monitoring_state == 'present'
 
 - name: Enable cron daemon
   ansible.builtin.systemd:
     name: cron
     state: started
     enabled: true
+  when: monitoring_state == 'present'
 
 - name: Create monitoring directory
   ansible.builtin.file:
@@ -17,6 +19,7 @@
     mode: "0755"
     owner: root
     group: root
+  when: monitoring_state == 'present'
 
 - name: Create monitoring state directory
   ansible.builtin.file:
@@ -25,6 +28,7 @@
     mode: "0755"
     owner: root
     group: root
+  when: monitoring_state == 'present'
 
 - name: Create disk monitoring script
   ansible.builtin.template:
@@ -33,6 +37,7 @@
     mode: "0755"
     owner: root
     group: root
+  when: monitoring_state == 'present'
 
 - name: Create service monitoring script
   ansible.builtin.template:
@@ -41,6 +46,7 @@
     mode: "0755"
     owner: root
     group: root
+  when: monitoring_state == 'present'
 
 - name: Create email alert script
   ansible.builtin.template:
@@ -49,6 +55,7 @@
     mode: "0755"
     owner: root
     group: root
+  when: monitoring_state == 'present'
 
 - name: Create main monitoring script
   ansible.builtin.template:
@@ -57,6 +64,7 @@
     mode: "0755"
     owner: root
     group: root
+  when: monitoring_state == 'present'
 
 - name: Schedule monitoring cron job
   ansible.builtin.cron:
@@ -68,10 +76,48 @@
     day: "{{ monitoring_interval.split(' ')[2] if monitoring_interval.split(' ')|length > 2 else '*' }}"
     month: "{{ monitoring_interval.split(' ')[3] if monitoring_interval.split(' ')|length > 3 else '*' }}"
     weekday: "{{ monitoring_interval.split(' ')[4] if monitoring_interval.split(' ')|length > 4 else '*' }}"
-  when: monitoring_enabled
+  when: monitoring_state == 'present' and monitoring_enabled
 
 - name: Remove monitoring cron job when disabled
   ansible.builtin.cron:
     name: "System monitoring"
     state: absent
-  when: not monitoring_enabled
+  when: monitoring_state == 'present' and not monitoring_enabled
+
+# Removal tasks
+- name: Remove monitoring cron job
+  ansible.builtin.cron:
+    name: "System monitoring"
+    user: root
+    state: absent
+  when: monitoring_state == 'absent'
+
+- name: Remove main monitoring script
+  ansible.builtin.file:
+    path: "{{ monitoring_directory }}/monitor-main.sh"
+    state: absent
+  when: monitoring_state == 'absent'
+
+- name: Remove email alert script
+  ansible.builtin.file:
+    path: "{{ monitoring_directory }}/alert-email.sh"
+    state: absent
+  when: monitoring_state == 'absent'
+
+- name: Remove service monitoring script
+  ansible.builtin.file:
+    path: "{{ monitoring_directory }}/monitor-services.sh"
+    state: absent
+  when: monitoring_state == 'absent'
+
+- name: Remove disk monitoring script
+  ansible.builtin.file:
+    path: "{{ monitoring_directory }}/monitor-disk.sh"
+    state: absent
+  when: monitoring_state == 'absent'
+
+- name: Remove monitoring directory
+  ansible.builtin.file:
+    path: "{{ monitoring_directory }}"
+    state: absent
+  when: monitoring_state == 'absent'

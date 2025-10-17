@@ -3,3 +3,4 @@ acme_client_source_host: "10.0.0.191"
 acme_client_source_user: "acme"
 acme_client_sync_cron_minute: "*/30"
 acme_client_sync_cron_hour: "*"
+acme_client_state: present

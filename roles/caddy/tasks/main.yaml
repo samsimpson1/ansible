@@ -9,6 +9,7 @@
     - ""
     - config
     - data
+  when: caddy_state == 'present'
 - name: Dockerfile
   ansible.builtin.template:
     src: Dockerfile.j2
@@ -17,11 +18,13 @@
     group: app
     mode: '0644'
   notify: "Restart {{ caddy_id }} caddy"
+  when: caddy_state == 'present'
 - name: Caddy image
   community.docker.docker_image_build:
     name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
     path: "{{ caddy_data_directory }}/{{ caddy_id }}"
   notify: "Restart {{ caddy_id }} caddy"
+  when: caddy_state == 'present'
 - name: Caddyfile
   ansible.builtin.template:
     src: Caddyfile.j2
@@ -31,11 +34,13 @@
     mode: '0644'
     lstrip_blocks: true
   notify: "Restart {{ caddy_id }} caddy"
+  when: caddy_state == 'present'
 - name: Resolve additional group names to GIDs
   ansible.builtin.shell: "getent group {{ item }} | cut -d: -f3"
   register: caddy_group_gids
   loop: "{{ caddy_additional_group_names }}"
   changed_when: false
+  when: caddy_state == 'present'
 - name: Set caddy facts
   ansible.builtin.set_fact:
     caddy_volumes_standard:
@@ -47,6 +52,7 @@
       - "{{ caddy_http_port }}:{{ caddy_http_port }}"
       - "{{ caddy_https_port }}:{{ caddy_https_port }}"
     caddy_all_groups: "{{ caddy_groups + (caddy_group_gids.results | map(attribute='stdout') | list) }}"
+  when: caddy_state == 'present'
 - name: Caddy service
   ansible.builtin.include_role:
     name: docker_service
@@ -57,8 +63,21 @@
     docker_service_pull_policy: "never"
     docker_service_network: "{{ caddy_networks[0] }}"
     docker_service_user: "568"
-    docker_service_groups: "{{ caddy_all_groups }}"
+    docker_service_groups: "{{ caddy_all_groups | default([]) }}"
     docker_service_command: "caddy run -c /Caddyfile"
     docker_service_env_vars: "{{ caddy_env_vars }}"
-    docker_service_ports: "{{ caddy_ports }}"
-    docker_service_volumes: "{{ caddy_volumes_standard + caddy_volumes }}"
+    docker_service_ports: "{{ caddy_ports | default([]) }}"
+    docker_service_volumes: "{{ (caddy_volumes_standard | default([])) + caddy_volumes }}"
+    docker_service_state: "{{ caddy_state }}"
+
+- name: Remove Caddy Docker image
+  community.docker.docker_image:
+    name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
+    state: absent
+  when: caddy_state == 'absent'
+
+- name: Remove Caddy data directory
+  ansible.builtin.file:
+    path: "{{ caddy_data_directory }}/{{ caddy_id }}"
+    state: absent
+  when: caddy_state == 'absent'
