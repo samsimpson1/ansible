@@ -1,14 +1,24 @@
+---
 - name: Create systemd service unit
   ansible.builtin.template:
     src: service.j2
     dest: /etc/systemd/system/{{ docker_service_id }}.service
     mode: "0644"
+  when: docker_service_state == 'present'
   notify: "Restart {{ docker_service_id }} service"
+
+- name: Remove systemd service unit
+  ansible.builtin.file:
+    path: /etc/systemd/system/{{ docker_service_id }}.service
+    state: absent
+  when: docker_service_state == 'absent'
+
 - name: Reload systemd daemon
   ansible.builtin.systemd:
     daemon_reload: true
-- name: Start and enable Docker service
+
+- name: Manage Docker service
   ansible.builtin.systemd:
     name: "{{ docker_service_id }}"
-    state: started
-    enabled: "{{ docker_service_enabled }}"
+    state: "{{ 'stopped' if docker_service_state == 'absent' else 'started' }}"
+    enabled: "{{ docker_service_enabled if docker_service_state == 'present' else false }}"
