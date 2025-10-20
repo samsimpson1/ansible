@@ -17,6 +17,20 @@ sites:
       - name: bookmarks
         target: "http://karakeep-web:3000"
         host: little
+      - name: box
+        host: box
+        custom: |
+          @box host box.srv.simpson.id
+          handle @box {
+            respond "i'm a box"
+          }
+      - name: little
+        host: little
+        custom: |
+          @little host little.srv.simpson.id
+          handle @little {
+            respond "i'm little"
+          }
       - name: budget
         target: "http://actual:5006"
         host: little
