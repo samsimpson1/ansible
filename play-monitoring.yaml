@@ -1,7 +1,5 @@
 - name: Monitoring
   hosts: home
-  vars_files:
-    - secret.yaml
   become: true
   tasks:
     - name: SSMTP

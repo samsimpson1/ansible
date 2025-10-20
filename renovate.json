@@ -19,7 +19,7 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": "container-images.yaml",
+      "managerFilePatterns": "group_vars/all/container-images.yaml",
       "matchStrings": [
         "\\W+.+: (?<depName>.+):(?<currentValue>.+)"
       ],

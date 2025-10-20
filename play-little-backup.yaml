@@ -1,7 +1,5 @@
 - name: Little (backup)
   hosts: little
-  vars_files:
-    - secret.yaml
   become: true
   tasks:
     - name: Duplicacy user

@@ -1,8 +1,6 @@
 - name: Desktop Backup (Linux)
   hosts: 127.0.0.1
   connection: local
-  vars_files:
-    - secret.yaml
   tasks:
     - name: Backup directory
       ansible.builtin.file:

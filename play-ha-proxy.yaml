@@ -2,9 +2,6 @@
   hosts:
     - box
     - little
-  vars_files:
-    - container-images.yaml
-    - secret.yaml
   become: true
   tasks:
     - name: App user
