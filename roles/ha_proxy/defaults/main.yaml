@@ -1,4 +1,5 @@
 ha_proxy_state: present
+ha_proxy_keepalived_state: BACKUP
 ha_proxy_address: "10.0.0.250"
 ha_proxy_netmask: "16"
 caddy_version: "2.10"

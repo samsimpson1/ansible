@@ -86,14 +86,6 @@
     docker_service_state: "{{ ha_proxy_state }}"
 
 # Removal tasks
-- name: Remove Caddy service
-  ansible.builtin.include_role:
-    name: docker_service
-  vars:
-    docker_service_id: "caddy-ha"
-    docker_service_state: "{{ ha_proxy_state }}"
-  when: ha_proxy_state == 'absent'
-
 - name: Stop and disable keepalived
   ansible.builtin.service:
     name: keepalived

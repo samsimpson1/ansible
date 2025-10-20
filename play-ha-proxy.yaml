@@ -5,7 +5,6 @@
   vars_files:
     - container-images.yaml
     - secret.yaml
-    - vars/sites.yaml
   become: true
   tasks:
     - name: App user
