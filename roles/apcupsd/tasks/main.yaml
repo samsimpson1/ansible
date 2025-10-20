@@ -1,0 +1,20 @@
+- name: Install apcupsd
+  ansible.builtin.apt:
+    name: apcupsd
+    state: present
+    update_cache: true
+
+- name: Configure apcupsd
+  ansible.builtin.template:
+    src: apcupsd.conf.j2
+    dest: /etc/apcupsd/apcupsd.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart apcupsd
+
+- name: Enable apcupsd service
+  ansible.builtin.systemd:
+    name: apcupsd
+    enabled: true
+    state: started

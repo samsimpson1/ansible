@@ -12,6 +12,19 @@
       ansible.builtin.include_role:
         name: tailscale
 
+    - name: APC UPS Daemon (Server)
+      ansible.builtin.include_role:
+        name: apcupsd
+      vars:
+        apcupsd_mode: server
+        apcupsd_upsname: BoxUPS
+        apcupsd_device: /dev/usb/hiddev0
+        apcupsd_upscable: usb
+        apcupsd_upstype: usb
+        apcupsd_batterylevel: 10
+        apcupsd_minutes: 5
+        apcupsd_netserver: "on"
+
     - name: Docker
       ansible.builtin.include_role:
         name: docker_host

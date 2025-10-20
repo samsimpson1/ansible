@@ -1,0 +1,53 @@
+## apcupsd.conf - Configuration for apcupsd
+## Managed by Ansible - DO NOT EDIT MANUALLY
+
+# UPS name
+UPSNAME {{ apcupsd_upsname }}
+
+# Cable type
+UPSCABLE {{ apcupsd_upscable }}
+
+# UPS type
+UPSTYPE {{ apcupsd_upstype }}
+
+{% if apcupsd_mode == 'server' %}
+# Device path for USB UPS
+DEVICE {{ apcupsd_device }}
+{% else %}
+# Network client mode - connect to server
+DEVICE
+UPSCLASS standalone
+UPSMODE net
+{% endif %}
+
+# Network Information Server
+NETSERVER {{ apcupsd_netserver }}
+NISPORT {{ apcupsd_nisport }}
+
+{% if apcupsd_mode == 'client' %}
+# Master server for network monitoring
+MASTER {{ apcupsd_server }}
+MASTERPORT {{ apcupsd_nisport }}
+{% endif %}
+
+# Battery level at which to shutdown (percent)
+BATTERYLEVEL {{ apcupsd_batterylevel }}
+
+# Runtime remaining at which to shutdown (minutes)
+MINUTES {{ apcupsd_minutes }}
+
+# Time on battery before shutdown (seconds, 0=disable)
+TIMEOUT {{ apcupsd_timeout }}
+
+# Logging
+STATTIME 0
+STATFILE /var/log/apcupsd.status
+LOGSTATS off
+DATATIME 0
+
+# Events logging
+EVENTSFILE /var/log/apcupsd.events
+EVENTFILE /var/log/apcupsd.event
+
+# Lock file
+LOCKFILE /var/lock/apcupsd

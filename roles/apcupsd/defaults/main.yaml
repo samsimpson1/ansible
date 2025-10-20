@@ -1,0 +1,36 @@
+# apcupsd role defaults
+
+# Mode: server or client
+# server - monitors UPS directly via USB
+# client - monitors UPS via network from another apcupsd server
+apcupsd_mode: client
+
+# For server mode: device path
+apcupsd_device: /dev/usb/hiddev0
+
+# For client mode: server hostname/IP
+apcupsd_server: localhost
+
+# UPS name
+apcupsd_upsname: UPS
+
+# Cable type (usb for USB connected UPS)
+apcupsd_upscable: usb
+
+# UPS type (usb for USB connected UPS)
+apcupsd_upstype: usb
+
+# Battery level at which to shutdown (percentage)
+apcupsd_batterylevel: 10
+
+# Runtime remaining at which to shutdown (minutes)
+apcupsd_minutes: 5
+
+# Time on battery before shutdown (seconds, 0=disable)
+apcupsd_timeout: 0
+
+# Net server port
+apcupsd_nisport: 3551
+
+# Enable network information server
+apcupsd_netserver: "on"
