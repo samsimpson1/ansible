@@ -28,6 +28,7 @@
     cmd: |
       bash -c "command -v /srv/app/github-actions/bin/op > /dev/null 2>&1 || { exit 0; } && /srv/app/github-actions/bin/op --version"
   register: onepassword_version_current
+  changed_when: false
 
 - name: Set 1Password version facts
   ansible.builtin.set_fact:

@@ -3,12 +3,11 @@
   vars_files:
     - container-images.yaml
     - secret.yaml
-    - vars/sites.yaml
   become: true
   tasks:
     - name: App user
       ansible.builtin.include_tasks: apps/app-user.yaml
-    
+
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
