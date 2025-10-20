@@ -34,13 +34,25 @@
         "ghcr.io/home-operations/sonarr",
         "ghcr.io/home-operations/sabnzbd",
         "ghcr.io/home-operations/qbittorrent",
-        "ghcr.io/sct/overseerr"
+        "ghcr.io/sct/overseerr",
+        "ghcr.io/advplyr/audiobookshelf",
+        "ghcr.io/gotson/komga",
+        "ghcr.io/unpackerr/unpackerr",
+        "slskd/slskd"
       ],
       "groupName": "Media apps"
     },
     {
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions"
+    },
+    {
+      "matchPackageNames": [
+        "prom/node-exporter",
+        "prom/prometheus",
+        "grafana/grafana"
+      ],
+      "groupName": "Monitoring"
     }
   ]
 }
