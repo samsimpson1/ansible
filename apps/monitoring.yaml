@@ -8,33 +8,198 @@
   loop:
     - grafana
     - prometheus
+    - alertmanager
+
+- name: Create Prometheus alert rules file
+  ansible.builtin.copy:
+    content: |
+      groups:
+        - name: host_alerts
+          interval: 30s
+          rules:
+            # Disk space alerts
+            - alert: DiskSpaceCritical
+              expr: |
+                (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+                / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < 10
+              for: 5m
+              labels:
+                severity: critical
+                component: disk
+              annotations:
+                summary: "Critical disk space on {{ $labels.instance }}"
+                description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has only {{ $value | humanize }}% available space remaining."
+
+            - alert: DiskSpaceWarning
+              expr: |
+                (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+                / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < 20
+              for: 10m
+              labels:
+                severity: warning
+                component: disk
+              annotations:
+                summary: "Low disk space on {{ $labels.instance }}"
+                description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has only {{ $value | humanize }}% available space remaining."
+
+            # Memory alerts
+            - alert: MemoryPressureHigh
+              expr: |
+                (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+              for: 5m
+              labels:
+                severity: warning
+                component: memory
+              annotations:
+                summary: "High memory pressure on {{ $labels.instance }}"
+                description: "Available memory on {{ $labels.instance }} is below 10% ({{ $value | humanize }}% remaining)."
+
+            - alert: MemoryPressureCritical
+              expr: |
+                (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 5
+              for: 2m
+              labels:
+                severity: critical
+                component: memory
+              annotations:
+                summary: "Critical memory pressure on {{ $labels.instance }}"
+                description: "Available memory on {{ $labels.instance }} is critically low at {{ $value | humanize }}%."
+
+            # SMART disk health alerts
+            - alert: DiskSmartFailure
+              expr: node_smartctl_device_smart_healthy == 0
+              for: 1m
+              labels:
+                severity: critical
+                component: disk
+              annotations:
+                summary: "SMART disk failure detected on {{ $labels.instance }}"
+                description: "Disk {{ $labels.device }} on {{ $labels.instance }} is reporting SMART health failure. Immediate attention required."
+
+            # Systemd service alerts
+            - alert: SystemdServiceFailed
+              expr: node_systemd_unit_state{state="failed"} == 1
+              for: 5m
+              labels:
+                severity: warning
+                component: service
+              annotations:
+                summary: "Systemd service failed on {{ $labels.instance }}"
+                description: "Service {{ $labels.name }} on {{ $labels.instance }} is in failed state."
+
+            # Host down alert
+            - alert: HostDown
+              expr: up{job="node_exporter"} == 0
+              for: 2m
+              labels:
+                severity: critical
+                component: host
+              annotations:
+                summary: "Host {{ $labels.instance }} is down"
+                description: "Node exporter on {{ $labels.instance }} has been unreachable for more than 2 minutes."
+    dest: /srv/containers/storage/ssd/prometheus/alerts.yaml
+    mode: "0644"
+    owner: "app"
+    group: "app"
 
 - name: Create Prometheus configuration file
   ansible.builtin.copy:
     content: |
+      global:
+        scrape_interval: 30s
+        evaluation_interval: 30s
+
+      alerting:
+        alertmanagers:
+          - static_configs:
+              - targets:
+                  - alertmanager:9093
+
+      rule_files:
+        - /alerts.yaml
+
       scrape_configs:
         - job_name: "prometheus"
           static_configs:
-            - targets: ["little.int.simpson.id:9100"]
+            - targets: ["localhost:9090"]
+
+        - job_name: "node_exporter"
+          static_configs:
+            - targets:
+                - "little.int.simpson.id:9100"
+                - "box.int.simpson.id:9100"
               labels:
-                host: little
+                environment: homelab
     dest: /srv/containers/storage/ssd/prometheus/config.yaml
     mode: "0644"
     owner: "app"
     group: "app"
 
-- name: Prometheus Node Exporter service
+- name: Create Alertmanager configuration file
+  ansible.builtin.copy:
+    content: |
+      global:
+        resolve_timeout: 5m
+
+      route:
+        receiver: 'discord'
+        group_by: ['alertname', 'cluster', 'service']
+        group_wait: 10s
+        group_interval: 10s
+        repeat_interval: 12h
+
+      receivers:
+        - name: 'discord'
+          discord_configs:
+            - webhook_url: '{{ alertmanager_discord_webhook_url }}'
+              title: '{% raw %}{{ template "discord.title" . }}{% endraw %}'
+              message: '{% raw %}{{ template "discord.message" . }}{% endraw %}'
+
+      templates:
+        - '/etc/alertmanager/templates/*.tmpl'
+    dest: /srv/containers/storage/ssd/alertmanager/config.yaml
+    mode: "0644"
+    owner: "app"
+    group: "app"
+
+- name: Create Alertmanager Discord template
+  ansible.builtin.copy:
+    content: |
+      {% raw %}{{ define "discord.title" }}
+      [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.alertname }}
+      {{ end }}
+
+      {{ define "discord.message" }}
+      {{ range .Alerts }}
+      **Alert:** {{ .Labels.alertname }}
+      **Severity:** {{ .Labels.severity }}
+      **Component:** {{ .Labels.component }}
+      **Instance:** {{ .Labels.instance }}
+      **Summary:** {{ .Annotations.summary }}
+      **Description:** {{ .Annotations.description }}
+      **Status:** {{ .Status }}
+      {{ end }}
+      {{ end }}{% endraw %}
+    dest: /srv/containers/storage/ssd/alertmanager/templates.tmpl
+    mode: "0644"
+    owner: "app"
+    group: "app"
+
+- name: Alertmanager service
   ansible.builtin.include_role:
     name: docker_service
   vars:
-    docker_service_id: "prometheus-node-exporter"
-    docker_service_description: "Prometheus Node Exporter"
-    docker_service_image: prom/node-exporter:v1.9.1
-    docker_service_network: host
-    docker_service_pid: host
-    docker_service_command: "--path.rootfs=/host"
+    docker_service_id: "alertmanager"
+    docker_service_description: "Prometheus Alertmanager"
+    docker_service_image: prom/alertmanager:v0.27.0
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_groups: ["568"]
+    docker_service_command: "--config.file=/etc/alertmanager/config.yaml --storage.path=/alertmanager"
     docker_service_volumes:
-      - "/:/host:ro,rslave"
+      - "/srv/containers/storage/ssd/alertmanager:/alertmanager:rw"
+      - "/srv/containers/storage/ssd/alertmanager/config.yaml:/etc/alertmanager/config.yaml:ro"
+      - "/srv/containers/storage/ssd/alertmanager/templates.tmpl:/etc/alertmanager/templates/discord.tmpl:ro"
 
 - name: Prometheus service
   ansible.builtin.include_role:
@@ -50,6 +215,7 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/prometheus:/data:rw"
       - "/srv/containers/storage/ssd/prometheus/config.yaml:/config.yaml:ro"
+      - "/srv/containers/storage/ssd/prometheus/alerts.yaml:/alerts.yaml:ro"
 
 - name: Grafana service
   ansible.builtin.include_role:

@@ -4,9 +4,27 @@
     - secret.yaml
   become: true
   tasks:
-    - name: SSMTP
+    - name: Docker
       ansible.builtin.include_role:
-        name: ssmtp
-    - name: Include monitoring tasks
+        name: docker_host
+
+    - name: Prometheus Node Exporter service
       ansible.builtin.include_role:
-        name: monitoring
+        name: docker_service
+      vars:
+        docker_service_id: "prometheus-node-exporter"
+        docker_service_description: "Prometheus Node Exporter"
+        docker_service_image: prom/node-exporter:v1.9.1
+        docker_service_network: host
+        docker_service_pid: host
+        docker_service_command: "--path.rootfs=/host --collector.systemd --collector.processes"
+        docker_service_volumes:
+          - "/:/host:ro,rslave"
+
+    # Legacy monitoring disabled - now using Prometheus + Alertmanager
+    # - name: SSMTP
+    #   ansible.builtin.include_role:
+    #     name: ssmtp
+    # - name: Include monitoring tasks
+    #   ansible.builtin.include_role:
+    #     name: monitoring
