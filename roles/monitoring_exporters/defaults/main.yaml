@@ -1,0 +1,8 @@
+---
+# Monitoring exporters role defaults
+
+# Node exporter configuration
+monitoring_exporters_node_exporter_image: "prom/node-exporter:v1.9.1"
+monitoring_exporters_node_exporter_collectors:
+  - systemd
+  - processes

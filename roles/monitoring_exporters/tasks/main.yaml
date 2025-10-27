@@ -1,0 +1,13 @@
+---
+- name: Prometheus Node Exporter service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "prometheus-node-exporter"
+    docker_service_description: "Prometheus Node Exporter"
+    docker_service_image: "{{ monitoring_exporters_node_exporter_image }}"
+    docker_service_network: host
+    docker_service_pid: host
+    docker_service_command: "--path.rootfs=/host{% for collector in monitoring_exporters_node_exporter_collectors %} --collector.{{ collector }}{% endfor %}"
+    docker_service_volumes:
+      - "/:/host:ro,rslave"

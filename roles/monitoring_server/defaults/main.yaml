@@ -1,0 +1,41 @@
+---
+# Monitoring server role defaults
+
+# Storage paths
+monitoring_server_storage_path: "/srv/containers/storage/ssd"
+
+# Container images
+monitoring_server_prometheus_image: "prom/prometheus:v2.55.1"
+monitoring_server_alertmanager_image: "prom/alertmanager:v0.27.0"
+monitoring_server_grafana_image: "grafana/grafana:11.6.7"
+
+# Prometheus configuration
+monitoring_server_prometheus_retention_size: "10GB"
+monitoring_server_prometheus_scrape_interval: "30s"
+monitoring_server_prometheus_evaluation_interval: "30s"
+
+# Alertmanager configuration
+monitoring_server_alertmanager_resolve_timeout: "5m"
+monitoring_server_alertmanager_group_wait: "10s"
+monitoring_server_alertmanager_group_interval: "10s"
+monitoring_server_alertmanager_repeat_interval: "12h"
+
+# Alert thresholds
+monitoring_server_disk_space_critical: 10
+monitoring_server_disk_space_warning: 20
+monitoring_server_memory_warning: 10
+monitoring_server_memory_critical: 5
+
+# Node exporter targets
+monitoring_server_node_exporter_targets:
+  - "little.int.simpson.id:9100"
+  - "box.int.simpson.id:9100"
+
+# Grafana configuration
+monitoring_server_grafana_root_url: "https://grafana.srv.simpson.id"
+monitoring_server_grafana_extra_volumes: []
+
+# Docker service configuration
+monitoring_server_network: "source_default"
+monitoring_server_user: "568"
+monitoring_server_group: "568"

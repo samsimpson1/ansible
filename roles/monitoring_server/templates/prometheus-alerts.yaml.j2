@@ -1,0 +1,84 @@
+groups:
+  - name: host_alerts
+    interval: 30s
+    rules:
+      # Disk space alerts
+      - alert: DiskSpaceCritical
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < {{ monitoring_server_disk_space_critical }}
+        for: 5m
+        labels:
+          severity: critical
+          component: disk
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has only {{ $value | humanize }}% available space remaining."
+
+      - alert: DiskSpaceWarning
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < {{ monitoring_server_disk_space_warning }}
+        for: 10m
+        labels:
+          severity: warning
+          component: disk
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has only {{ $value | humanize }}% available space remaining."
+
+      # Memory alerts
+      - alert: MemoryPressureHigh
+        expr: |
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < {{ monitoring_server_memory_warning }}
+        for: 5m
+        labels:
+          severity: warning
+          component: memory
+        annotations:
+          summary: "High memory pressure on {{ $labels.instance }}"
+          description: "Available memory on {{ $labels.instance }} is below {{ monitoring_server_memory_warning }}% ({{ $value | humanize }}% remaining)."
+
+      - alert: MemoryPressureCritical
+        expr: |
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < {{ monitoring_server_memory_critical }}
+        for: 2m
+        labels:
+          severity: critical
+          component: memory
+        annotations:
+          summary: "Critical memory pressure on {{ $labels.instance }}"
+          description: "Available memory on {{ $labels.instance }} is critically low at {{ $value | humanize }}%."
+
+      # SMART disk health alerts
+      - alert: DiskSmartFailure
+        expr: node_smartctl_device_smart_healthy == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: disk
+        annotations:
+          summary: "SMART disk failure detected on {{ $labels.instance }}"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} is reporting SMART health failure. Immediate attention required."
+
+      # Systemd service alerts
+      - alert: SystemdServiceFailed
+        expr: node_systemd_unit_state{state="failed"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          component: service
+        annotations:
+          summary: "Systemd service failed on {{ $labels.instance }}"
+          description: "Service {{ $labels.name }} on {{ $labels.instance }} is in failed state."
+
+      # Host down alert
+      - alert: HostDown
+        expr: up{job="node_exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: host
+        annotations:
+          summary: "Host {{ $labels.instance }} is down"
+          description: "Node exporter on {{ $labels.instance }} has been unreachable for more than 2 minutes."
