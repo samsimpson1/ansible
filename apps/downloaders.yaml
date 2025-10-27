@@ -34,7 +34,7 @@
   vars:
     docker_service_id: "sabnzbd"
     docker_service_description: "SABnzbd"
-    docker_service_image: ghcr.io/home-operations/sabnzbd:4.5.3
+    docker_service_image: ghcr.io/home-operations/sabnzbd:4.5.5
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
