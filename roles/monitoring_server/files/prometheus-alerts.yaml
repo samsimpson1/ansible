@@ -70,7 +70,7 @@ groups:
         annotations:
           summary: "Reallocated sectors detected on {{ $labels.instance }}"
           description: "Disk {{ $labels.device }} on {{ $labels.instance }} has {{ $value }} reallocated sectors."
-      
+
       - alert: DiskUncorrectableErrors
         expr: smartctl_device_attribute{attribute_name="Offline_Uncorrectable",attribute_value_type="raw"} > 0
         for: 1m
@@ -80,7 +80,7 @@ groups:
         annotations:
           summary: "Uncorrectable errors detected on {{ $labels.instance }}"
           description: "Disk {{ $labels.device }} on {{ $labels.instance }} has {{ $value }} uncorrectable errors."
-      
+
       # Systemd service alerts
       - alert: SystemdServiceFailed
         expr: node_systemd_unit_state{state="failed"} == 1
