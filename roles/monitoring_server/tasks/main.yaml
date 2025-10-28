@@ -58,7 +58,7 @@
   vars:
     docker_service_id: "alertmanager"
     docker_service_description: "Prometheus Alertmanager"
-    docker_service_image: "{{ monitoring_server_alertmanager_image }}"
+    docker_service_image: "{{ container_images.alertmanager }}"
     docker_service_network: "{{ monitoring_server_network }}"
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
@@ -75,7 +75,7 @@
   vars:
     docker_service_id: "prometheus"
     docker_service_description: "Prometheus"
-    docker_service_image: "{{ monitoring_server_prometheus_image }}"
+    docker_service_image: "{{ container_images.prometheus }}"
     docker_service_network: "{{ monitoring_server_network }}"
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
@@ -92,7 +92,7 @@
   vars:
     docker_service_id: "grafana"
     docker_service_description: "Grafana"
-    docker_service_image: "{{ monitoring_server_grafana_image }}"
+    docker_service_image: "{{ container_images.grafana }}"
     docker_service_network: "{{ monitoring_server_network }}"
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]

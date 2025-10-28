@@ -7,11 +7,6 @@ monitoring_server_state: present
 # Storage paths
 monitoring_server_storage_path: "/srv/containers/storage/ssd"
 
-# Container images
-monitoring_server_prometheus_image: "prom/prometheus:v2.55.1"
-monitoring_server_alertmanager_image: "prom/alertmanager:v0.27.0"
-monitoring_server_grafana_image: "grafana/grafana:11.6.7"
-
 # Prometheus configuration
 monitoring_server_prometheus_retention_size: "10GB"
 monitoring_server_prometheus_scrape_interval: "30s"

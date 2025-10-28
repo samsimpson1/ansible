@@ -1,6 +1,7 @@
 - name: Monitoring
   hosts: home
   vars_files:
+    - container-images.yaml
     - secret.yaml
   become: true
   tasks:

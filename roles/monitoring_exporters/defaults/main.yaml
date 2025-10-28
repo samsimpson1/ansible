@@ -5,10 +5,6 @@
 monitoring_exporters_state: present
 
 # Node exporter configuration
-monitoring_exporters_node_exporter_image: "prom/node-exporter:v1.9.1"
 monitoring_exporters_node_exporter_collectors:
   - systemd
   - processes
-
-# SMARTCTL exporter configuration
-monitoring_exporters_smartctl_exporter_image: "prometheuscommunity/smartctl-exporter:v0.14.0"
