@@ -20,12 +20,6 @@ monitoring_server_alertmanager_group_wait: "10s"
 monitoring_server_alertmanager_group_interval: "10s"
 monitoring_server_alertmanager_repeat_interval: "12h"
 
-# Alert thresholds
-monitoring_server_disk_space_critical: 10
-monitoring_server_disk_space_warning: 20
-monitoring_server_memory_warning: 10
-monitoring_server_memory_critical: 5
-
 # Node exporter targets
 monitoring_server_node_exporter_targets:
   - "little.int.simpson.id:9100"

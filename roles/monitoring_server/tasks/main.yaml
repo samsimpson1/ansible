@@ -12,12 +12,13 @@
     - alertmanager
 
 - name: Deploy Prometheus alert rules
-  ansible.builtin.template:
-    src: prometheus-alerts.yaml.j2
+  ansible.builtin.copy:
+    src: prometheus-alerts.yaml
     dest: "{{ monitoring_server_storage_path }}/prometheus/alerts.yaml"
     mode: "0644"
     owner: "app"
     group: "app"
+  notify: Restart Prometheus
 
 - name: Deploy Prometheus configuration
   ansible.builtin.template:
@@ -26,6 +27,7 @@
     mode: "0644"
     owner: "app"
     group: "app"
+  notify: Restart Prometheus
 
 - name: Deploy Alertmanager configuration
   ansible.builtin.template:
@@ -34,6 +36,7 @@
     mode: "0644"
     owner: "app"
     group: "app"
+  notify: Restart Alertmanager
 
 - name: Deploy Alertmanager Discord template
   ansible.builtin.copy:
@@ -42,6 +45,7 @@
     mode: "0644"
     owner: "app"
     group: "app"
+  notify: Restart Alertmanager
 
 - name: Alertmanager service
   ansible.builtin.include_role:

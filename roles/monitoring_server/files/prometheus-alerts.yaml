@@ -6,7 +6,7 @@ groups:
       - alert: DiskSpaceCritical
         expr: |
           (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
-          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < {{ monitoring_server_disk_space_critical }}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < 99
         for: 5m
         labels:
           severity: critical
@@ -18,7 +18,7 @@ groups:
       - alert: DiskSpaceWarning
         expr: |
           (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
-          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < {{ monitoring_server_disk_space_warning }}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < 20
         for: 10m
         labels:
           severity: warning
@@ -30,18 +30,18 @@ groups:
       # Memory alerts
       - alert: MemoryPressureHigh
         expr: |
-          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < {{ monitoring_server_memory_warning }}
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
         for: 5m
         labels:
           severity: warning
           component: memory
         annotations:
           summary: "High memory pressure on {{ $labels.instance }}"
-          description: "Available memory on {{ $labels.instance }} is below {{ monitoring_server_memory_warning }}% ({{ $value | humanize }}% remaining)."
+          description: "Available memory on {{ $labels.instance }} is below 10% ({{ $value | humanize }}% remaining)."
 
       - alert: MemoryPressureCritical
         expr: |
-          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < {{ monitoring_server_memory_critical }}
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 5
         for: 2m
         labels:
           severity: critical
