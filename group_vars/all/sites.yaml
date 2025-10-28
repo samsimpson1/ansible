@@ -89,7 +89,7 @@ sites:
             root * /sharex
             file_server
           }
-          
+
   - name: int.simpson.id
     kind: internal
     wildcard: true

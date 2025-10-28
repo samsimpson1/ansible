@@ -79,7 +79,10 @@
     docker_service_network: "{{ monitoring_server_network }}"
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
-    docker_service_command: "--storage.tsdb.path /data --storage.tsdb.retention.size {{ monitoring_server_prometheus_retention_size }} --config.file /config.yaml"
+    docker_service_command: >-
+      --storage.tsdb.path /data
+      --storage.tsdb.retention.size {{ monitoring_server_prometheus_retention_size }}
+      --config.file /config.yaml
     docker_service_volumes:
       - "{{ monitoring_server_storage_path }}/prometheus:/data:rw"
       - "{{ monitoring_server_storage_path }}/prometheus/config.yaml:/config.yaml:ro"
