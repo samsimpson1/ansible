@@ -52,7 +52,7 @@ groups:
 
       # SMART disk health alerts
       - alert: DiskSmartFailure
-        expr: node_smartctl_device_smart_healthy == 0
+        expr: smartctl_device_smart_status == 0
         for: 1m
         labels:
           severity: critical
@@ -61,6 +61,26 @@ groups:
           summary: "SMART disk failure detected on {{ $labels.instance }}"
           description: "Disk {{ $labels.device }} on {{ $labels.instance }} is reporting SMART health failure. Immediate attention required."
 
+      - alert: DiskReallocatedSectors
+        expr: smartctl_device_attribute{attribute_name="Reallocated_Sector_Ct",attribute_value_type="raw"} > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: disk
+        annotations:
+          summary: "Reallocated sectors detected on {{ $labels.instance }}"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} has {{ $value }} reallocated sectors."
+      
+      - alert: DiskUncorrectableErrors
+        expr: smartctl_device_attribute{attribute_name="Offline_Uncorrectable",attribute_value_type="raw"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: disk
+        annotations:
+          summary: "Uncorrectable errors detected on {{ $labels.instance }}"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} has {{ $value }} uncorrectable errors."
+      
       # Systemd service alerts
       - alert: SystemdServiceFailed
         expr: node_systemd_unit_state{state="failed"} == 1
@@ -71,14 +91,3 @@ groups:
         annotations:
           summary: "Systemd service failed on {{ $labels.instance }}"
           description: "Service {{ $labels.name }} on {{ $labels.instance }} is in failed state."
-
-      # Host down alert
-      - alert: HostDown
-        expr: up{job="node_exporter"} == 0
-        for: 2m
-        labels:
-          severity: critical
-          component: host
-        annotations:
-          summary: "Host {{ $labels.instance }} is down"
-          description: "Node exporter on {{ $labels.instance }} has been unreachable for more than 2 minutes."
