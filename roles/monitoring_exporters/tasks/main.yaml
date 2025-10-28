@@ -11,3 +11,4 @@
     docker_service_command: "--path.rootfs=/host{% for collector in monitoring_exporters_node_exporter_collectors %} --collector.{{ collector }}{% endfor %}"
     docker_service_volumes:
       - "/:/host:ro,rslave"
+    docker_service_state: "{{ monitoring_exporters_state }}"

@@ -1,6 +1,9 @@
 ---
 # Monitoring server role defaults
 
+# State management
+monitoring_server_state: present
+
 # Storage paths
 monitoring_server_storage_path: "/srv/containers/storage/ssd"
 
