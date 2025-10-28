@@ -28,7 +28,7 @@
 - name: Check if acme.sh is installed
   ansible.builtin.stat:
     path: "{{ acme_manager_install_dir }}/acme.sh"
-  register: acme_sh_installed
+  register: acme_manager_sh_installed
   when: acme_manager_state == 'present'
 
 - name: Install git
@@ -43,17 +43,19 @@
     dest: /tmp/acme.sh-repo
     version: master
     depth: 1
-  when: acme_manager_state == 'present' and not acme_sh_installed.stat.exists
+  when: acme_manager_state == 'present' and not acme_manager_sh_installed.stat.exists
 
 - name: Install acme.sh
   ansible.builtin.shell:
     cmd: cd /tmp/acme.sh-repo && ./acme.sh --install --home {{ acme_manager_install_dir }} --email {{ acme_manager_email }}
-  when: acme_manager_state == 'present' and not acme_sh_installed.stat.exists
+  when: acme_manager_state == 'present' and not acme_manager_sh_installed.stat.exists
+  changed_when: true
 
 - name: Set Let's Encrypt as default CA
   ansible.builtin.command:
     cmd: "{{ acme_manager_install_dir }}/acme.sh --set-default-ca --server letsencrypt"
   when: acme_manager_state == 'present'
+  changed_when: false
 
 - name: Create acme group for certificate access
   ansible.builtin.group:

@@ -17,13 +17,13 @@
     owner: app
     group: app
     mode: '0644'
-  notify: "Restart {{ caddy_id }} caddy"
+  notify: "Restart caddy {{ caddy_id }}"
   when: caddy_state == 'present'
 - name: Caddy image
   community.docker.docker_image_build:
     name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
     path: "{{ caddy_data_directory }}/{{ caddy_id }}"
-  notify: "Restart {{ caddy_id }} caddy"
+  notify: "Restart caddy {{ caddy_id }}"
   when: caddy_state == 'present'
 - name: Caddyfile
   ansible.builtin.template:
@@ -33,10 +33,12 @@
     group: app
     mode: '0644'
     lstrip_blocks: true
-  notify: "Restart {{ caddy_id }} caddy"
+  notify: "Restart caddy {{ caddy_id }}"
   when: caddy_state == 'present'
 - name: Resolve additional group names to GIDs
-  ansible.builtin.shell: "getent group {{ item }} | cut -d: -f3"
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && getent group {{ item }} | cut -d: -f3"
+    executable: /bin/bash
   register: caddy_group_gids
   loop: "{{ caddy_additional_group_names }}"
   changed_when: false
@@ -67,7 +69,7 @@
     docker_service_command: "caddy run -c /Caddyfile"
     docker_service_env_vars: "{{ caddy_env_vars }}"
     docker_service_ports: "{{ caddy_ports | default([]) }}"
-    docker_service_volumes: "{{ (caddy_volumes_standard | default([])) + caddy_volumes }}"
+    docker_service_volumes: "{{ (caddy_volumes_standard | default([])) + (caddy_volumes | default([])) }}"
     docker_service_state: "{{ caddy_state }}"
 
 - name: Remove Caddy Docker image

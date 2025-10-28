@@ -18,12 +18,12 @@
 - name: Fetch acme user public key
   ansible.builtin.slurp:
     src: "/home/{{ acme_client_source_user }}/.ssh/id_ed25519.pub"
-  register: acme_pubkey
+  register: acme_client_pubkey
   when: acme_client_state == 'present'
 
 - name: Display public key for manual configuration
   ansible.builtin.debug:
-    msg: "Add this key to {{ acme_client_source_host }}:/home/{{ acme_client_source_user }}/.ssh/authorized_keys: {{ acme_pubkey.content | b64decode }}"
+    msg: "Add this key to {{ acme_client_source_host }}:/home/{{ acme_client_source_user }}/.ssh/authorized_keys: {{ acme_client_pubkey.content | b64decode }}"
   when: acme_client_state == 'present'
 
 - name: Create acme group for certificate access
