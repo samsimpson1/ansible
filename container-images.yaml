@@ -1,8 +1,8 @@
 container_images:
   caddy: caddy:2.10
   renovate: ghcr.io/renovatebot/renovate:41.156
-  node_exporter: prom/node-exporter:v1.9.1
+  node_exporter: prom/node-exporter:v1.10.2
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
   prometheus: prom/prometheus:v2.55.1
-  alertmanager: prom/alertmanager:v0.27.0
+  alertmanager: prom/alertmanager:v0.28.1
   grafana: grafana/grafana:11.6.7
