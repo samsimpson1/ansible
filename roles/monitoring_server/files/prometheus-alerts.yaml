@@ -1,0 +1,93 @@
+groups:
+  - name: host_alerts
+    interval: 30s
+    rules:
+      # Disk space alerts
+      - alert: DiskSpaceCritical
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          component: disk
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has only {{ $value | humanize }}% available space remaining."
+
+      - alert: DiskSpaceWarning
+        expr: |
+          (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+          / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}) * 100 < 20
+        for: 10m
+        labels:
+          severity: warning
+          component: disk
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Filesystem {{ $labels.mountpoint }} on {{ $labels.instance }} has only {{ $value | humanize }}% available space remaining."
+
+      # Memory alerts
+      - alert: MemoryPressureHigh
+        expr: |
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+          component: memory
+        annotations:
+          summary: "High memory pressure on {{ $labels.instance }}"
+          description: "Available memory on {{ $labels.instance }} is below 10% ({{ $value | humanize }}% remaining)."
+
+      - alert: MemoryPressureCritical
+        expr: |
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 5
+        for: 2m
+        labels:
+          severity: critical
+          component: memory
+        annotations:
+          summary: "Critical memory pressure on {{ $labels.instance }}"
+          description: "Available memory on {{ $labels.instance }} is critically low at {{ $value | humanize }}%."
+
+      # SMART disk health alerts
+      - alert: DiskSmartFailure
+        expr: smartctl_device_smart_status == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: disk
+        annotations:
+          summary: "SMART disk failure detected on {{ $labels.instance }}"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} is reporting SMART health failure. Immediate attention required."
+
+      - alert: DiskReallocatedSectors
+        expr: smartctl_device_attribute{attribute_name="Reallocated_Sector_Ct",attribute_value_type="raw"} > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: disk
+        annotations:
+          summary: "Reallocated sectors detected on {{ $labels.instance }}"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} has {{ $value }} reallocated sectors."
+      
+      - alert: DiskUncorrectableErrors
+        expr: smartctl_device_attribute{attribute_name="Offline_Uncorrectable",attribute_value_type="raw"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: disk
+        annotations:
+          summary: "Uncorrectable errors detected on {{ $labels.instance }}"
+          description: "Disk {{ $labels.device }} on {{ $labels.instance }} has {{ $value }} uncorrectable errors."
+      
+      # Systemd service alerts
+      - alert: SystemdServiceFailed
+        expr: node_systemd_unit_state{state="failed"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          component: service
+        annotations:
+          summary: "Systemd service failed on {{ $labels.instance }}"
+          description: "Service {{ $labels.name }} on {{ $labels.instance }} is in failed state."

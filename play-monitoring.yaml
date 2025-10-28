@@ -4,9 +4,10 @@
     - secret.yaml
   become: true
   tasks:
-    - name: SSMTP
+    - name: Docker
       ansible.builtin.include_role:
-        name: ssmtp
-    - name: Include monitoring tasks
+        name: docker_host
+
+    - name: Monitoring exporters
       ansible.builtin.include_role:
-        name: monitoring
+        name: monitoring_exporters

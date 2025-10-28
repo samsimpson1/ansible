@@ -1,0 +1,131 @@
+---
+- name: Create monitoring data directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ monitoring_server_storage_path }}/{{ item }}"
+    mode: "0750"
+    owner: "app"
+    group: "app"
+  loop:
+    - grafana
+    - prometheus
+    - alertmanager
+  when: monitoring_server_state == 'present'
+
+- name: Deploy Prometheus alert rules
+  ansible.builtin.copy:
+    src: prometheus-alerts.yaml
+    dest: "{{ monitoring_server_storage_path }}/prometheus/alerts.yaml"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Prometheus
+  when: monitoring_server_state == 'present'
+
+- name: Deploy Prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yaml.j2
+    dest: "{{ monitoring_server_storage_path }}/prometheus/config.yaml"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Prometheus
+  when: monitoring_server_state == 'present'
+
+- name: Deploy Alertmanager configuration
+  ansible.builtin.template:
+    src: alertmanager.yaml.j2
+    dest: "{{ monitoring_server_storage_path }}/alertmanager/config.yaml"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Alertmanager
+  when: monitoring_server_state == 'present'
+
+- name: Deploy Alertmanager Discord template
+  ansible.builtin.copy:
+    src: alertmanager-discord-template.tmpl
+    dest: "{{ monitoring_server_storage_path }}/alertmanager/templates.tmpl"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Alertmanager
+  when: monitoring_server_state == 'present'
+
+- name: Alertmanager service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "alertmanager"
+    docker_service_description: "Prometheus Alertmanager"
+    docker_service_image: "{{ monitoring_server_alertmanager_image }}"
+    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_user: "{{ monitoring_server_user }}"
+    docker_service_groups: ["{{ monitoring_server_group }}"]
+    docker_service_command: "--config.file=/etc/alertmanager/config.yaml --storage.path=/alertmanager"
+    docker_service_volumes:
+      - "{{ monitoring_server_storage_path }}/alertmanager:/alertmanager:rw"
+      - "{{ monitoring_server_storage_path }}/alertmanager/config.yaml:/etc/alertmanager/config.yaml:ro"
+      - "{{ monitoring_server_storage_path }}/alertmanager/templates.tmpl:/etc/alertmanager/templates/discord.tmpl:ro"
+    docker_service_state: "{{ monitoring_server_state }}"
+
+- name: Prometheus service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "prometheus"
+    docker_service_description: "Prometheus"
+    docker_service_image: "{{ monitoring_server_prometheus_image }}"
+    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_user: "{{ monitoring_server_user }}"
+    docker_service_groups: ["{{ monitoring_server_group }}"]
+    docker_service_command: "--storage.tsdb.path /data --storage.tsdb.retention.size {{ monitoring_server_prometheus_retention_size }} --config.file /config.yaml"
+    docker_service_volumes:
+      - "{{ monitoring_server_storage_path }}/prometheus:/data:rw"
+      - "{{ monitoring_server_storage_path }}/prometheus/config.yaml:/config.yaml:ro"
+      - "{{ monitoring_server_storage_path }}/prometheus/alerts.yaml:/alerts.yaml:ro"
+    docker_service_state: "{{ monitoring_server_state }}"
+
+- name: Grafana service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "grafana"
+    docker_service_description: "Grafana"
+    docker_service_image: "{{ monitoring_server_grafana_image }}"
+    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_user: "{{ monitoring_server_user }}"
+    docker_service_groups: ["{{ monitoring_server_group }}"]
+    docker_service_env_vars:
+      GF_SERVER_ROOT_URL: "{{ monitoring_server_grafana_root_url }}"
+    docker_service_volumes: "{{ [monitoring_server_storage_path + '/grafana:/var/lib/grafana:rw'] + monitoring_server_grafana_extra_volumes }}"
+    docker_service_state: "{{ monitoring_server_state }}"
+
+# Removal tasks
+- name: Remove Alertmanager configuration files
+  ansible.builtin.file:
+    path: "{{ monitoring_server_storage_path }}/alertmanager/{{ item }}"
+    state: absent
+  loop:
+    - config.yaml
+    - templates.tmpl
+  when: monitoring_server_state == 'absent'
+
+- name: Remove Prometheus configuration files
+  ansible.builtin.file:
+    path: "{{ monitoring_server_storage_path }}/prometheus/{{ item }}"
+    state: absent
+  loop:
+    - config.yaml
+    - alerts.yaml
+  when: monitoring_server_state == 'absent'
+
+- name: Remove monitoring data directories
+  ansible.builtin.file:
+    path: "{{ monitoring_server_storage_path }}/{{ item }}"
+    state: absent
+  loop:
+    - alertmanager
+    - prometheus
+    - grafana
+  when: monitoring_server_state == 'absent'

@@ -1,0 +1,19 @@
+global:
+  resolve_timeout: {{ monitoring_server_alertmanager_resolve_timeout }}
+
+route:
+  receiver: 'discord'
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: {{ monitoring_server_alertmanager_group_wait }}
+  group_interval: {{ monitoring_server_alertmanager_group_interval }}
+  repeat_interval: {{ monitoring_server_alertmanager_repeat_interval }}
+
+receivers:
+  - name: 'discord'
+    discord_configs:
+      - webhook_url: '{{ alertmanager_discord_webhook_url }}'
+        title: '{{ "{{" }} template "discord.title" . {{ "}}" }}'
+        message: '{{ "{{" }} template "discord.message" . {{ "}}" }}'
+
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
