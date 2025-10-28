@@ -49,6 +49,8 @@
     {
       "matchPackageNames": [
         "prom/node-exporter",
+        "prometheuscommunity/smartctl-exporter",
+        "prom/alertmanager",
         "prom/prometheus",
         "grafana/grafana"
       ],
