@@ -1,0 +1,12 @@
+---
+- name: Restart Prometheus
+  ansible.builtin.systemd:
+    name: "prometheus"
+    state: restarted
+    daemon_reload: false
+
+- name: Restart Alertmanager
+  ansible.builtin.systemd:
+    name: "alertmanager"
+    state: restarted
+    daemon_reload: false
