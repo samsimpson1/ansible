@@ -1,0 +1,45 @@
+name: Ansible Lint
+
+on:
+  push:
+
+jobs:
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip3 install ansible
+      
+      - name: Install Ansible requirements
+        run: |
+          ansible-galaxy install -r requirements.yaml
+
+      - name: Install 1Password CLI
+        run: |
+          curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+            sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
+            sudo tee /etc/apt/sources.list.d/1password.list
+          sudo apt update
+          sudo apt install -y 1password-cli
+      
+      - name: Configure 1Password CLI
+        run: |
+          echo "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
+        with:
+          setup_python: "false"
+          working_directory: "."
+          args: "--exclude .github/workflows/"
