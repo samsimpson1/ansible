@@ -118,6 +118,9 @@ sites:
       - name: sonarr
         target: "http://sonarr:8989"
         host: little
+      - name: alertmanager
+        target: "http://alertmanager:9093"
+        host: little
       - name: prometheus
         target: "http://prometheus:9090"
         host: little
