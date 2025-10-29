@@ -1,0 +1,58 @@
+# a partial playbook for setting up secure boot on Arch Linux
+- name: Desktop Secure Boot
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Install required packages
+      ansible.builtin.pacman:
+        name:
+          - efitools
+          - sbsigntools
+        state: present
+        update_cache: yes
+    - name: Create signing script
+      ansible.builtin.copy:
+        dest: /home/sam/MOK/sign-bootloader.sh
+        content: |
+          #!/bin/bash
+          KEY_DIR="/home/sam/MOK"
+          KEY_FILE="$KEY_DIR/MOK.key"
+          CERT_FILE="$KEY_DIR/MOK.crt"
+
+          if [ $(sbverify --list /boot/vmlinuz-linux 2>&1 | grep -c "No signature table present") -eq 0 ]; then
+            echo "Kernel already signed."
+          else
+            echo "Signing kernel..."
+            sbsign --key "$KEY_FILE" --cert "$CERT_FILE" --output /boot/vmlinuz-linux /boot/vmlinuz-linux
+          fi
+
+          if [ $(sbverify --list /boot/EFI/BOOT/grubx64.efi 2>&1 | grep -c "No signature table present") -eq 0 ]; then
+            echo "grub already signed."
+          else
+            echo "Signing grub..."
+            sbsign --key "$KEY_FILE" --cert "$CERT_FILE" --output /boot/EFI/BOOT/grubx64.efi /boot/EFI/BOOT/grubx64.efi
+          fi
+        mode: '0755'
+        owner: sam
+        group: sam
+    - name: Create pacman hook
+      ansible.builtin.copy:
+        dest: /usr/share/libalpm/hooks/99-sign-bootloader.hook
+        content: |
+          [Trigger]
+          Type = Path
+          Operation = Install
+          Operation = Upgrade
+          Operation = Remove
+          Target = boot/*
+          Target = efi/*
+          Target = usr/lib/modules/*/vmlinuz
+          Target = usr/lib/modules/*/extramodules/*
+          Target = usr/lib/**/efi/*.efi*
+          Target = usr/share/**/*.efi*
+
+          [Action]
+          Description = Signing bootloader and kernel...
+          When = PostTransaction
+          Exec = /home/sam/MOK/sign-bootloader.sh
+        mode: '0644'
