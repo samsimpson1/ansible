@@ -4,12 +4,12 @@
   connection: local
   tasks:
     - name: Install required packages
-      ansible.builtin.pacman:
+      community.general.pacman:
         name:
           - efitools
           - sbsigntools
         state: present
-        update_cache: yes
+        update_cache: true
     - name: Create signing script
       ansible.builtin.copy:
         dest: /home/sam/MOK/sign-bootloader.sh
