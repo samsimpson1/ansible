@@ -12,6 +12,7 @@ on:
       - '**.md'
       - 'renovate.json'
       - '.gitignore'
+      - 'desktop/*'
 
 jobs:
   deploy:
