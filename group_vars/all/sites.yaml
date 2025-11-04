@@ -7,6 +7,15 @@ sites:
         respond "Nothing to see here."
       }
 
+  - name: cp.sams.wtf
+    kind: external
+    routes: []
+    fallback_host: little
+    fallback: |
+      handle {
+        reverse_proxy http://copyparty:80
+      }
+
   - name: srv.simpson.id
     kind: external
     wildcard: true

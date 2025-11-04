@@ -1,0 +1,3 @@
+copyparty_config_dir: /srv/containers/storage/ssd/copyparty
+copyparty_private_dir: /srv/containers/storage/hdd/files
+copyparty_share_dir: /srv/containers/storage/hdd/share

@@ -1,0 +1,46 @@
+- name: Copyparty user
+  ansible.builtin.user:
+    name: copyparty
+    state: present
+    system: true
+    create_home: false
+- name: Getent passwd
+  ansible.builtin.getent:
+    database: passwd
+  changed_when: false
+- name: Set copyparty uid
+  ansible.builtin.set_fact:
+    copyparty_uid: "{{ getent_passwd['copyparty'].1 }}"
+  changed_when: false
+- name: Create copyparty directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: copyparty
+    group: copyparty
+    mode: '0750'
+  loop:
+    - "{{ copyparty_config_dir }}"
+    - "{{ copyparty_private_dir }}"
+    - "{{ copyparty_share_dir }}"
+- name: Create copyparty config file
+  ansible.builtin.template:
+    src: config.conf.j2
+    dest: "{{ copyparty_config_dir }}/copyparty.conf"
+    owner: copyparty
+    group: copyparty
+    mode: '0640'
+  notify: Restart copyparty service
+- name: Copyparty service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: copyparty
+    docker_service_image: "{{ container_images.copyparty }}"
+    docker_service_state: "{{ copyparty_state }}"
+    docker_service_user: "{{ copyparty_uid }}"
+    docker_service_network: "source_default"
+    docker_service_volumes:
+      - "{{ copyparty_config_dir }}:/cfg"
+      - "{{ copyparty_private_dir }}:/private"
+      - "{{ copyparty_share_dir }}:/files"

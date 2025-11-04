@@ -1,0 +1,4 @@
+- name: Restart copyparty service
+  ansible.builtin.systemd_service:
+    name: copyparty
+    state: restarted

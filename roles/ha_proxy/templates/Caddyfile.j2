@@ -21,9 +21,21 @@
   }
 
   {% endfor %}
+  {% if host.fallback_host is defined %}
+
+  handle {
+    reverse_proxy {
+      to https://{{ host.fallback_host }}:6997
+      transport http {
+        tls_server_name {{ host.name }}
+      }
+    }
+  }
+  {% else %}
   {% if host.fallback is defined %}
 
   {{ host.fallback | indent(width=2, first=False) }}
+  {% endif %}
   {% endif %}
 }
 {% endfor %}

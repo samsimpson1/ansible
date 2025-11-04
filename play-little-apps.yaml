@@ -2,6 +2,7 @@
   hosts: little
   vars_files:
     - container-images.yaml
+    - copyparty.yaml
     - secret.yaml
   become: true
   tasks:
@@ -36,5 +37,8 @@
         name: samba_server
     - name: Stonks scraper
       ansible.builtin.include_tasks: apps/stonks-scraper.yaml
-    - name: File storage
-      ansible.builtin.include_tasks: apps/file-storage.yaml
+    - name: Copyparty
+      ansible.builtin.include_role:
+        name: copyparty
+      vars:
+        copyparty_state: "present"

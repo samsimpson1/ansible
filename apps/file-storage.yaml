@@ -1,7 +1,0 @@
-- name: File storage data directory
-  ansible.builtin.file:
-    path: /srv/containers/storage/hdd/files
-    state: directory
-    owner: app
-    group: app
-    mode: '0750'

@@ -1,0 +1,37 @@
+[global]
+  p: 80
+  e2dsa
+  e2ts
+  dedup
+  xff-hdr: x-forwarded-for
+  xff-src: lan
+  rproxy: -2
+
+
+[accounts]
+  {% for account in copyparty_accounts -%}
+  {{ account.name }}: {{ account.password }}
+  {% endfor %}
+
+[/]
+  /files
+  accs:
+    r: *
+    rwmda: {{ copyparty_accounts|map(attribute="name")|join(", ") }}
+
+[/u]
+  /files/u
+  accs:
+    g: *
+    r: {{ copyparty_accounts|map(attribute="name")|join(", ") }}
+
+[/u/${u}]
+  /files/u/${u}
+  accs:
+    r: *
+    rwmda: ${u}
+
+[/u/${u}/priv]
+  /private/${u}
+  accs:
+    rwmda: ${u}
