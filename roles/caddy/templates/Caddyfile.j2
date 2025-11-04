@@ -2,6 +2,9 @@
   http_port {{ caddy_http_port }}
   https_port {{ caddy_https_port }}
   debug
+  servers {
+    trusted_proxies static 172.18.0.1/32
+  }
 }
 
 {% for host in caddy_hosts %}
