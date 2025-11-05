@@ -1,8 +1,5 @@
 - name: Little (infra)
   hosts: little
-  vars_files:
-    - container-images.yaml
-    - secret.yaml
   become: true
   tasks:
     - name: GitHub Actions SSH key

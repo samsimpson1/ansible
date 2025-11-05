@@ -28,7 +28,7 @@ Add `--check` flag to any playbook command for dry-run mode:
 - `ansible-galaxy collection install -r requirements.yaml` - Install required Ansible collections
 
 ### Vault Management
-- `ansible-vault edit secret.yaml` - Edit encrypted secrets (uses 1Password CLI via onepassword-client.sh)
+- `ansible-vault edit group_vars/all/secret.yaml` - Edit encrypted secrets (uses 1Password CLI via onepassword-client.sh)
 
 All commands use 1Password CLI for vault password retrieval via `onepassword-client.sh`. The inventory file and vault configuration are specified in `ansible.cfg`.
 
@@ -155,12 +155,12 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 ```
 
 ### Secrets Management
-- Encrypted variables stored in `secret.yaml` using ansible-vault
+- Encrypted variables stored in `group_vars/all/secret.yaml` using ansible-vault
 - 1Password CLI integration for vault password retrieval
 - Sensitive configuration like API keys, passwords, and tokens are vaulted
 
 ### Container Image Versions
-- Container image versions are centrally managed in `container-images.yaml`
+- Container image versions are centrally managed in `group_vars/all/container-images.yaml`
 - Reference images using `{{ container_images.service_name }}` in playbooks
 - Currently managed: Caddy, Renovate
 
@@ -170,8 +170,10 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 - **Reusable roles**: `roles/` directory
 - **Configuration**: `ansible.cfg` (inventory path, vault settings)
 - **Host inventory**: `inventory.yaml`
-- **Encrypted secrets**: `secret.yaml`
-- **Container versions**: `container-images.yaml`
+- **Global variables**: `group_vars/all/` (automatically loaded for all hosts)
+  - **Encrypted secrets**: `group_vars/all/secret.yaml`
+  - **Container versions**: `group_vars/all/container-images.yaml`
+  - **Site definitions**: `group_vars/all/sites.yaml`
 
 ## Development Workflow
 1. **For faster iterations**: Use split playbooks (e.g., `ansible-playbook play-little-apps.yaml` for app changes, `ansible-playbook play-little-infrastructure.yaml` for system changes)
