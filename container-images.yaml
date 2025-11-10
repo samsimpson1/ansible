@@ -7,3 +7,7 @@ container_images:
   alertmanager: prom/alertmanager:v0.28.1
   grafana: grafana/grafana:12.2.1
   copyparty: ghcr.io/9001/copyparty-iv:1.19.20
+  immich_server: ghcr.io/immich-app/immich-server:v2.0.1
+  immich_machine_learning: ghcr.io/immich-app/immich-machine-learning:v2.0.1
+  immich_postgres: ghcr.io/immich-app/postgres:14-vectorchord0.5.3
+  immich_redis: docker.io/valkey/valkey:8-bookworm
