@@ -35,8 +35,7 @@
   vars:
     docker_service_id: "immich-postgres"
     docker_service_description: "Immich PostgreSQL Database"
-    docker_service_image: >-
-      ghcr.io/immich-app/postgres:14-vectorchord0.5.3-pgvector0.8.1
+    docker_service_image: "{{ container_images.immich_postgres }}"
     docker_service_network: immich
     docker_service_user: "{{ immich_user.uid }}"
     docker_service_groups: ["{{ immich_user.group }}"]
@@ -54,7 +53,7 @@
   vars:
     docker_service_id: "immich-redis"
     docker_service_description: "Immich Redis"
-    docker_service_image: "docker.io/valkey/valkey:8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571"
+    docker_service_image: "{{ container_images.immich_redis }}"
     docker_service_network: immich
 
 - name: Immich Server service
@@ -63,7 +62,7 @@
   vars:
     docker_service_id: "immich-server"
     docker_service_description: "Immich Server"
-    docker_service_image: "ghcr.io/immich-app/immich-server:v2.0.1"
+    docker_service_image: "{{ container_images.immich_server }}"
     docker_service_network: immich
     docker_service_user: "{{ immich_user.uid }}"
     docker_service_groups: ["{{ immich_user.group }}"]
@@ -83,7 +82,7 @@
   vars:
     docker_service_id: "immich-machine-learning"
     docker_service_description: "Immich Machine Learning"
-    docker_service_image: "ghcr.io/immich-app/immich-machine-learning:v2.0.1"
+    docker_service_image: "{{ container_images.immich_machine_learning }}"
     docker_service_network: immich
     docker_service_user: "{{ immich_user.uid }}"
     docker_service_groups: ["{{ immich_user.group }}"]
