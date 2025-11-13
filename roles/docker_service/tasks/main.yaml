@@ -1,4 +1,21 @@
 ---
+- name: Set Docker service string
+  ansible.builtin.set_fact:
+    docker_service_network_string: "--network {{ docker_service_network }}"
+  when: docker_service_network is string and docker_service_network | length > 0
+- name: Set Docker service network list
+  ansible.builtin.set_fact:
+    docker_service_network_string: >-
+      {%- set nets = [] -%}
+      {%- for net in docker_service_network -%}
+      {%-   set _ = nets.append('--network ' ~ net) -%}
+      {%- endfor -%}
+      {{ nets | join(' ') }}
+  when: docker_service_network is iterable and docker_service_network is not string and docker_service_network | length > 0
+- name: Set Docker service network fallback
+  ansible.builtin.set_fact:
+    docker_service_network_string: ""
+  when: docker_service_network is not defined or not docker_service_network
 - name: Create systemd service unit
   ansible.builtin.template:
     src: service.j2
