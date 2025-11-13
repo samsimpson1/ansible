@@ -42,4 +42,3 @@ jobs:
         with:
           setup_python: "false"
           working_directory: "."
-          args: "--exclude .github/workflows/"
