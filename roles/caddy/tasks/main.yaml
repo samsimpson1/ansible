@@ -63,7 +63,7 @@
     docker_service_description: "Caddy {{ caddy_id }}"
     docker_service_image: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
     docker_service_pull_policy: "never"
-    docker_service_network: "{{ caddy_networks[0] }}"
+    docker_service_network: "{{ caddy_networks }}"
     docker_service_user: "568"
     docker_service_groups: "{{ caddy_all_groups | default([]) }}"
     docker_service_command: "caddy run -c /Caddyfile"
