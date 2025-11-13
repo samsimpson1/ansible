@@ -43,6 +43,9 @@ sites:
       - name: budget
         target: "http://actual:5006"
         host: little
+      - name: ci
+        target: "http://concourse-web:8080"
+        host: box
       - name: files
         host: little
         custom: |

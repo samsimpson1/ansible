@@ -2,6 +2,7 @@
   hosts: box
   vars_files:
     - container-images.yaml
+    - concourse-secrets.yaml
     - secret.yaml
   become: true
   tasks:
@@ -69,6 +70,26 @@
       ansible.builtin.include_role:
         name: acme_client
 
+    - name: Immich
+      ansible.builtin.include_tasks: apps/immich.yaml
+
+    - name: Concourse Web
+      ansible.builtin.include_role:
+        name: concourse_web
+      vars:
+        concourse_web_data_directory: "/srv/app/concourse"
+        concourse_web_external_url: "https://ci.srv.simpson.id"
+        concourse_web_session_signing_key: "{{ concourse_session_signing_key }}"
+        concourse_web_tsa_host_key: "{{ concourse_tsa_host_key }}"
+        concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
+
+    - name: Concourse Worker
+      ansible.builtin.include_role:
+        name: concourse_worker
+      vars:
+        concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
+        concourse_worker_worker_key: "{{ concourse_worker_key }}"
+
     - name: Caddy external
       ansible.builtin.include_role:
         name: caddy
@@ -79,7 +100,4 @@
         caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["immich"]
-
-    - name: Immich
-      ansible.builtin.include_tasks: apps/immich.yaml
+        caddy_networks: ["immich", "concourse"]

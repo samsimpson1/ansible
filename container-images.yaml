@@ -11,3 +11,6 @@ container_images:
   immich_machine_learning: ghcr.io/immich-app/immich-machine-learning:v2.2.3
   immich_postgres: ghcr.io/immich-app/postgres:14-vectorchord0.5.3
   immich_redis: docker.io/valkey/valkey:8-bookworm
+  concourse_web: concourse/concourse:7.14.3
+  concourse_worker: concourse/concourse:7.14.3
+  concourse_postgres: postgres:18

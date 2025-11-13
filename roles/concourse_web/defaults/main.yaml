@@ -1,0 +1,14 @@
+---
+concourse_web_network: "concourse"
+concourse_web_external_url: "http://localhost:8080"
+concourse_web_postgres_user: "concourse"
+concourse_web_postgres_password: "changeme"
+concourse_web_postgres_database: "concourse"
+concourse_web_add_local_user: "admin:admin"
+concourse_web_main_team_local_user: "admin"
+concourse_web_session_signing_key: ""
+concourse_web_tsa_host_key: ""
+concourse_web_tsa_authorized_keys: ""
+concourse_web_data_directory: "/srv/containers/storage/ssd/concourse"
+concourse_web_state: present
+concourse_web_oidc_issuer: "https://pocket-id.srv.simpson.id"
