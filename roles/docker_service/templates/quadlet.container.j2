@@ -1,0 +1,56 @@
+[Unit]
+Description={{ docker_service_description }}
+After=docker.service
+Requires=docker.service
+
+[Container]
+Image={{ docker_service_image }}
+ContainerName={{ docker_service_id }}
+{% if docker_service_command %}
+Exec={{ docker_service_command }}
+{% endif %}
+{% if docker_service_network is string and docker_service_network | length > 0 %}
+Network={{ docker_service_network }}
+{% elif docker_service_network is iterable and docker_service_network is not string %}
+{% for net in docker_service_network %}
+Network={{ net }}
+{% endfor %}
+{% endif %}
+{% for port in docker_service_ports %}
+PublishPort={{ port }}
+{% endfor %}
+{% for volume in docker_service_volumes %}
+Volume={{ volume }}
+{% endfor %}
+{% for k, v in docker_service_env_vars.items() %}
+Environment={{ k }}={{ v }}
+{% endfor %}
+{% if docker_service_user and docker_service_groups|length > 0 %}
+User={{ docker_service_user }}:{{ docker_service_groups[0] }}
+{% elif docker_service_user %}
+User={{ docker_service_user }}
+{% endif %}
+{% for group in docker_service_groups[1:] %}
+PodmanArgs=--group-add={{ group }}
+{% endfor %}
+{% for device in docker_service_devices %}
+AddDevice={{ device }}
+{% endfor %}
+{% if docker_service_privileged %}
+PodmanArgs=--privileged
+{% endif %}
+{% if docker_service_pid %}
+PodmanArgs=--pid={{ docker_service_pid }}
+{% endif %}
+{% if docker_service_cgroupns %}
+PodmanArgs=--cgroupns={{ docker_service_cgroupns }}
+{% endif %}
+AutoUpdate=registry
+Pull={{ docker_service_pull_policy }}
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target

@@ -15,3 +15,5 @@ docker_service_privileged: false
 docker_service_pid: null
 docker_service_cgroupns: null
 docker_service_state: present
+docker_service_generate_quadlet: false
+docker_service_quadlet_dir: /srv/quadlets

@@ -16,6 +16,27 @@
   ansible.builtin.set_fact:
     docker_service_network_string: ""
   when: docker_service_network is not defined or not docker_service_network
+
+- name: Create quadlet staging directory
+  ansible.builtin.file:
+    path: "{{ docker_service_quadlet_dir }}"
+    state: directory
+    mode: "0755"
+  when: docker_service_generate_quadlet and docker_service_state == 'present'
+
+- name: Generate quadlet container file
+  ansible.builtin.template:
+    src: quadlet.container.j2
+    dest: "{{ docker_service_quadlet_dir }}/{{ docker_service_id }}.container"
+    mode: "0644"
+  when: docker_service_generate_quadlet and docker_service_state == 'present'
+
+- name: Remove quadlet container file
+  ansible.builtin.file:
+    path: "{{ docker_service_quadlet_dir }}/{{ docker_service_id }}.container"
+    state: absent
+  when: docker_service_generate_quadlet and docker_service_state == 'absent'
+
 - name: Create systemd service unit
   ansible.builtin.template:
     src: service.j2
