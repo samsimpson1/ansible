@@ -1,0 +1,207 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure Docker is installed
+      ansible.builtin.package:
+        name: docker.io
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    # Test 1: Basic service with minimal configuration
+    - name: Test basic service
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-basic"
+        docker_service_description: "Basic Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+
+    # Test 2: Service with single network
+    - name: Create test network
+      community.docker.docker_network:
+        name: test_network
+        state: present
+
+    - name: Test service with single network
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-network-single"
+        docker_service_description: "Single Network Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_network: "test_network"
+
+    # Test 3: Service with multiple networks
+    - name: Create second test network
+      community.docker.docker_network:
+        name: test_network_2
+        state: present
+
+    - name: Test service with multiple networks
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-network-multi"
+        docker_service_description: "Multiple Networks Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_network:
+          - "test_network"
+          - "test_network_2"
+
+    # Test 4: Service with ports
+    - name: Test service with port mappings
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-ports"
+        docker_service_description: "Port Mapping Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_ports:
+          - "8080:5678"
+          - "8081:5679"
+
+    # Test 5: Service with volumes
+    - name: Create test directory for volumes
+      ansible.builtin.file:
+        path: /tmp/test-volumes
+        state: directory
+        mode: "0755"
+
+    - name: Test service with volumes
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-volumes"
+        docker_service_description: "Volume Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_volumes:
+          - "/tmp/test-volumes:/data"
+
+    # Test 6: Service with environment variables
+    - name: Test service with environment variables
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-env"
+        docker_service_description: "Environment Variables Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_env_vars:
+          TEST_VAR1: "value1"
+          TEST_VAR2: "value2"
+
+    # Test 7: Service with user and groups
+    - name: Test service with user and groups
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-user"
+        docker_service_description: "User/Group Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_user: "1000"
+        docker_service_groups:
+          - "1000"
+          - "1001"
+
+    # Test 8: Service with privileged mode
+    - name: Test service with privileged mode
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-privileged"
+        docker_service_description: "Privileged Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_privileged: true
+
+    # Test 9: Service with PID namespace
+    - name: Test service with PID namespace
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-pid"
+        docker_service_description: "PID Namespace Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_pid: "host"
+
+    # Test 10: Service with cgroup namespace
+    - name: Test service with cgroup namespace
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-cgroupns"
+        docker_service_description: "Cgroup Namespace Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_cgroupns: "host"
+
+    # Test 11: Service with custom command
+    - name: Test service with custom command
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-command"
+        docker_service_description: "Custom Command Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_command: "-text='hello world'"
+
+    # Test 12: Service disabled (not enabled on boot)
+    - name: Test disabled service
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-disabled"
+        docker_service_description: "Disabled Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_enabled: false
+
+    # Test 13: Comprehensive service with all options
+    - name: Test comprehensive service configuration
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-comprehensive"
+        docker_service_description: "Comprehensive Test Service"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_command: "-text='comprehensive test'"
+        docker_service_network:
+          - "test_network"
+          - "test_network_2"
+        docker_service_ports:
+          - "9090:5678"
+        docker_service_volumes:
+          - "/tmp/test-volumes:/data"
+        docker_service_env_vars:
+          COMPREHENSIVE_TEST: "true"
+          MULTI_OPTION: "enabled"
+        docker_service_user: "1000"
+        docker_service_pull_policy: "always"
+
+    # Test 14: Service state absent (to test removal)
+    - name: Create service for removal test
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-removal"
+        docker_service_description: "Service to be Removed"
+        docker_service_image: "hashicorp/http-echo:latest"
+
+    - name: Test service removal
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "test-removal"
+        docker_service_description: "Service to be Removed"
+        docker_service_image: "hashicorp/http-echo:latest"
+        docker_service_state: "absent"

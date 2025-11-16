@@ -1,0 +1,291 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    # Verify basic service
+    - name: Check that test-basic service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-basic.service
+      register: basic_service_file
+      failed_when: not basic_service_file.stat.exists
+
+    - name: Check that test-basic service is running
+      ansible.builtin.systemd:
+        name: test-basic
+      register: basic_service_status
+      failed_when: basic_service_status.status.ActiveState != "active"
+
+    - name: Verify basic service unit content
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-basic.service
+      register: basic_service_content
+
+    - name: Assert basic service has correct description
+      ansible.builtin.assert:
+        that:
+          - "'Description=Basic Test Service' in basic_service_content.content | b64decode"
+        fail_msg: "Basic service description not found in unit file"
+
+    # Verify single network service
+    - name: Check that test-network-single service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-network-single.service
+      register: network_single_service_file
+      failed_when: not network_single_service_file.stat.exists
+
+    - name: Verify single network configuration
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-network-single.service
+      register: network_single_content
+
+    - name: Assert single network is configured
+      ansible.builtin.assert:
+        that:
+          - "'--network test_network' in network_single_content.content | b64decode"
+        fail_msg: "Single network configuration not found"
+
+    # Verify multiple networks service
+    - name: Check that test-network-multi service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-network-multi.service
+      register: network_multi_service_file
+      failed_when: not network_multi_service_file.stat.exists
+
+    - name: Verify multiple network configuration
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-network-multi.service
+      register: network_multi_content
+
+    - name: Assert multiple networks are configured
+      ansible.builtin.assert:
+        that:
+          - "'--network test_network' in network_multi_content.content | b64decode"
+          - "'--network test_network_2' in network_multi_content.content | b64decode"
+        fail_msg: "Multiple network configuration not found"
+
+    # Verify ports service
+    - name: Check that test-ports service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-ports.service
+      register: ports_service_file
+      failed_when: not ports_service_file.stat.exists
+
+    - name: Verify port mappings
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-ports.service
+      register: ports_content
+
+    - name: Assert port mappings are configured
+      ansible.builtin.assert:
+        that:
+          - "'-p 8080:5678' in ports_content.content | b64decode"
+          - "'-p 8081:5679' in ports_content.content | b64decode"
+        fail_msg: "Port mappings not found"
+
+    # Verify volumes service
+    - name: Check that test-volumes service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-volumes.service
+      register: volumes_service_file
+      failed_when: not volumes_service_file.stat.exists
+
+    - name: Verify volume mounts
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-volumes.service
+      register: volumes_content
+
+    - name: Assert volume mounts are configured
+      ansible.builtin.assert:
+        that:
+          - "'-v /tmp/test-volumes:/data' in volumes_content.content | b64decode"
+        fail_msg: "Volume mounts not found"
+
+    # Verify environment variables service
+    - name: Check that test-env service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-env.service
+      register: env_service_file
+      failed_when: not env_service_file.stat.exists
+
+    - name: Verify environment variables
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-env.service
+      register: env_content
+
+    - name: Assert environment variables are configured
+      ansible.builtin.assert:
+        that:
+          - '"-e TEST_VAR1=\"value1\"" in env_content.content | b64decode'
+          - '"-e TEST_VAR2=\"value2\"" in env_content.content | b64decode'
+        fail_msg: "Environment variables not found"
+
+    # Verify user and groups service
+    - name: Check that test-user service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-user.service
+      register: user_service_file
+      failed_when: not user_service_file.stat.exists
+
+    - name: Verify user and groups configuration
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-user.service
+      register: user_content
+
+    - name: Assert user and groups are configured
+      ansible.builtin.assert:
+        that:
+          - "'-u 1000:1000' in user_content.content | b64decode"
+          - "'--group-add 1001' in user_content.content | b64decode"
+        fail_msg: "User and groups configuration not found"
+
+    # Verify privileged service
+    - name: Check that test-privileged service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-privileged.service
+      register: privileged_service_file
+      failed_when: not privileged_service_file.stat.exists
+
+    - name: Verify privileged mode
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-privileged.service
+      register: privileged_content
+
+    - name: Assert privileged mode is configured
+      ansible.builtin.assert:
+        that:
+          - "'--privileged' in privileged_content.content | b64decode"
+        fail_msg: "Privileged mode not found"
+
+    # Verify PID namespace service
+    - name: Check that test-pid service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-pid.service
+      register: pid_service_file
+      failed_when: not pid_service_file.stat.exists
+
+    - name: Verify PID namespace
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-pid.service
+      register: pid_content
+
+    - name: Assert PID namespace is configured
+      ansible.builtin.assert:
+        that:
+          - "'--pid host' in pid_content.content | b64decode"
+        fail_msg: "PID namespace not found"
+
+    # Verify cgroup namespace service
+    - name: Check that test-cgroupns service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-cgroupns.service
+      register: cgroupns_service_file
+      failed_when: not cgroupns_service_file.stat.exists
+
+    - name: Verify cgroup namespace
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-cgroupns.service
+      register: cgroupns_content
+
+    - name: Assert cgroup namespace is configured
+      ansible.builtin.assert:
+        that:
+          - "'--cgroupns host' in cgroupns_content.content | b64decode"
+        fail_msg: "Cgroup namespace not found"
+
+    # Verify custom command service
+    - name: Check that test-command service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-command.service
+      register: command_service_file
+      failed_when: not command_service_file.stat.exists
+
+    - name: Verify custom command
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-command.service
+      register: command_content
+
+    - name: Assert custom command is configured
+      ansible.builtin.assert:
+        that:
+          - "'-text=\\'hello world\\'' in command_content.content | b64decode or \"-text='hello world'\" in command_content.content | b64decode"
+        fail_msg: "Custom command not found"
+
+    # Verify disabled service
+    - name: Check that test-disabled service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-disabled.service
+      register: disabled_service_file
+      failed_when: not disabled_service_file.stat.exists
+
+    - name: Check that test-disabled service is not enabled
+      ansible.builtin.systemd:
+        name: test-disabled
+      register: disabled_service_status
+      failed_when: disabled_service_status.status.UnitFileState == "enabled"
+
+    # Verify comprehensive service
+    - name: Check that test-comprehensive service unit exists
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-comprehensive.service
+      register: comprehensive_service_file
+      failed_when: not comprehensive_service_file.stat.exists
+
+    - name: Verify comprehensive service configuration
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-comprehensive.service
+      register: comprehensive_content
+
+    - name: Assert comprehensive service has all configurations
+      ansible.builtin.assert:
+        that:
+          - "'--network test_network' in comprehensive_content.content | b64decode"
+          - "'--network test_network_2' in comprehensive_content.content | b64decode"
+          - "'-p 9090:5678' in comprehensive_content.content | b64decode"
+          - "'-v /tmp/test-volumes:/data' in comprehensive_content.content | b64decode"
+          - '"-e COMPREHENSIVE_TEST=\"true\"" in comprehensive_content.content | b64decode'
+          - '"-e MULTI_OPTION=\"enabled\"" in comprehensive_content.content | b64decode'
+          - "'-u 1000' in comprehensive_content.content | b64decode"
+          - "'--pull always' in comprehensive_content.content | b64decode"
+        fail_msg: "Comprehensive service configuration incomplete"
+
+    # Verify service removal
+    - name: Check that test-removal service unit was removed
+      ansible.builtin.stat:
+        path: /etc/systemd/system/test-removal.service
+      register: removal_service_file
+      failed_when: removal_service_file.stat.exists
+
+    # Verify systemd dependencies
+    - name: Verify systemd unit has Docker dependencies
+      ansible.builtin.slurp:
+        path: /etc/systemd/system/test-basic.service
+      register: basic_unit_content
+
+    - name: Assert Docker dependencies are configured
+      ansible.builtin.assert:
+        that:
+          - "'After=docker.service' in basic_unit_content.content | b64decode"
+          - "'Requires=docker.service' in basic_unit_content.content | b64decode"
+        fail_msg: "Docker dependencies not found in unit file"
+
+    # Verify restart policy
+    - name: Assert restart policy is configured
+      ansible.builtin.assert:
+        that:
+          - "'Restart=always' in basic_unit_content.content | b64decode"
+          - "'RestartSec=10' in basic_unit_content.content | b64decode"
+        fail_msg: "Restart policy not configured correctly"
+
+    # Verify ExecStop and ExecReload
+    - name: Assert ExecStop and ExecReload are configured
+      ansible.builtin.assert:
+        that:
+          - "'ExecStop=/usr/bin/docker stop test-basic' in basic_unit_content.content | b64decode"
+          - "'ExecReload=/usr/bin/docker restart test-basic' in basic_unit_content.content | b64decode"
+        fail_msg: "ExecStop or ExecReload not configured correctly"
+
+    # Summary
+    - name: Print verification summary
+      ansible.builtin.debug:
+        msg: "All docker_service role tests passed successfully!"
