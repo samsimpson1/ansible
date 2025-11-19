@@ -3,6 +3,7 @@
   ansible.builtin.set_fact:
     docker_service_network_string: "--network {{ docker_service_network }}"
   when: docker_service_network is string and docker_service_network | length > 0
+
 - name: Set Docker service network list
   ansible.builtin.set_fact:
     docker_service_network_string: >-
@@ -12,10 +13,30 @@
       {%- endfor -%}
       {{ nets | join(' ') }}
   when: docker_service_network is iterable and docker_service_network is not string and docker_service_network | length > 0
+
 - name: Set Docker service network fallback
   ansible.builtin.set_fact:
     docker_service_network_string: ""
   when: docker_service_network is not defined or not docker_service_network
+
+- name: Create env var file directory
+  ansible.builtin.file:
+    path: /opt/docker_service_env
+    state: directory
+    mode: "0700"
+    owner: root
+    group: root
+
+- name: Create Docker service env var file
+  ansible.builtin.template:
+    src: envfile.j2
+    dest: /opt/docker_service_env/{{ docker_service_id }}.env
+    mode: "0600"
+    owner: root
+    group: root
+  when: docker_service_state == 'present' and docker_service_env_vars is defined and docker_service_env_vars | length > 0
+  notify: "Restart service {{ docker_service_id }}"
+
 - name: Create systemd service unit
   ansible.builtin.template:
     src: service.j2
@@ -43,5 +64,11 @@
 - name: Remove systemd service unit
   ansible.builtin.file:
     path: /etc/systemd/system/{{ docker_service_id }}.service
+    state: absent
+  when: docker_service_state == 'absent'
+
+- name: Remove Docker service env var file
+  ansible.builtin.file:
+    path: /opt/docker_service_env/{{ docker_service_id }}.env
     state: absent
   when: docker_service_state == 'absent'

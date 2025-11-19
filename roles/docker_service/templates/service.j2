@@ -14,7 +14,7 @@ ExecStart=/usr/bin/docker run --rm \
   {% endif -%}
   {% if docker_service_volumes|length > 0 %}-v {{ ' -v '.join(docker_service_volumes) }} \
   {% endif -%}
-  {% if docker_service_env_vars|length > 0 %}{% for k, v in docker_service_env_vars.items() %}{{ '-e ' + k + '="' + v + '" ' }}{% endfor %} \
+  {% if docker_service_env_vars|length > 0 %}--env-file /opt/docker_service_env/{{ docker_service_id }}.env \
   {% endif -%}
   {% if docker_service_user and docker_service_groups|length > 0 %}-u {{ docker_service_user }}:{{ docker_service_groups[0] }} \
   {% elif docker_service_user %}-u {{ docker_service_user }} \
