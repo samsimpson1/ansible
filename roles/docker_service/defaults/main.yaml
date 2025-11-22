@@ -15,3 +15,4 @@ docker_service_privileged: false
 docker_service_pid: null
 docker_service_cgroupns: null
 docker_service_state: present
+docker_service_capabilities: []
