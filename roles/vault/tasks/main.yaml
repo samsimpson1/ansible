@@ -1,0 +1,66 @@
+- name: Vault Docker network
+  community.docker.docker_network:
+    name: "{{ vault_network }}"
+    state: "{{ vault_state }}"
+- name: Vault user
+  ansible.builtin.user:
+    name: vault
+    state: "{{ vault_state }}"
+    system: true
+    create_home: false
+- name: Getent passwd
+  ansible.builtin.getent:
+    database: passwd
+  changed_when: false
+  when: vault_state == 'present'
+- name: Set vault uid
+  ansible.builtin.set_fact:
+    vault_uid: "{{ getent_passwd['vault'].1 }}"
+  changed_when: false
+  when: vault_state == 'present'
+- name: Create Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: vault
+    group: vault
+    state: directory
+    mode: '0750'
+  loop:
+    - "{{ vault_directory }}"
+    - "{{ vault_directory }}/data"
+  when: vault_state == 'present'
+- name: Create Vault config file
+  ansible.builtin.template:
+    src: config.hcl.j2
+    dest: "{{ vault_directory }}/config.hcl"
+    owner: vault
+    group: vault
+    mode: '0640'
+  when: vault_state == 'present'
+  notify: Restart vault service
+- name: Vault service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: vault
+    docker_service_command: "vault server -config /config.hcl"
+    docker_service_image: "{{ container_images.vault }}"
+    docker_service_network: "{{ vault_network }}"
+    docker_service_user: "{{ vault_uid }}"
+    docker_service_volumes:
+      - "{{ vault_directory }}/data:/data"
+      - "{{ vault_directory }}/config.hcl:/config.hcl"
+    docker_service_capabilities:
+      - IPC_LOCK
+    docker_service_env_vars:
+      SKIP_SETCAP: "true"
+      SKIP_CHOWN: "true"
+    docker_service_state: "{{ vault_state }}"
+- name: Remove Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ vault_directory }}/data"
+    - "{{ vault_directory }}"
+  when: vault_state == 'absent'

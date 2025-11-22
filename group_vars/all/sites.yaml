@@ -136,3 +136,6 @@ sites:
       - name: prometheus
         target: "http://prometheus:9090"
         host: little
+      - name: vault
+        target: "http://vault:8200"
+        host: little

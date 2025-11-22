@@ -42,3 +42,6 @@
         name: copyparty
       vars:
         copyparty_state: "present"
+    - name: Vault
+      ansible.builtin.include_role:
+        name: vault

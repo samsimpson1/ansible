@@ -14,3 +14,4 @@ container_images:
   concourse_web: concourse/concourse:7.14.3
   concourse_worker: concourse/concourse:7.14.3
   concourse_postgres: postgres:18
+  vault: hashicorp/vault:1.21.1

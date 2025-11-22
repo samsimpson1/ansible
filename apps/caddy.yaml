@@ -26,3 +26,4 @@
     caddy_http_port: "80"
     caddy_env_vars: {}
     caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'internal') }}"
+    caddy_networks: ["source_default", "vault"]

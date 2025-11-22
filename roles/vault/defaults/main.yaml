@@ -1,0 +1,5 @@
+vault_cluster_name: "home-vault"
+vault_directory: /srv/containers/storage/ssd/vault
+vault_network: vault
+vault_hostname: vault.int.simpson.id
+vault_state: present
