@@ -107,7 +107,9 @@
       CONCOURSE_SESSION_SIGNING_KEY: "/concourse-keys/session_signing_key"
       CONCOURSE_TSA_HOST_KEY: "/concourse-keys/tsa_host_key"
       CONCOURSE_TSA_AUTHORIZED_KEYS: "/concourse-keys/authorized_worker_keys"
-      CONCOURSE_DUMMY_CREDS_VAR: "op_service_account_token={{ concourse_web_onepassword_service_account_token }}"
+      CONCOURSE_VAULT_URL: "{{ concourse_web_vault_url }}"
+      CONCOURSE_VAULT_CLIENT_TOKEN: "{{ concourse_web_vault_token }}"
+      CONCOURSE_VAULT_SHARED_PATH: "shared"
     docker_service_volumes:
       - "{{ concourse_web_data_directory }}/concourse-web/keys:/concourse-keys:ro"
     docker_service_state: "{{ concourse_web_state }}"

@@ -12,3 +12,4 @@ concourse_web_tsa_authorized_keys: ""
 concourse_web_data_directory: "/srv/containers/storage/ssd/concourse"
 concourse_web_state: present
 concourse_web_oidc_issuer: "https://pocket-id.srv.simpson.id"
+concourse_web_vault_url: "https://vault.int.simpson.id"
