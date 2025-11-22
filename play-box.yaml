@@ -82,6 +82,7 @@
         concourse_web_session_signing_key: "{{ concourse_session_signing_key }}"
         concourse_web_tsa_host_key: "{{ concourse_tsa_host_key }}"
         concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
+        concourse_web_onepassword_service_account_token: "{{ concourse_onepassword_service_account_token }}"
 
     - name: Concourse Worker
       ansible.builtin.include_role:
