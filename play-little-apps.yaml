@@ -45,3 +45,6 @@
     - name: Vault
       ansible.builtin.include_role:
         name: vault
+    - name: Tandoor Recipe Manager
+      ansible.builtin.include_tasks: apps/tandoor.yaml
+

@@ -1,0 +1,73 @@
+- name: Tandoor group
+  ansible.builtin.group:
+    name: tandoor
+    state: present
+
+- name: Tandoor user
+  ansible.builtin.user:
+    name: tandoor
+    group: tandoor
+    shell: /usr/sbin/nologin
+    create_home: false
+    state: present
+  register: tandoor_user
+
+- name: Create Tandoor data directories
+  ansible.builtin.file:
+    state: directory
+    path: "/srv/app/tandoor/{{ item }}"
+    mode: "0750"
+    owner: tandoor
+    group: tandoor
+  loop:
+    - postgres-data
+    - mediafiles
+    - staticfiles
+
+- name: Create Tandoor Docker network
+  community.docker.docker_network:
+    name: tandoor
+    state: present
+
+- name: Tandoor PostgreSQL service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "tandoor-postgres"
+    docker_service_description: "Tandoor PostgreSQL Database"
+    docker_service_image: "{{ container_images.tandoor_postgres }}"
+    docker_service_network: tandoor
+    docker_service_user: "{{ tandoor_user.uid }}"
+    docker_service_groups: ["{{ tandoor_user.group }}"]
+    docker_service_env_vars:
+      POSTGRES_PASSWORD: "{{ tandoor.db_password }}"
+      POSTGRES_USER: "{{ tandoor.db_username }}"
+      POSTGRES_DB: "{{ tandoor.db_database_name }}"
+    docker_service_volumes:
+      - "/srv/app/tandoor/postgres-data:/var/lib/postgresql/data:rw"
+
+- name: Tandoor service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "tandoor"
+    docker_service_description: "Tandoor Recipe Manager"
+    docker_service_image: "{{ container_images.tandoor }}"
+    docker_service_network:
+      - tandoor
+      - source_default
+    docker_service_user: "{{ tandoor_user.uid }}"
+    docker_service_groups: ["{{ tandoor_user.group }}"]
+    docker_service_env_vars:
+      SECRET_KEY: "{{ tandoor.django_secret_key }}"
+      DB_ENGINE: "django.db.backends.postgresql"
+      POSTGRES_HOST: "tandoor-postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: "{{ tandoor.db_username }}"
+      POSTGRES_PASSWORD: "{{ tandoor.db_password }}"
+      POSTGRES_DB: "{{ tandoor.db_database_name }}"
+      ENABLE_SIGNUP: "0"
+      GUNICORN_MEDIA: "0"
+    docker_service_volumes:
+      - "/srv/app/tandoor/mediafiles:/opt/recipes/mediafiles:rw"
+      - "/srv/app/tandoor/staticfiles:/opt/recipes/staticfiles:rw"
