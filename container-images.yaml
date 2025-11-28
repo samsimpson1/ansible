@@ -15,3 +15,5 @@ container_images:
   concourse_worker: concourse/concourse:7.14.3
   concourse_postgres: postgres:18
   vault: hashicorp/vault:1.21.1
+  tandoor: ghcr.io/tandoorrecipes/recipes:2.3.5
+  tandoor_postgres: postgres:18

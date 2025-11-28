@@ -3,6 +3,7 @@
   vars_files:
     - container-images.yaml
     - concourse-secrets.yaml
+    - tandoor-secrets.yaml
     - secret.yaml
   become: true
   tasks:
@@ -91,6 +92,10 @@
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
 
+    - name: Tandoor
+      ansible.builtin.include_role:
+        name: tandoor
+
     - name: Caddy external
       ansible.builtin.include_role:
         name: caddy
@@ -101,4 +106,4 @@
         caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["immich", "concourse"]
+        caddy_networks: ["immich", "concourse", "tandoor"]
