@@ -96,6 +96,10 @@
       ansible.builtin.include_role:
         name: tandoor
 
+    - name: Knot
+      ansible.builtin.include_role:
+        name: knot
+
     - name: Caddy external
       ansible.builtin.include_role:
         name: caddy
@@ -106,4 +110,4 @@
         caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["immich", "concourse", "tandoor"]
+        caddy_networks: ["immich", "concourse", "tandoor", "knot"]

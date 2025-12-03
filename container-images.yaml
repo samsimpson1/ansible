@@ -17,3 +17,4 @@ container_images:
   vault: hashicorp/vault:1.21.1
   tandoor: ghcr.io/tandoorrecipes/recipes:2.3.5
   tandoor_postgres: postgres:18
+  knot: tngl/knot:v1.10.0-alpha

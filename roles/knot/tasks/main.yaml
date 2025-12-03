@@ -1,0 +1,39 @@
+---
+- name: Knot Docker network
+  community.docker.docker_network:
+    name: "{{ knot_network }}"
+    state: "{{ knot_state }}"
+- name: Create knot directories
+  ansible.builtin.file:
+    path: "{{ knot_directory }}/{{ item }}"
+    state: directory
+    mode: '0750'
+    owner: '1000'
+    group: '1000'
+  loop:
+    - ''
+    - keys
+    - database
+  when: knot_state == 'present'
+- name: Knot service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: knot
+    docker_service_image: "{{ container_images.knot }}"
+    docker_service_state: "{{ knot_state }}"
+    docker_service_network: "{{ knot_network }}"
+    docker_service_ports:
+      - "2022:22"
+    docker_service_env_vars:
+      APPVIEW_ENDPOINT: https://tangled.sh
+      KNOT_REPO_SCAN_PATH: "/home/git/repositories"
+      KNOT_SERVER_HOSTNAME: "knot.srv.simpson.id"
+      KNOT_SERVER_OWNER: "did:plc:3h52iqwillalbu2dmh3z2sx5"
+      KNOT_SERVER_INTERNAL_LISTEN_ADDR: 127.0.0.1:5444
+      KNOT_SERVER_LISTEN_ADDR: 0.0.0.0:5555
+      KNOT_SERVER_DB_PATH: "/database/knot.db"
+    docker_service_volumes:
+      - "{{ knot_directory }}/repositories:/home/git/repositories"
+      - "{{ knot_directory }}/keys:/etc/ssh/keys"
+      - "{{ knot_directory }}/database:/database"

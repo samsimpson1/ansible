@@ -1,0 +1,3 @@
+knot_state: present
+knot_network: knot
+knot_directory: /srv/app/knot

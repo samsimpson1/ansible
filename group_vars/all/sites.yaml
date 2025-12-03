@@ -75,6 +75,9 @@ sites:
       - name: immich
         target: "http://immich-server:2283"
         host: box
+      - name: knot
+        target: "http://knot:5555"
+        host: box
       - name: navidrome
         target: "http://navidrome:4533"
         host: little
