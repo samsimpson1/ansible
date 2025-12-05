@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_UUID}=="{{ offline_backup_disk_uuid }}", TAG+="systemd", ENV{SYSTEMD_WANTS}="offline-backup.service"

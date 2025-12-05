@@ -1,0 +1,10 @@
+[Unit]
+Description=Offline backup script
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash {{ offline_backup_directory }}/offline_backup.sh {{ offline_backup_directory }}/config.env
+ExecStopPost=/usr/bin/bash -c 'if [ $$EXIT_STATUS != 0 ]; then sleep 5; umount {{ offline_backup_directory }}/mount; fi'
+
+[Install]
+WantedBy=multi-user.target

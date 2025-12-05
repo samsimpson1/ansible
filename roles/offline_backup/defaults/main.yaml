@@ -1,0 +1,3 @@
+offline_backup_disk_uuid: 969c9790-a1c0-4fe9-8ab2-e83ad418bc59
+offline_backup_directory: /mnt/offline_backup
+offline_backup_state: present

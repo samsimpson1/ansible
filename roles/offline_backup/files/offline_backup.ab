@@ -1,0 +1,93 @@
+#!/usr/bin/env amber
+
+import {
+  echo_error,
+  echo_info,
+  env_var_get,
+  env_var_load
+} from "std/env"
+
+import { parse_int } from "std/text"
+
+fun discord(message: Text, webhook_url: Text) {
+  if webhook_url == "" {
+    echo_error("Discord webhook URL is not set", 1)
+  }
+
+  const payload = "\{\"username\": \"Offline Backups\", \"content\": \"{message}\"}"
+
+  $ curl -H "Content-Type: application/json" -X POST -d "{payload}" "{webhook_url}" $ failed(code) {
+    echo_error("Failed to send Discord notification", 1)
+  }
+}
+
+fun mount_drive(device: Text, path: Text) {
+  echo_info("Mounting {device} to {path}")
+
+  $ mount "/dev/disk/by-uuid/{device}" "{path}" $ failed(code) {
+    echo_error("Failed to mount {device} to {path}", 1)
+  }
+}
+
+fun unmount_drive(path: Text) {
+  echo_info("Unmounting {path}")
+
+  $ umount "{path}" $ failed(code) {
+    echo_error("Failed to unmount {path}", 1)
+  }
+
+  $ sync $ failed(code) {
+    echo_error("Failed to sync after unmounting {path}", 1)
+  }
+}
+
+fun do_rsync(path: Text, backup_host: Text, backup_port: Int, backup_user: Text, backup_password_path: Text) {
+  $ mkdir -p "{path}/backup" $?
+
+  echo_info("Starting rsync from {backup_user}@{backup_host} to {path}")
+
+  $ sshpass -f "{backup_password_path}" \
+    rsync -avz --delete \
+    -e "ssh -p{backup_port} -o StrictHostKeyChecking=no" \
+    "{backup_user}@{backup_host}:./" "{path}" $ failed(code) {
+    echo_error("rsync from {backup_user}@{backup_host}:{path} failed", 1)
+  }
+}
+
+main(args) {
+  if len(args) != 2 {
+    echo_error("Usage: offline_backup.sh <config_file>", 1)
+  }
+
+  const config = args[1]
+
+  const device = env_var_load("DEVICE_UUID", config)?
+  const mount_path = env_var_load("MOUNT_PATH", config)?
+
+  const backup_host = env_var_load("BACKUP_TARGET", config)?
+  const backup_port = parse_int(env_var_load("BACKUP_PORT", config)?)?
+  const backup_user = env_var_load("BACKUP_USERNAME", config)?
+  const backup_password_path = env_var_load("BACKUP_PASSWORD_PATH", config)?
+
+  const discord_webhook_url = env_var_load("DISCORD_WEBHOOK_URL", config)?
+
+  discord("Starting offline backup", discord_webhook_url)?
+
+  mount_drive(device, mount_path) failed {
+    discord("Failed to mount backup drive", discord_webhook_url)?
+    echo_error("Failed to mount backup drive", 1)
+  }
+
+  do_rsync("{mount_path}/backup", backup_host, backup_port, backup_user, backup_password_path) failed {
+    discord("Offline backup failed during rsync", discord_webhook_url)?
+    unmount_drive(mount_path)?
+    echo_error("Offline backup failed during rsync", 1)
+  }
+
+  unmount_drive(mount_path) failed {
+    discord("Failed to unmount backup drive", discord_webhook_url)?
+    echo_error("Failed to unmount backup drive", 1)
+  }
+
+  discord("Offline backup complete", discord_webhook_url)?
+}
