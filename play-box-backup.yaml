@@ -1,0 +1,24 @@
+- name: Box (backup)
+  hosts: box
+  vars_files:
+    - secret.yaml
+    - backup-vars.yaml
+  become: true
+  tasks:
+    - name: Backup
+      ansible.builtin.include_role:
+        name: backup
+      vars:
+        backup_jobs:
+          - name: box-concourse
+            op: restic
+            path: /srv/app/concourse
+            cron:
+              minute: "49"
+              hour: "*/6"
+          - name: box-knot
+            op: restic
+            path: /srv/app/knot
+            cron:
+              minute: "58"
+              hour: "*/2"
