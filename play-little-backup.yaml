@@ -61,6 +61,12 @@
             cron:
               minute: "11"
               hour: "*/2"
+          - name: certificates
+            op: restic
+            path: /srv/certificates
+            cron:
+              minute: "0"
+              hour: "5"
 
     - name: Offline Backup
       ansible.builtin.include_role:
