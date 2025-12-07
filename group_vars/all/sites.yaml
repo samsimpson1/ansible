@@ -10,10 +10,9 @@ sites:
   - name: cp.sams.wtf
     kind: external
     routes: []
-    fallback_host: little
     fallback: |
       handle {
-        reverse_proxy http://copyparty:80
+        respond "🤷"
       }
 
   - name: srv.simpson.id
@@ -112,6 +111,9 @@ sites:
     kind: internal
     wildcard: true
     routes:
+      - name: cp
+        target: "http://copyparty:80"
+        host: little
       - name: firefly-di
         target: "http://firefly-iii-data-importer:8080"
         host: little
