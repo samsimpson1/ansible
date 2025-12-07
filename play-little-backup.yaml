@@ -55,6 +55,12 @@
             cron:
               minute: "16"
               hour: "*/4"
+          - name: vault
+            op: restic
+            path: /srv/containers/storage/ssd/vault/
+            cron:
+              minute: "11"
+              hour: "*/2"
 
     - name: Offline Backup
       ansible.builtin.include_role:
