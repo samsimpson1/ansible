@@ -64,9 +64,6 @@
         state: present
         key: "{{ lookup('file', 'github-actions.pub') }}"
 
-    - name: GitHub Actions Runner
-      ansible.builtin.include_tasks: apps/github-actions-runner.yaml
-
     - name: ACME Client
       ansible.builtin.include_role:
         name: acme_client
