@@ -71,3 +71,15 @@
     - name: Offline Backup
       ansible.builtin.include_role:
         name: offline_backup
+
+    - name: Create storage box metrics cron job
+      ansible.builtin.cron:
+        name: "Storage Box Metrics"
+        user: root
+        minute: "*/20"
+        job: >
+          /usr/bin/env docker run
+          --rm --pull always
+          -e HCLOUD_TOKEN={{ backup_hcloud_token }}
+          ghcr.io/samsimpson1/storage-box-metrics:latest
+          backup-box
