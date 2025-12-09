@@ -71,9 +71,6 @@
       ansible.builtin.include_role:
         name: acme_client
 
-    - name: Immich
-      ansible.builtin.include_tasks: apps/immich.yaml
-
     - name: Concourse Web
       ansible.builtin.include_role:
         name: concourse_web
@@ -110,4 +107,4 @@
         caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["immich", "concourse", "tandoor", "knot"]
+        caddy_networks: ["concourse", "tandoor", "knot"]
