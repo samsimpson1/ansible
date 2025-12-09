@@ -69,6 +69,18 @@
       - "{{ monitoring_server_storage_path }}/alertmanager/templates.tmpl:/etc/alertmanager/templates/discord.tmpl:ro"
     docker_service_state: "{{ monitoring_server_state }}"
 
+- name: Prometheus Pushgateway service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "prometheus-pushgateway"
+    docker_service_description: "Prometheus Pushgateway"
+    docker_service_image: "{{ container_images.prometheus_pushgateway }}"
+    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_user: "{{ monitoring_server_user }}"
+    docker_service_groups: ["{{ monitoring_server_group }}"]
+    docker_service_state: "{{ monitoring_server_state }}"
+
 - name: Prometheus service
   ansible.builtin.include_role:
     name: docker_service

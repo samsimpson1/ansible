@@ -71,9 +71,6 @@ sites:
       - name: comics
         target: "http://komga:25600"
         host: little
-      - name: immich
-        target: "http://immich-server:2283"
-        host: box
       - name: knot
         target: "http://knot:5555"
         host: box
@@ -143,6 +140,9 @@ sites:
         host: little
       - name: prometheus
         target: "http://prometheus:9090"
+        host: little
+      - name: prometheus-push
+        target: "http://prometheus-pushgateway:9091"
         host: little
       - name: vault
         target: "http://vault:8200"

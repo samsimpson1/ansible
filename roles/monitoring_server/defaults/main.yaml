@@ -36,3 +36,6 @@ monitoring_server_grafana_extra_volumes: []
 monitoring_server_network: "source_default"
 monitoring_server_user: "568"
 monitoring_server_group: "568"
+
+# Storage box metrics
+monitoring_server_storage_box_name: "backup-box"

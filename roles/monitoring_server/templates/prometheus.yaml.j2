@@ -33,3 +33,9 @@ scrape_configs:
 {% endfor %}
         labels:
           environment: homelab
+
+  - job_name: "pushgateway"
+    static_configs:
+      - targets: ["prometheus-pushgateway:9091"]
+        labels:
+          environment: homelab

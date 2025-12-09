@@ -4,6 +4,7 @@ container_images:
   node_exporter: prom/node-exporter:v1.10.2
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
   prometheus: prom/prometheus:v3.7.3
+  prometheus_pushgateway: prom/pushgateway:v1.11.2
   alertmanager: prom/alertmanager:v0.28.1
   grafana: grafana/grafana:12.2.1
   copyparty: ghcr.io/9001/copyparty-iv:1.19.21
