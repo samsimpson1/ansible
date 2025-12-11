@@ -1,45 +1,49 @@
 - name: Little (apps)
   hosts: little
   vars_files:
-    - container-images.yaml
     - copyparty.yaml
-    - secret.yaml
   become: true
   tasks:
-    - name: Renovate
-      ansible.builtin.include_role:
-        name: renovate
     - name: Wiki
       ansible.builtin.include_tasks: apps/wiki.yaml
+      tags:
+        - wiki
     - name: ECG notify
       ansible.builtin.include_role:
         name: ecg_notify
+      tags:
+        - ecg-notify
     - name: Karakeep
       ansible.builtin.include_tasks: apps/karakeep.yaml
+      tags:
+        - karakeep
     - name: FreshRSS
       ansible.builtin.include_tasks: apps/freshrss.yaml
-    - name: Arr apps
-      ansible.builtin.include_tasks: apps/arr.yaml
-    - name: Downloader apps
-      ansible.builtin.include_tasks: apps/downloaders.yaml
-    - name: Media frontend apps
-      ansible.builtin.include_tasks: apps/media-frontend.yaml
+      tags:
+        - freshrss
     - name: Home Assistant
       ansible.builtin.include_tasks: apps/home-assistant.yaml
-    - name: Monitoring
-      ansible.builtin.include_tasks: apps/monitoring.yaml
+      tags:
+        - home-assistant
     - name: Miscellaneous
       ansible.builtin.include_tasks: apps/misc.yaml
+      tags:
+        - misc
     - name: Catbot
       ansible.builtin.include_tasks: apps/catbot.yaml
+      tags:
+        - catbot
     - name: Samba server
       ansible.builtin.include_role:
         name: samba_server
+      tags:
+        - samba
     - name: Stonks scraper
       ansible.builtin.include_tasks: apps/stonks-scraper.yaml
+      tags:
+        - stonks
     - name: Copyparty
       ansible.builtin.include_role:
         name: copyparty
-    - name: Vault
-      ansible.builtin.include_role:
-        name: vault
+      tags:
+        - copyparty

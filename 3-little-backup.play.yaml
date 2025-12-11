@@ -1,12 +1,13 @@
 - name: Little (backup)
   hosts: little
   vars_files:
-    - secret.yaml
-    - backup-vars.yaml
+    - vars/backup.yaml
   become: true
   tasks:
     - name: Duplicacy user
       ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
+      tags:
+        - duplicacy
     - name: Backup
       ansible.builtin.include_role:
         name: backup
@@ -67,10 +68,14 @@
             cron:
               minute: "0"
               hour: "5"
+      tags:
+        - backup
 
     - name: Offline Backup
       ansible.builtin.include_role:
         name: offline_backup
+      tags:
+        - offline-backup
 
     - name: Create storage box metrics cron job
       ansible.builtin.cron:
@@ -83,3 +88,5 @@
           -e HCLOUD_TOKEN={{ backup_hcloud_token }}
           ghcr.io/samsimpson1/storage-box-metrics:latest
           backup-box
+      tags:
+        - storage-box-metrics

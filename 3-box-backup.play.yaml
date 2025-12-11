@@ -1,9 +1,8 @@
 - name: Box (backup)
   hosts: box
-  vars_files:
-    - secret.yaml
-    - backup-vars.yaml
   become: true
+  vars_files:
+    - vars/backup.yaml
   tasks:
     - name: Backup
       ansible.builtin.include_role:

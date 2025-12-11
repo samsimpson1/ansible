@@ -2,17 +2,24 @@
   hosts:
     - box
     - little
-  vars_files:
-    - container-images.yaml
-    - secret.yaml
   become: true
   tasks:
     - name: App user
       ansible.builtin.include_tasks: apps/app-user.yaml
+    - name: ACME Manager
+      ansible.builtin.include_role:
+        name: acme_manager
+      vars:
+        acme_manager_cloudflare_account_id: "{{ cloudflare_account_id }}"
+        acme_manager_cloudflare_account_token: "{{ cloudflare_account_token }}"
+      tags: acme
+      when: inventory_hostname == 'little'
     - name: ACME Client
       ansible.builtin.include_role:
         name: acme_client
       when: inventory_hostname != 'little'
+      tags: acme
     - name: HA Proxy Role
       ansible.builtin.include_role:
         name: ha_proxy
+      tags: ha_proxy

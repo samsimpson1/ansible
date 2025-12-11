@@ -1,0 +1,51 @@
+- name: Little (infra)
+  hosts: little
+  become: true
+  tasks:
+    - name: GitHub Actions SSH key
+      ansible.posix.authorized_key:
+        user: me
+        state: present
+        key: "{{ lookup('file', 'github-actions.pub') }}"
+      tags:
+        - github-ssh
+    - name: Tailscale
+      ansible.builtin.include_role:
+        name: tailscale
+      tags:
+        - tailscale
+    - name: Docker
+      ansible.builtin.include_role:
+        name: docker_host
+      tags:
+        - docker
+    - name: SSMTP
+      ansible.builtin.include_role:
+        name: ssmtp
+      tags:
+        - ssmtp
+    - name: Caddy
+      ansible.builtin.include_tasks: apps/caddy.yaml
+      tags:
+        - caddy
+    - name: Pocket ID
+      ansible.builtin.include_tasks: apps/pocket-id.yaml
+      tags:
+        - pocket-id
+    - name: Monitoring
+      ansible.builtin.include_tasks: apps/monitoring.yaml
+      tags:
+        - monitoring
+        - prometheus
+        - grafana
+        - node-exporter
+    - name: Vault
+      ansible.builtin.include_role:
+        name: vault
+      tags:
+        - vault
+    - name: Renovate
+      ansible.builtin.include_role:
+        name: renovate
+      tags:
+        - renovate

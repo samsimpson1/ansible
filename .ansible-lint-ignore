@@ -1,1 +1,1 @@
-concourse-secrets.yaml yaml[line-length]
+vars/concourse.yaml yaml[line-length]

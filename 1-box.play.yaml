@@ -1,10 +1,8 @@
 - name: Box
   hosts: box
   vars_files:
-    - container-images.yaml
-    - concourse-secrets.yaml
-    - tandoor-secrets.yaml
-    - secret.yaml
+    - vars/concourse.yaml
+    - vars/tandoor.yaml
   become: true
   tasks:
     - name: App user
@@ -13,10 +11,12 @@
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
+      tags: tailscale
 
     - name: Docker
       ansible.builtin.include_role:
         name: docker_host
+      tags: docker
 
     - name: App data disk directory
       ansible.builtin.file:
@@ -67,6 +67,7 @@
     - name: ACME Client
       ansible.builtin.include_role:
         name: acme_client
+      tags: acme
 
     - name: Concourse Web
       ansible.builtin.include_role:
@@ -79,20 +80,25 @@
         concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
         concourse_web_onepassword_service_account_token: "{{ concourse_onepassword_service_account_token }}"
         concourse_web_vault_token: "{{ concourse_vault_token }}"
+      tags: [ concourse, concourse_web ]
+
     - name: Concourse Worker
       ansible.builtin.include_role:
         name: concourse_worker
       vars:
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
+      tags: [ concourse, concourse_worker ]
 
     - name: Tandoor
       ansible.builtin.include_role:
         name: tandoor
+      tags: tandoor
 
     - name: Knot
       ansible.builtin.include_role:
         name: knot
+      tags: knot
 
     - name: Caddy external
       ansible.builtin.include_role:
@@ -105,3 +111,4 @@
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["concourse", "tandoor", "knot"]
+      tags: caddy
