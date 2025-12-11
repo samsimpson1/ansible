@@ -91,3 +91,24 @@ groups:
         annotations:
           summary: "Systemd service failed on {{ $labels.instance }}"
           description: "Service {{ $labels.name }} on {{ $labels.instance }} is in failed state."
+      
+      # Backup alerts
+      - alert: BackupResticTooOld
+        expr: restic_last_snapshot < (time() - 86400)
+        for: 5m
+        labels:
+          severity: critical
+          component: backup
+        annotations:
+          summary: "Restic backup {{ $labels.repository }} too old"
+          description: "The last restic backup for repository {{ $labels.repository }} is older than 24 hours."
+
+      - alert: BackupStorageBoxFreeSpace
+        expr: (storage_box_used_bytes / storage_box_max_bytes) > 0.9
+        for: 10m
+        labels:
+          severity: warning
+          component: backup
+        annotations:
+          summary: "Storage box {{ $labels.storage_box }} low on free space"
+          description: "The storage box {{ $labels.storage_box }} is over 90% full."
