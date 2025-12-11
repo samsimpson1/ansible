@@ -20,3 +20,5 @@ else
 fi
 
 r backup "{{ item.path }}" {% if item.excludes is defined %}--exclude-file /srv/backups/restic-{{ item.name }}-excludes.txt{% endif %}
+
+/srv/backups/restic-metrics-{{ item.name }}.sh

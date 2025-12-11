@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -e
+
+STATS=$(/srv/backups/restic-util.sh "{{ item.name }}" stats --json)
+SIZE_BYTES=$(jq -r '.total_size' <<< "${STATS}")
+SNAPSHOT_COUNT=$(jq -r '.snapshots_count' <<< "${STATS}")
+FILE_COUNT=$(jq -r '.total_file_count' <<< "${STATS}")
+
+LAST_SNAPSHOT=$(/srv/backups/restic-util.sh "{{ item.name }}" snapshots --json --latest 1 | jq -r '.[0].time' | date +"%s" -f -)
+
+cat <<EOF | curl --data-binary @- https://prometheus-push.int.simpson.id/metrics/job/restic-{{ item.name }}
+# HELP restic_last_snapshot Unix time of the latest snapshot in repository
+# TYPE restic_last_snapshot gauge
+restic_last_snapshot{repository="{{ item.name }}"} ${LAST_SNAPSHOT}
+# HELP restic_size_bytes Size of repository in bytes
+# TYPE restic_size_bytes gauge
+restic_size_bytes{repository="{{ item.name }}"} ${SIZE_BYTES}
+# HELP restic_snapshot_count Number of snapshots in repository
+# TYPE restic_snapshot_count gauge
+restic_snapshot_count{repository="{{ item.name }}"} ${SNAPSHOT_COUNT}
+# HELP restic_file_count Number of files in repository
+# TYPE restic_file_count gauge
+restic_file_count{repository="{{ item.name }}"} ${FILE_COUNT}
+EOF

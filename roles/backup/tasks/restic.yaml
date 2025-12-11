@@ -16,6 +16,15 @@
     group: root
   loop: "{{ backup_jobs }}"
   when: item.op == 'restic'
+- name: Create restic metrics scripts
+  ansible.builtin.template:
+    src: restic-metrics.sh.j2
+    dest: /srv/backups/restic-metrics-{{ item.name }}.sh
+    mode: "0750"
+    owner: root
+    group: root
+  loop: "{{ backup_jobs }}"
+  when: item.op == 'restic'
 - name: Create restic util script
   ansible.builtin.template:
     src: restic-util.sh.j2
