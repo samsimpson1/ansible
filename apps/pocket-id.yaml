@@ -5,6 +5,20 @@
     mode: '0750'
     owner: app
     group: app
+- name: Pocket ID encryption key
+  ansible.builtin.copy:
+    content: !vault |
+      $ANSIBLE_VAULT;1.2;AES256;ansible-vault
+      30386332303665333735656565353233343864323033313830386566363838363235376536633266
+      3362373932376231663563643337366562653934383962620a653033646263663937336165656235
+      30623334396665393334383666643366336265626563653962656238333132333933376139386137
+      6664383331653138350a666137383663663935353530623963343137376638643939386239346230
+      32656265636337653739656164646430636134633261656465623434633363626661633037663066
+      3462323538636266366664643862353334346634303935396331
+    dest: /srv/containers/storage/ssd/pocket-id/encryption-key.txt
+    mode: '0640'
+    owner: app
+    group: app
 - name: Pocket ID service
   ansible.builtin.include_role:
     name: docker_service
@@ -15,12 +29,13 @@
     docker_service_network: source_default
     docker_service_env_vars:
       APP_URL: "https://pocket-id.srv.simpson.id"
+      ENCRYPTION_KEY_FILE: "/data/encryption-key.txt"
       TRUST_PROXY: "true"
       PUID: "568"
       PGID: "568"
       DB_CONNECTION_STRING: "file:/data/pocket-id.db?_pragma=journal_mode(WAL)&_pragma=busy_timeout(2500)&_txlock=immediate"
-      UPLOAD_PATH: "/data/uploads"
-      KEYS_PATH: "/data/keys"
+      FILE_BACKEND: "database"
+      KEYS_STORAGE: "database"
       UI_CONFIG_DISABLED: "true"
       SMTP_FROM: "pocket-id@ses.simpson.id"
       SMTP_USER: "{{ smtp_username }}"
