@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -e
+
+SIZE=$(
+  sshpass -f /srv/backups/password \
+  ssh -o StrictHostKeyChecking=no -p23 {{ backup_target.user }}@{{ backup_target.hostname }} \
+    "du -sk {{ item.name }}" | awk '{print $1}'
+)
+
+cat <<EOF | curl --data-binary @- https://prometheus-push.int.simpson.id/metrics/job/backup-sync-{{ item.name }}
+# HELP backup_size_bytes Size of the backup repository in bytes
+# TYPE backup_size_bytes gauge
+backup_size_bytes{repository="{{ item.name }}",kind="sync"} $((SIZE * 1024))
+# HELP backup_last_run_timestamp Timestamp of the last successful run
+# TYPE backup_last_run_timestamp gauge
+backup_last_run_timestamp{repository="{{ item.name }}",kind="sync"} $(date +%s)
+EOF
