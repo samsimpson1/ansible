@@ -94,7 +94,7 @@ groups:
       
       # Backup alerts
       - alert: BackupResticTooOld
-        expr: restic_last_snapshot < (time() - 86400)
+        expr: backup_restic_last_snapshot < (time() - 86400)
         for: 5m
         labels:
           severity: critical
