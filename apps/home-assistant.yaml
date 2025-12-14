@@ -12,7 +12,7 @@
   vars:
     docker_service_id: "home-assistant"
     docker_service_description: "Home Assistant"
-    docker_service_image: ghcr.io/home-assistant/home-assistant:2025.12.2
+    docker_service_image: ghcr.io/home-assistant/home-assistant:2025.12.3
     docker_service_network: host
     docker_service_privileged: true
     docker_service_volumes:
