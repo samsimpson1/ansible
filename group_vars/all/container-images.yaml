@@ -10,7 +10,7 @@ container_images:
   copyparty: ghcr.io/9001/copyparty-iv:1.19.21
   immich_server: ghcr.io/immich-app/immich-server:v2.2.3
   immich_machine_learning: ghcr.io/immich-app/immich-machine-learning:v2.2.3
-  immich_postgres: ghcr.io/immich-app/postgres:14-vectorchord0.5.3
+  immich_postgres: ghcr.io/immich-app/postgres:18-vectorchord0.5.3
   immich_redis: docker.io/valkey/valkey:8-bookworm
   concourse_web: concourse/concourse:7.14.3
   concourse_worker: concourse/concourse:7.14.3
