@@ -1,1 +1,2 @@
 vars/concourse.yaml yaml[line-length]
+apps/pocket-id.yaml avoid-implicit

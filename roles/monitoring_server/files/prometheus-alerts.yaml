@@ -91,7 +91,7 @@ groups:
         annotations:
           summary: "Systemd service failed on {{ $labels.instance }}"
           description: "Service {{ $labels.name }} on {{ $labels.instance }} is in failed state."
-      
+
       # Backup alerts
       - alert: BackupResticTooOld
         expr: backup_restic_last_snapshot < (time() - 86400)

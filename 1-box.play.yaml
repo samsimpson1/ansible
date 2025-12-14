@@ -80,7 +80,7 @@
         concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
         concourse_web_onepassword_service_account_token: "{{ concourse_onepassword_service_account_token }}"
         concourse_web_vault_token: "{{ concourse_vault_token }}"
-      tags: [ concourse, concourse_web ]
+      tags: [concourse, concourse_web]
 
     - name: Concourse Worker
       ansible.builtin.include_role:
@@ -88,7 +88,7 @@
       vars:
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
-      tags: [ concourse, concourse_worker ]
+      tags: [concourse, concourse_worker]
 
     - name: Tandoor
       ansible.builtin.include_role:
