@@ -1,6 +1,6 @@
 container_images:
   caddy: caddy:2.10
-  renovate: ghcr.io/renovatebot/renovate:41.156
+  renovate: ghcr.io/renovatebot/renovate:41.173
   node_exporter: prom/node-exporter:v1.10.2
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
   prometheus: prom/prometheus:v3.7.3
