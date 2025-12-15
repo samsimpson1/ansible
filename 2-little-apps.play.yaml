@@ -11,6 +11,8 @@
     - name: ECG notify
       ansible.builtin.include_role:
         name: ecg_notify
+      vars:
+        ecg_notify_state: "absent"
       tags:
         - ecg-notify
     - name: Karakeep
