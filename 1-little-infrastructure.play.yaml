@@ -44,10 +44,3 @@
         name: vault
       tags:
         - vault
-    - name: Renovate
-      ansible.builtin.include_role:
-        name: renovate
-      vars:
-        renovate_state: absent
-      tags:
-        - renovate
