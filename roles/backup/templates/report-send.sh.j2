@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-set -o pipefail
-set -e
-
-/srv/backups/report-generate.py | ssmtp "{{ smtp_to }}"

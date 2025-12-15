@@ -57,29 +57,20 @@
     weekday: "{{ item.cron.weekday | default('*') }}"
   loop: "{{ backup_jobs }}"
   when: backup_state == 'present'
-- name: Create backup configuration file
-  ansible.builtin.template:
-    src: config.json.j2
-    dest: /srv/backups/config.json
-    mode: "0640"
-    owner: root
-    group: root
+- name: Remove backup configuration file
+  ansible.builtin.file:
+    path: /srv/backups/config.json
+    state: absent
   when: backup_state == 'present'
-- name: Create report send script
-  ansible.builtin.template:
-    src: report-send.sh.j2
-    dest: /srv/backups/report-send.sh
-    mode: "0750"
-    owner: root
-    group: root
+- name: Remove report send script
+  ansible.builtin.file:
+    state: absent
+    path: /srv/backups/report-send.sh
   when: backup_state == 'present'
-- name: Create report generation script
-  ansible.builtin.copy:
-    src: report-generate.py
-    dest: /srv/backups/report-generate.py
-    mode: "0750"
-    owner: root
-    group: root
+- name: Remove report generation script
+  ansible.builtin.file:
+    path: /srv/backups/report-generate.py
+    state: absent
   when: backup_state == 'present'
 - name: Schedule report job
   ansible.builtin.cron:
@@ -89,6 +80,7 @@
     minute: "0"
     hour: "12"
     day: "*/2"
+    state: absent
   when: backup_state == 'present'
 
 - name: Remove backup job cron entries
@@ -106,13 +98,6 @@
     user: root
   loop: "{{ backup_jobs }}"
   when: backup_state == 'absent' and item.op == 'restic'
-
-- name: Remove report job cron entry
-  ansible.builtin.cron:
-    name: "Backup report"
-    state: absent
-    user: root
-  when: backup_state == 'absent'
 
 - name: Remove backup directory
   ansible.builtin.file:
