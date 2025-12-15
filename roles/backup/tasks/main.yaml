@@ -57,31 +57,6 @@
     weekday: "{{ item.cron.weekday | default('*') }}"
   loop: "{{ backup_jobs }}"
   when: backup_state == 'present'
-- name: Remove backup configuration file
-  ansible.builtin.file:
-    path: /srv/backups/config.json
-    state: absent
-  when: backup_state == 'present'
-- name: Remove report send script
-  ansible.builtin.file:
-    state: absent
-    path: /srv/backups/report-send.sh
-  when: backup_state == 'present'
-- name: Remove report generation script
-  ansible.builtin.file:
-    path: /srv/backups/report-generate.py
-    state: absent
-  when: backup_state == 'present'
-- name: Schedule report job
-  ansible.builtin.cron:
-    name: "Backup report"
-    user: root
-    job: "/srv/backups/report-send.sh"
-    minute: "0"
-    hour: "12"
-    day: "*/2"
-    state: absent
-  when: backup_state == 'present'
 
 - name: Remove backup job cron entries
   ansible.builtin.cron:
