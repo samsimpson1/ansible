@@ -7,7 +7,7 @@ container_images:
   prometheus_pushgateway: prom/pushgateway:v1.11.2
   alertmanager: prom/alertmanager:v0.28.1
   grafana: grafana/grafana:12.2.1
-  copyparty: ghcr.io/9001/copyparty-iv:1.19.21
+  copyparty: ghcr.io/9001/copyparty-iv:1.19.23
   immich_server: ghcr.io/immich-app/immich-server:v2.2.3
   immich_machine_learning: ghcr.io/immich-app/immich-machine-learning:v2.2.3
   immich_postgres: ghcr.io/immich-app/postgres:14-vectorchord0.5.3
