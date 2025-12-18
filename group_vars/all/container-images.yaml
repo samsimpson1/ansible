@@ -2,10 +2,10 @@ container_images:
   caddy: caddy:2.10
   node_exporter: prom/node-exporter:v1.10.2
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
-  prometheus: prom/prometheus:v3.7.3
+  prometheus: prom/prometheus:v3.8.1
   prometheus_pushgateway: prom/pushgateway:v1.11.2
-  alertmanager: prom/alertmanager:v0.28.1
-  grafana: grafana/grafana:12.2.1
+  alertmanager: prom/alertmanager:v0.30.0
+  grafana: grafana/grafana:12.3.1
   copyparty: ghcr.io/9001/copyparty-iv:1.19.23
   concourse_web: concourse/concourse:7.14.3
   concourse_worker: concourse/concourse:7.14.3
