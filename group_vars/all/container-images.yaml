@@ -1,6 +1,5 @@
 container_images:
   caddy: caddy:2.10
-  renovate: ghcr.io/renovatebot/renovate:41.156
   node_exporter: prom/node-exporter:v1.10.2
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
   prometheus: prom/prometheus:v3.7.3
@@ -8,10 +7,6 @@ container_images:
   alertmanager: prom/alertmanager:v0.28.1
   grafana: grafana/grafana:12.2.1
   copyparty: ghcr.io/9001/copyparty-iv:1.19.23
-  immich_server: ghcr.io/immich-app/immich-server:v2.2.3
-  immich_machine_learning: ghcr.io/immich-app/immich-machine-learning:v2.2.3
-  immich_postgres: ghcr.io/immich-app/postgres:14-vectorchord0.5.3
-  immich_redis: docker.io/valkey/valkey:8-bookworm
   concourse_web: concourse/concourse:7.14.3
   concourse_worker: concourse/concourse:7.14.3
   concourse_postgres: postgres:18
