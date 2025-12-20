@@ -110,9 +110,6 @@ sites:
     kind: internal
     wildcard: true
     routes:
-      - name: cp
-        target: "http://copyparty:80"
-        host: little
       - name: firefly-di
         target: "http://firefly-iii-data-importer:8080"
         host: little
