@@ -5,6 +5,7 @@
     owner: app
     group: app
     mode: '0750'
+  when: filebrowser_state == 'present'
 - name: Filebrowser config file
   ansible.builtin.template:
     src: config.yaml.j2
@@ -13,6 +14,7 @@
     group: app
     mode: '0640'
   notify: Restart filebrowser
+  when: filebrowser_state == 'present'
 - name: Filebrowser docker network
   community.docker.docker_network:
     name: "{{ filebrowser_network }}"
@@ -33,3 +35,8 @@
       - "{{ filebrowser_files_directory }}:/files"
     docker_service_env_vars:
       FILEBROWSER_CONFIG: "/config/config.yaml"
+- name: Remove Filebrowser config directory
+  ansible.builtin.file:
+    path: "{{ filebrowser_config_directory }}"
+    state: absent
+  when: filebrowser_state == 'absent'
