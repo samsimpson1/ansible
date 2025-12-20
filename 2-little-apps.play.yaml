@@ -44,10 +44,3 @@
       ansible.builtin.include_tasks: apps/stonks-scraper.yaml
       tags:
         - stonks
-    - name: Copyparty
-      ansible.builtin.include_role:
-        name: copyparty
-      vars:
-        copyparty_state: absent
-      tags:
-        - copyparty
