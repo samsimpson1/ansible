@@ -1,0 +1,35 @@
+- name: Filebrowser config directory
+  ansible.builtin.file:
+    path: "{{ filebrowser_config_directory }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+- name: Filebrowser config file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ filebrowser_config_directory }}/config.yaml"
+    owner: app
+    group: app
+    mode: '0640'
+  notify: Restart filebrowser
+- name: Filebrowser docker network
+  community.docker.docker_network:
+    name: "{{ filebrowser_network }}"
+    state: "{{ filebrowser_state }}"
+- name: Filebrowser container service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: filebrowser
+    docker_service_description: "Filebrowser Quantum"
+    docker_service_image: "{{ container_images.filebrowser }}"
+    docker_service_network: "{{ filebrowser_network }}"
+    docker_service_state: "{{ filebrowser_state }}"
+    docker_service_user: "568"
+    docker_service_groups: ["568"]
+    docker_service_volumes:
+      - "{{ filebrowser_config_directory }}:/config"
+      - "{{ filebrowser_files_directory }}:/files"
+    docker_service_env_vars:
+      FILEBROWSER_CONFIG: "/config/config.yaml"

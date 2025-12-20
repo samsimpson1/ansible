@@ -1,0 +1,4 @@
+filebrowser_config_directory: /srv/containers/storage/ssd/filebrowser
+filebrowser_files_directory: /srv/containers/storage/hdd/files
+filebrowser_network: filebrowser
+filebrowser_state: present

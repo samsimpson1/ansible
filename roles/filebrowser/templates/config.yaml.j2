@@ -1,0 +1,22 @@
+server:
+  database: "/config/database.db"
+  cacheDir: "/config/cache"
+  sources:
+    - path: "/files"
+      config:
+        defaultEnabled: false
+        denyByDefault: true
+
+auth:
+  methods:
+    password:
+      enabled: false
+    oidc:
+      enabled: true
+      clientId: "{{ sso_clients.filebrowser.id }}"
+      clientSecret: "{{ sso_clients.filebrowser.secret }}"
+      issuerUrl: "https://pocket-id.srv.simpson.id"
+      scopes: "openid email profile groups"
+      userIdentifier: "preferred_username"
+      adminGroup: "admin"
+      createUser: true
