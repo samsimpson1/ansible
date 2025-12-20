@@ -50,12 +50,14 @@ sites:
         custom: |
           @files host files.srv.simpson.id
           handle @files {
-            route {
+            rewrite /dav /dav/
+            route /dav/* {
               basic_auth {
                 me {{ webdav_basic_auth_password_hash }}
               }
               webdav {
                 root /webdav-files
+                prefix /dav
               }
             }
           }
