@@ -13,7 +13,7 @@
   changed_when: false
 - name: Pocket ID data directory
   ansible.builtin.file:
-    path: /srv/containers/storage/ssd/pocket-id
+    path: "{{ pocket_id_directory }}"
     state: directory
     mode: '0750'
     owner: pocket-id
@@ -22,7 +22,7 @@
 - name: Pocket ID Litestream private key
   ansible.builtin.copy:
     src: litestream.key
-    dest: /srv/containers/storage/ssd/pocket-id/ssh-key
+    dest: "{{ pocket_id_directory }}/ssh-key"
     mode: '0640'
     owner: pocket-id
     group: pocket-id
@@ -36,7 +36,7 @@
 - name: Pocket ID encryption key
   ansible.builtin.copy:
     src: encryption.key
-    dest: /srv/containers/storage/ssd/pocket-id/encryption-key.txt
+    dest: "{{ pocket_id_directory }}/encryption-key.txt"
     mode: '0640'
     owner: pocket-id
     group: pocket-id
@@ -68,4 +68,4 @@
       SMTP_PORT: "{{ smtp_port }}"
       SMTP_TLS: "{{ smtp_tls }}"
     docker_service_volumes:
-      - "/srv/containers/storage/ssd/pocket-id:/data"
+      - "{{ pocket_id_directory }}:/data"

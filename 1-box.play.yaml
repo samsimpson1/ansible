@@ -105,6 +105,7 @@
         name: pocket_id
       vars:
         pocket_id_role: secondary
+        pocket_id_directory: "/srv/app/pocket-id"
       tags: pocket-id
 
     - name: Caddy external
