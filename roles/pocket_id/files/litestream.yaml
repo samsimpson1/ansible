@@ -1,0 +1,8 @@
+dbs:
+  - path: /data/pocket-id.db
+    replica:
+      type: sftp
+      host: 10.0.0.202:22
+      user: pocket-id
+      key-path: /data/ssh-key
+      path: /srv/app/pocket-id/litestream

@@ -1,7 +1,7 @@
 - name: Pocket ID user
   ansible.builtin.user:
     name: pocket-id
-    shell: /usr/sbin/nologin
+    shell: /usr/bin/bash
     create_home: true
 - name: Getent passwd
   ansible.builtin.getent:
@@ -19,6 +19,14 @@
     owner: pocket-id
     group: pocket-id
     recurse: true
+- name: Pocket ID Litestream directory
+  ansible.builtin.file:
+    path: "{{ pocket_id_directory }}/litestream"
+    state: directory
+    mode: '0750'
+    owner: pocket-id
+    group: pocket-id
+  when: pocket_id_role == 'secondary'
 - name: Pocket ID Litestream private key
   ansible.builtin.copy:
     src: litestream.key
@@ -33,6 +41,14 @@
     key: "{{ lookup('file', 'litestream.pub') }}"
     state: "{{ 'present' if (pocket_id_role == 'secondary' and pocket_id_state == 'present') else 'absent' }}"
   when: pocket_id_role == 'secondary'
+- name: Litestream config file
+  ansible.builtin.copy:
+    src: litestream.yaml
+    dest: "{{ pocket_id_directory }}/litestream.yaml"
+    mode: '0640'
+    owner: pocket-id
+    group: pocket-id
+  when: pocket_id_role == 'primary'
 - name: Pocket ID encryption key
   ansible.builtin.copy:
     src: encryption.key
@@ -69,3 +85,18 @@
       SMTP_TLS: "{{ smtp_tls }}"
     docker_service_volumes:
       - "{{ pocket_id_directory }}:/data"
+- name: Pocket ID Litestream service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "pocket-id-litestream"
+    docker_service_description: "Pocket ID Litestream"
+    docker_service_image: "{{ container_images.litestream }}"
+    docker_service_network: source_default
+    docker_service_state: "{{ 'present' if pocket_id_role == 'primary' and pocket_id_state == 'present' else 'absent' }}"
+    docker_service_user: "{{ pocket_id_uid }}"
+    docker_service_groups: ["{{ pocket_id_uid }}"]
+    docker_service_command: "replicate -config /data/litestream.yaml"
+    docker_service_volumes:
+      - "{{ pocket_id_directory }}:/data:rw"
+    docker_service_restart_policy: "always"
