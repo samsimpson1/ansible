@@ -4,6 +4,7 @@
     name: "pocket-id"
     state: restarted
     daemon_reload: false
+  when: pocket_id_role == 'primary'
 
 - name: Restart Litestream
   ansible.builtin.systemd:
