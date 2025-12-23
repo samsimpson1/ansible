@@ -1,4 +1,8 @@
 ---
+- name: Debug
+  ansible.builtin.debug:
+    msg: "Enabled: {{ docker_service_enabled }}"
+
 - name: Set Docker service string
   ansible.builtin.set_fact:
     docker_service_network_string: "--network {{ docker_service_network }}"
@@ -54,12 +58,23 @@
     path: /etc/systemd/system/{{ docker_service_id }}.service
   register: docker_service_unit_file
 
-- name: Manage Docker service
+- name: Enable Docker service
   ansible.builtin.systemd:
     name: "{{ docker_service_id }}"
-    state: "{{ 'stopped' if docker_service_state == 'absent' else 'started' }}"
     enabled: "{{ docker_service_enabled if docker_service_state == 'present' else false }}"
   when: docker_service_unit_file.stat.exists
+
+- name: Start Docker service
+  ansible.builtin.systemd:
+    name: "{{ docker_service_id }}"
+    state: "started"
+  when: docker_service_unit_file.stat.exists and docker_service_enabled and docker_service_state == 'present'
+
+- name: Stop Docker service
+  ansible.builtin.systemd:
+    name: "{{ docker_service_id }}"
+    state: "stopped"
+  when: docker_service_unit_file.stat.exists and docker_service_state == 'absent'
 
 - name: Remove systemd service unit
   ansible.builtin.file:
