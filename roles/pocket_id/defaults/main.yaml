@@ -1,0 +1,3 @@
+pocket_id_state: present
+# primary or secondary
+pocket_id_role: primary

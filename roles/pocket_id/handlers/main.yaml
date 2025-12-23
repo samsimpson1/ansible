@@ -1,0 +1,12 @@
+---
+- name: Restart Pocket ID
+  ansible.builtin.systemd:
+    name: "pocket-id"
+    state: restarted
+    daemon_reload: false
+
+- name: Restart Litestream
+  ansible.builtin.systemd:
+    name: "pocket-id-litestream"
+    state: restarted
+    daemon_reload: false

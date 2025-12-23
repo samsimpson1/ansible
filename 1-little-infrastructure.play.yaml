@@ -29,7 +29,10 @@
       tags:
         - caddy
     - name: Pocket ID
-      ansible.builtin.include_tasks: apps/pocket-id.yaml
+      ansible.builtin.include_role:
+        name: pocket_id
+      vars:
+        pocket_id_role: primary
       tags:
         - pocket-id
     - name: Monitoring
