@@ -1,8 +1,13 @@
+- name: Pocket ID docker network
+  community.docker.docker_network:
+    name: "{{ pocket_id_network }}"
+    state: "{{ pocket_id_state }}"
 - name: Pocket ID user
   ansible.builtin.user:
     name: pocket-id
     shell: /usr/bin/bash
     create_home: true
+    uid: "1985"
 - name: Getent passwd
   ansible.builtin.getent:
     database: passwd
@@ -43,12 +48,11 @@
   when: pocket_id_role == 'secondary'
 - name: Litestream config file
   ansible.builtin.copy:
-    src: litestream.yaml
+    src: "litestream-{{ pocket_id_role }}.yaml"
     dest: "{{ pocket_id_directory }}/litestream.yaml"
     mode: '0640'
     owner: pocket-id
     group: pocket-id
-  when: pocket_id_role == 'primary'
 - name: Pocket ID encryption key
   ansible.builtin.copy:
     src: encryption.key
@@ -64,9 +68,11 @@
     docker_service_id: "pocket-id"
     docker_service_description: "Pocket ID"
     docker_service_image: ghcr.io/pocket-id/pocket-id:v1
-    docker_service_network: source_default
+    docker_service_network: "{{ pocket_id_network }}"
     docker_service_enabled: "{{ pocket_id_role == 'primary' }}"
     docker_service_state: "{{ pocket_id_state }}"
+    docker_service_ports:
+      - "127.0.0.1:1411:1411"
     docker_service_env_vars:
       APP_URL: "https://pocket-id.srv.simpson.id"
       ENCRYPTION_KEY_FILE: "/data/encryption-key.txt"

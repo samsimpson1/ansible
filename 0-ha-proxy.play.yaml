@@ -19,7 +19,7 @@
         name: acme_client
       when: inventory_hostname != 'little'
       tags: acme
-    - name: HA Proxy Role
+    - name: HA Proxy
       ansible.builtin.include_role:
         name: ha_proxy
       tags: ha_proxy

@@ -2,3 +2,4 @@ pocket_id_state: present
 # primary or secondary
 pocket_id_role: primary
 pocket_id_directory: /srv/containers/storage/ssd/pocket-id
+pocket_id_network: pocket_id

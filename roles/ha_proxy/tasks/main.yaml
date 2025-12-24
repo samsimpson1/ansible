@@ -19,6 +19,17 @@
     - keepalived
   when: ha_proxy_state == 'present'
 
+- name: Pocket ID manage script
+  ansible.builtin.template:
+    src: pocket-id-manage.sh.j2
+    dest: /etc/keepalived/pocket-id-manage.sh
+    owner: root
+    group: root
+    mode: '0750'
+  when: |
+    ha_proxy_state == 'present' and
+    ha_proxy_keepalived_state == 'BACKUP'
+
 - name: Create keepalived config file
   ansible.builtin.template:
     src: keepalived.conf.j2

@@ -1,0 +1,4 @@
+dbs:
+  - path: /data/pocket-id.db
+    replica:
+      path: /data/litestream

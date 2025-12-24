@@ -90,8 +90,8 @@ sites:
         target: "http://pinchflat-oauth2-proxy:4180"
         host: little
       - name: pocket-id
-        target: "http://pocket-id:1411"
-        host: little
+        target: "http://127.0.0.1:1411"
+        host: ha
       - name: rss
         target: "http://freshrss:80"
         host: little

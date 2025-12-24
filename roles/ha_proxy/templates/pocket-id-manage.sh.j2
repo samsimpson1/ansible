@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+POCKET_ID_DIR="{{ ha_proxy_pocket_id_directory }}"
+LITESTREAM_IMAGE_URI="{{ container_images.litestream }}"
+POCKET_ID_UID="$(id -u pocket-id)"
+
+OP="${1}"
+
+if [ "${OP}" = "start" ]; then
+  echo "restoring from litestream"
+  docker run --rm -i \
+    -v "${POCKET_ID_DIR}:/data" \
+    --user "${POCKET_ID_UID}" \
+    "${LITESTREAM_IMAGE_URI}" \
+    restore \
+    -config /data/litestream.yaml \
+    /data/pocket-id.db
+    
+  systemctl start pocket-id
+elif [ "${OP}" = "stop" ]; then
+  systemctl stop pocket-id
+  rm "${POCKET_ID_DIR}/pocket-id.db"
+else
+  echo "usage: ${0} start|stop"
+fi

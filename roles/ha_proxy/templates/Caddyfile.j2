@@ -10,6 +10,13 @@
   tls /certificates/{{ host.name }}/fullchain.pem /certificates/{{ host.name }}/key.pem
 
   {% for site in host.routes %}
+
+  {% if site.host == 'ha' %}
+  @{{ site.name }} host {{ site.name }}.{{ host.name }}
+  handle @{{ site.name }} {
+    reverse_proxy {{ site.target }}
+  }
+  {% else %}
   @{{ site.name }} host {{ site.name }}.{{ host.name }}
   handle @{{ site.name }} {
     reverse_proxy {
@@ -19,6 +26,7 @@
       }
     }
   }
+  {% endif %}
 
   {% endfor %}
   {% if host.fallback_host is defined %}

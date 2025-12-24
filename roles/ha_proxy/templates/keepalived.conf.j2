@@ -11,4 +11,9 @@ vrrp_instance VI_1 {
     virtual_ipaddress {
         {{ ha_proxy_address }}/{{ ha_proxy_netmask }}
     }
+
+    {% if ha_proxy_keepalived_state == 'BACKUP' %}
+    notify_backup "/etc/keepalived/pocket-id-manage.sh stop"
+    notify_master "/etc/keepalived/pocket-id-manage.sh start"
+    {% endif %}
 }
