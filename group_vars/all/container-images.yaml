@@ -14,6 +14,6 @@ container_images:
   tandoor: ghcr.io/tandoorrecipes/recipes:2.3.6
   tandoor_postgres: postgres:18
   knot: tngl/knot:v1.10.0-alpha
-  filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.0.3-stable
+  filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.1.0-stable
   litestream: litestream/litestream:0.5.5
   pocket_id: ghcr.io/pocket-id/pocket-id:v1.16.0
