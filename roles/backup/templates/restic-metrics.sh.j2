@@ -3,10 +3,9 @@
 set -o pipefail
 set -e
 
-STATS=$(/srv/backups/restic-util.sh "{{ item.name }}" stats --json)
+STATS=$(/srv/backups/restic-util.sh "{{ item.name }}" stats --json --mode raw-data)
 SIZE_BYTES=$(jq -r '.total_size' <<< "${STATS}")
 SNAPSHOT_COUNT=$(jq -r '.snapshots_count' <<< "${STATS}")
-FILE_COUNT=$(jq -r '.total_file_count' <<< "${STATS}")
 
 LAST_SNAPSHOT=$(/srv/backups/restic-util.sh "{{ item.name }}" snapshots --json --latest 1 | jq -r '.[0].time' | date +"%s" -f -)
 
@@ -20,9 +19,6 @@ backup_size_bytes{repository="{{ item.name }}",kind="restic"} ${SIZE_BYTES}
 # HELP backup_restic_snapshot_count Number of snapshots in repository
 # TYPE backup_restic_snapshot_count gauge
 backup_restic_snapshot_count{repository="{{ item.name }}"} ${SNAPSHOT_COUNT}
-# HELP backup_restic_file_count Number of files in repository
-# TYPE backup_restic_file_count gauge
-backup_restic_file_count{repository="{{ item.name }}"} ${FILE_COUNT}
 # HELP backup_last_run_timestamp Timestamp of the last successful run
 # TYPE backup_last_run_timestamp gauge
 backup_last_run_timestamp{repository="{{ item.name }}",kind="restic"} $(date +%s)
