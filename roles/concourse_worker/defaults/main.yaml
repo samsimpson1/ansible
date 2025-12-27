@@ -2,6 +2,5 @@
 concourse_worker_tsa_host: "box.int.simpson.id:2222"
 concourse_worker_tsa_public_key: ""
 concourse_worker_worker_key: ""
-concourse_worker_work_dir: "/worker-state"
 concourse_worker_data_directory: "/srv/app/concourse-worker"
 concourse_worker_state: present

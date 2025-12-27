@@ -59,11 +59,11 @@
       CONCOURSE_TSA_HOST: "{{ concourse_worker_tsa_host }}"
       CONCOURSE_TSA_PUBLIC_KEY: "/concourse-keys/tsa_host_key.pub"
       CONCOURSE_TSA_WORKER_PRIVATE_KEY: "/concourse-keys/worker_key"
-      CONCOURSE_WORK_DIR: "{{ concourse_worker_work_dir }}"
-      CONCOURSE_RUNTIME: containerd
+      CONCOURSE_WORK_DIR: "{{ concourse_worker_data_directory }}/work"
+      CONCOURSE_RUNTIME: guardian
     docker_service_volumes:
       - "{{ concourse_worker_data_directory }}/keys:/concourse-keys:ro"
-      - "{{ concourse_worker_data_directory }}/work:{{ concourse_worker_work_dir }}"
+      - "{{ concourse_worker_data_directory }}/work:{{ concourse_worker_data_directory }}/work"
     docker_service_state: "{{ concourse_worker_state }}"
 
 - name: Remove Concourse Worker data directory
