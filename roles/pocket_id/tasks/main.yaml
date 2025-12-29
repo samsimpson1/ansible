@@ -75,6 +75,8 @@
       - "127.0.0.1:1411:1411"
     docker_service_env_vars:
       APP_URL: "https://pocket-id.srv.simpson.id"
+      APP_NAME: "{{ pocket_id_app_name }}"
+      ACCENT_COLOR: "{{ pocket_id_accent_colour }}"
       ENCRYPTION_KEY_FILE: "/data/encryption-key.txt"
       TRUST_PROXY: "true"
       PUID: "{{ pocket_id_uid }}"

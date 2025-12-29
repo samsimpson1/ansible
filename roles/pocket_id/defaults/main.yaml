@@ -3,3 +3,5 @@ pocket_id_state: present
 pocket_id_role: primary
 pocket_id_directory: /srv/containers/storage/ssd/pocket-id
 pocket_id_network: pocket_id
+pocket_id_app_name: "Pocket ID"
+pocket_id_accent_colour: "default"
