@@ -19,7 +19,9 @@ if [ "${OP}" = "start" ]; then
   systemctl start pocket-id
 elif [ "${OP}" = "stop" ]; then
   systemctl stop pocket-id
-  rm "${POCKET_ID_DIR}/pocket-id.db"
+  rm -f "${POCKET_ID_DIR}/pocket-id.db"
+  rm -f "${POCKET_ID_DIR}/pocket-id.db-wal"
+  rm -f "${POCKET_ID_DIR}/pocket-id.db-shm"
 else
   echo "usage: ${0} start|stop"
 fi
