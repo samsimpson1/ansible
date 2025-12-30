@@ -4,24 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is an Ansible infrastructure-as-code repository for managing home lab infrastructure for the `little` host. The setup includes container services, backups, SSO authentication, and various self-hosted applications.
+This is an Ansible infrastructure-as-code repository for managing home lab infrastructure across multiple hosts (`little` and `box`). The setup includes container services, CI/CD, backups, SSO authentication, high-availability proxy, and various self-hosted applications.
 
 ## Key Commands
 
 ### Running Playbooks
 
+Playbooks use a numbered naming convention (`N-*.play.yaml`) indicating execution order dependencies.
+
 #### Direct Playbook Execution
-- `ansible-playbook play-little-infrastructure.yaml` - Deploy base infrastructure (Tailscale, Docker, sSMTP, Caddy)
-- `ansible-playbook play-little-auth.yaml` - Deploy authentication services (Pocket ID)
-- `ansible-playbook play-little-apps.yaml` - Deploy applications (ECG notify, Karakeep, FreshRSS, Arr apps, Firefly III, Home Assistant, Monitoring stack)
-- `ansible-playbook play-little-backup.yaml` - Deploy backup configuration
+- `ansible-playbook 0-ha-proxy.play.yaml` - Deploy HA Proxy with Keepalived on both hosts
+- `ansible-playbook 1-little-infrastructure.play.yaml` - Deploy little host infrastructure (Tailscale, Docker, SSMTP, Caddy, Pocket ID, Monitoring, Vault)
+- `ansible-playbook 1-box.play.yaml` - Deploy box host infrastructure (Docker, Concourse CI, Tandoor, Knot DNS, Pocket ID secondary)
+- `ansible-playbook 2-little-apps.play.yaml` - Deploy little host applications (Wiki, Karakeep, FreshRSS, Home Assistant, Catbot, Samba, Stonks, Filebrowser)
+- `ansible-playbook 2-little-media.play.yaml` - Deploy media services (Arr stack, Downloaders, Plex, Jellyfin, Audiobookshelf, etc.)
+- `ansible-playbook 3-monitoring.play.yaml` - Deploy monitoring exporters across home host group
+- `ansible-playbook 3-little-backup.play.yaml` - Deploy little host backup configuration
+- `ansible-playbook 3-box-backup.play.yaml` - Deploy box host backup configuration
 
 #### Dry-run (Check Mode)
 Add `--check` flag to any playbook command for dry-run mode:
-- `ansible-playbook play-little-infrastructure.yaml --check`
-- `ansible-playbook play-little-auth.yaml --check`
-- `ansible-playbook play-little-apps.yaml --check`
-- `ansible-playbook play-little-backup.yaml --check`
+- `ansible-playbook 1-little-infrastructure.play.yaml --check`
+- `ansible-playbook 2-little-apps.play.yaml --check`
 
 #### Install Requirements
 - `ansible-galaxy role install -r requirements.yaml` - Install required Ansible roles
@@ -36,13 +40,22 @@ All commands use 1Password CLI for vault password retrieval via `onepassword-cli
 
 ### Host Structure
 - **little** (10.0.0.191) - Main application host running containerized services
+- **box** (10.0.0.202) - Secondary host running CI/CD (Concourse), DNS (Knot), recipes (Tandoor)
+- **home** (group) - Both hosts for shared configurations like monitoring exporters
+
+HA Proxy with Keepalived provides failover between hosts.
 
 ### Key Roles
 
-#### docker_service
+#### Infrastructure Roles
+
+##### docker_host
+Sets up Docker daemon on target hosts.
+
+##### docker_service
 Central role for managing containerized services via systemd. Creates systemd unit files that run Docker containers with configurable:
 - Network settings
-- Port mappings  
+- Port mappings
 - Volume mounts
 - Environment variables
 - User/group settings
@@ -50,44 +63,104 @@ Central role for managing containerized services via systemd. Creates systemd un
 - Privileged mode (`docker_service_privileged`)
 - PID namespace (`docker_service_pid`)
 
-#### backup
-Comprehensive backup system supporting:
-- **Restic** - Encrypted backups to remote storage
-- **Sync operations** - Direct rsync/ssh transfers
-- **Automated reporting** - Email reports every 2 days
-- **Scheduled jobs** - Cron-based backup scheduling
+##### ha_proxy
+High-availability proxy with Keepalived for failover between hosts. Configured via host_vars with MASTER/BACKUP states and priorities.
 
-#### caddy
+##### tailscale
+Mesh networking setup for secure inter-host communication.
+
+##### ssmtp
+Mail relay configuration for system notifications.
+
+#### Reverse Proxy & TLS Roles
+
+##### caddy
 Reverse proxy and web server role that builds custom Caddy images with DNS plugins:
 - **Custom Docker image** - Builds Caddy with Cloudflare DNS plugin using xcaddy
 - **Configurable instances** - Supports multiple Caddy instances with unique IDs
 - **Automatic TLS** - Built-in HTTPS with Let's Encrypt integration
 - **Service integration** - Uses docker_service role for systemd management
 
-#### oauth2_proxy
+##### acme_manager / acme_client
+ACME certificate management with Cloudflare DNS integration.
+
+#### Authentication & Security Roles
+
+##### pocket_id
+SSO provider supporting both primary and secondary roles for HA setups.
+
+##### oauth2_proxy
 Reusable OAuth2 proxy role for SSO integration with applications:
 - **Service isolation** - Creates `{id}-oauth2-proxy` service and data directory to avoid conflicts
 - **Flexible configuration** - Configurable upstreams, skip auth routes, and OIDC settings
 - **Pocket ID integration** - Pre-configured for Pocket ID SSO provider
 - **Template-based config** - Generates oauth2-proxy.cfg from Jinja2 template
 
+##### vault
+HashiCorp Vault for secrets management.
+
+#### CI/CD Roles
+
+##### concourse_web / concourse_worker
+Concourse CI server and worker for automation pipelines.
+
+#### Monitoring Roles
+
+##### monitoring_server
+Prometheus, Grafana, and Alertmanager stack.
+
+##### monitoring_exporters
+Node exporter, smartctl exporter, and pushgateway for metrics collection.
+
+#### Backup Roles
+
+##### backup
+Comprehensive backup system supporting:
+- **Restic** - Encrypted backups to remote storage
+- **Sync operations** - Direct rsync/ssh transfers
+- **Discord reporting** - Backup status notifications
+- **Scheduled jobs** - Cron-based backup scheduling
+
+##### offline_backup
+Offline backup management for air-gapped storage.
+
+#### Application Roles
+
+##### knot
+DNS server for internal name resolution.
+
+##### tandoor
+Recipe management application.
+
+##### filebrowser
+Web-based file browser.
+
+##### samba_server
+Samba file sharing server.
+
 ### Authentication
-Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Applications like FreshRSS and Firefly III are configured with OIDC authentication.
+Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Applications like FreshRSS and Karakeep are configured with OIDC authentication.
 
 ### Application Categories
 - **Media Management** - Arr stack (Prowlarr, Radarr, Sonarr), Komga, Overseerr, Pinchflat
+- **Media Playback** - Plex, Jellyfin, Audiobookshelf, LMS (Lyrion), Navidrome
 - **Downloads** - qBittorrent, SABnzbd, Unpackerr, Slskd
-- **Personal Finance** - Firefly III with OAuth2 proxy and data importer
 - **Knowledge Management** - Karakeep with Meilisearch backend, Wiki
 - **RSS/Feed Reading** - FreshRSS with OIDC
 - **Home Automation** - Home Assistant with Zigbee USB device support
-- **Monitoring** - Prometheus, Grafana, Node Exporter
+- **Recipes** - Tandoor (on box host)
+- **Monitoring** - Prometheus, Grafana, Alertmanager, Node Exporter
 - **Communication** - Catbot Discord bot with timezone support
+- **File Management** - Filebrowser, Samba
 
 ### Infrastructure Services
 - **Tailscale** - Mesh networking
 - **Docker** - Container runtime
 - **sSMTP** - Mail relay configuration
+- **HA Proxy** - High-availability proxy with Keepalived
+- **Concourse CI** - CI/CD automation
+- **Knot** - DNS server
+- **Vault** - Secrets management
 
 ## Important Patterns
 
@@ -160,36 +233,43 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 - Sensitive configuration like API keys, passwords, and tokens are vaulted
 
 ### Container Image Versions
-- Container image versions are centrally managed in `container-images.yaml`
+- Container image versions are centrally managed in `group_vars/all/container-images.yaml`
 - Reference images using `{{ container_images.service_name }}` in playbooks
-- Currently managed: Caddy, Renovate
+- Currently managed: Caddy, Prometheus, Grafana, Alertmanager, Node Exporter, Smartctl Exporter, Pushgateway, Concourse, Vault, Tandoor, Knot, Filebrowser, Litestream, Pocket ID, Copyparty
 
 ## File Structure Notes
-- **Playbooks**: `play-little-infrastructure.yaml`, `play-little-auth.yaml`, `play-little-apps.yaml`, `play-little-backup.yaml`
+- **Playbooks**: `0-ha-proxy.play.yaml`, `1-little-infrastructure.play.yaml`, `1-box.play.yaml`, `2-little-apps.play.yaml`, `2-little-media.play.yaml`, `3-monitoring.play.yaml`, `3-little-backup.play.yaml`, `3-box-backup.play.yaml`
 - **Application-specific tasks**: `apps/` directory
-- **Reusable roles**: `roles/` directory
+- **Reusable roles**: `roles/` directory (22 roles)
 - **Configuration**: `ansible.cfg` (inventory path, vault settings)
 - **Host inventory**: `inventory.yaml`
-- **Encrypted secrets**: `secret.yaml`
-- **Container versions**: `container-images.yaml`
+- **Host variables**: `host_vars/` (little.yaml, box.yaml for HA Proxy configuration)
+- **Group variables**: `group_vars/all/` (container-images.yaml, sites.yaml, secret.yaml)
+- **Playbook variables**: `vars/` (backup.yaml, concourse.yaml, tandoor.yaml)
+- **Desktop playbooks**: `desktop/` directory
 
 ## Development Workflow
-1. **For faster iterations**: Use split playbooks (e.g., `ansible-playbook play-little-apps.yaml` for app changes, `ansible-playbook play-little-infrastructure.yaml` for system changes)
-2. **Test changes**: Use `--check` flag before applying (e.g., `ansible-playbook play-little-apps.yaml --check`)
+1. **For faster iterations**: Use split playbooks (e.g., `ansible-playbook 2-little-apps.play.yaml` for app changes, `ansible-playbook 1-little-infrastructure.play.yaml` for system changes)
+2. **Test changes**: Use `--check` flag before applying (e.g., `ansible-playbook 2-little-apps.play.yaml --check`)
 3. **Use fully qualified Ansible module names** (e.g., `ansible.builtin.include_role`)
 4. **Vault integration** requires 1Password CLI (`op`) to be configured
 5. **Service configurations** should leverage the `docker_service` role for consistency
 
-## Automated Deployment
-- GitHub Actions automatically deploys all playbooks (`play-*.yaml`) on push to main branch
-- Uses self-hosted runner with 1Password service account for secrets
-- Workflow file: `.github/workflows/deploy-ansible.yaml`
+## CI/CD
+- GitHub Actions runs ansible-lint on all pushes to validate playbook syntax
+- Workflow file: `.github/workflows/ansible-lint.yaml`
+- Uses 1Password service account for vault password during linting
 
-## Split Playbook Dependencies
-- **play-little-infrastructure.yaml**: Must run first (provides Docker, networking, Caddy)
-- **play-little-auth.yaml**: Requires infrastructure (provides SSO for apps)
-- **play-little-apps.yaml**: Requires infrastructure and auth
-- **play-little-backup.yaml**: Independent, can run anytime after infrastructure
+## Playbook Dependencies (Execution Order)
+The numbered prefix indicates execution order:
+- **0-ha-proxy.play.yaml**: HA Proxy setup (can run independently)
+- **1-little-infrastructure.play.yaml**: Must run first for little host (provides Docker, networking, Caddy, Pocket ID, Monitoring, Vault)
+- **1-box.play.yaml**: Must run first for box host (provides Docker, Concourse, Tandoor, Knot, Pocket ID secondary)
+- **2-little-apps.play.yaml**: Requires little infrastructure
+- **2-little-media.play.yaml**: Requires little infrastructure
+- **3-monitoring.play.yaml**: Requires infrastructure on both hosts (deploys exporters)
+- **3-little-backup.play.yaml**: Requires little infrastructure
+- **3-box-backup.play.yaml**: Requires box infrastructure
 
 # Style Requirements
 
