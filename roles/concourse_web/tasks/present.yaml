@@ -1,0 +1,53 @@
+---
+- name: Concourse Docker network
+  community.docker.docker_network:
+    name: "{{ concourse_web_network }}"
+    state: "present"
+
+- name: Concourse Web data directory
+  ansible.builtin.file:
+    path: "{{ concourse_web_data_directory }}/concourse-web"
+    state: directory
+    owner: app
+    group: app
+    mode: '0755'
+
+- name: Concourse Web keys directory
+  ansible.builtin.file:
+    path: "{{ concourse_web_data_directory }}/concourse-web/keys"
+    state: directory
+    owner: app
+    group: app
+    mode: '0700'
+
+- name: Concourse Web session signing key
+  ansible.builtin.copy:
+    content: "{{ concourse_web_session_signing_key }}"
+    dest: "{{ concourse_web_data_directory }}/concourse-web/keys/session_signing_key"
+    owner: app
+    group: app
+    mode: '0600'
+
+- name: Concourse Web TSA host key
+  ansible.builtin.copy:
+    content: "{{ concourse_web_tsa_host_key }}"
+    dest: "{{ concourse_web_data_directory }}/concourse-web/keys/tsa_host_key"
+    owner: app
+    group: app
+    mode: '0600'
+
+- name: Concourse Web TSA authorized keys
+  ansible.builtin.copy:
+    content: "{{ concourse_web_tsa_authorized_keys }}"
+    dest: "{{ concourse_web_data_directory }}/concourse-web/keys/authorized_worker_keys"
+    owner: app
+    group: app
+    mode: '0600'
+
+- name: PostgreSQL data directory
+  ansible.builtin.file:
+    path: "{{ concourse_web_data_directory }}/postgres"
+    state: directory
+    owner: app
+    group: app
+    mode: '0755'

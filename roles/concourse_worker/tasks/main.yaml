@@ -1,47 +1,7 @@
 ---
-- name: Concourse Worker data directory
-  ansible.builtin.file:
-    path: "{{ concourse_worker_data_directory }}"
-    state: directory
-    owner: app
-    group: app
-    mode: '0755'
-  when: concourse_worker_state == 'present'
-
-- name: Concourse Worker keys directory
-  ansible.builtin.file:
-    path: "{{ concourse_worker_data_directory }}/keys"
-    state: directory
-    owner: app
-    group: app
-    mode: '0700'
-  when: concourse_worker_state == 'present'
-
-- name: Concourse Worker TSA public key
-  ansible.builtin.copy:
-    content: "{{ concourse_worker_tsa_public_key }}"
-    dest: "{{ concourse_worker_data_directory }}/keys/tsa_host_key.pub"
-    owner: app
-    group: app
-    mode: '0600'
-  when: concourse_worker_state == 'present'
-
-- name: Concourse Worker private key
-  ansible.builtin.copy:
-    content: "{{ concourse_worker_worker_key }}"
-    dest: "{{ concourse_worker_data_directory }}/keys/worker_key"
-    owner: app
-    group: app
-    mode: '0600'
-  when: concourse_worker_state == 'present'
-
-- name: Concourse Worker state directory
-  ansible.builtin.file:
-    path: "{{ concourse_worker_data_directory }}/work"
-    state: directory
-    owner: app
-    group: app
-    mode: '0755'
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: concourse_worker_state == 'present'
 
 - name: Concourse Worker service
@@ -66,8 +26,7 @@
       - "{{ concourse_worker_data_directory }}/work:{{ concourse_worker_data_directory }}/work"
     docker_service_state: "{{ concourse_worker_state }}"
 
-- name: Remove Concourse Worker data directory
-  ansible.builtin.file:
-    path: "{{ concourse_worker_data_directory }}"
-    state: absent
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
   when: concourse_worker_state == 'absent'
