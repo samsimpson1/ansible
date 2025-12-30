@@ -1,0 +1,81 @@
+- name: Desktop Backup (Linux)
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Backup directory
+      ansible.builtin.file:
+        state: directory
+        path: /home/sam/.restic-backup
+        mode: "0750"
+        owner: sam
+        group: sam
+    - name: Restic env file
+      ansible.builtin.template:
+        dest: /home/sam/.restic-backup/env
+        src: files/env.j2
+        mode: "0700"
+        owner: sam
+        group: sam
+    - name: Restic excludes file
+      ansible.builtin.copy:
+        dest: /home/sam/.restic-backup/excludes.txt
+        src: files/excludes.txt
+        owner: sam
+        group: sam
+        mode: '0600'
+    - name: Restic backup script
+      ansible.builtin.copy:
+        dest: /home/sam/.restic-backup/backup.sh
+        src: files/backup.sh
+        mode: "0700"
+        owner: sam
+        group: sam
+    - name: Restic script
+      ansible.builtin.copy:
+        dest: /home/sam/.restic-backup/restic.sh
+        src: files/restic.sh
+        mode: "0700"
+        owner: sam
+        group: sam
+    - name: Restic SSH keypair
+      ansible.builtin.copy:
+        dest: /home/sam/.restic-backup/key
+        src: files/ssh-key
+        mode: '0600'
+        owner: sam
+        group: sam
+    - name: Ensure systemd user directory exists
+      ansible.builtin.file:
+        path: /home/sam/.config/systemd/user
+        state: directory
+        mode: '0755'
+        owner: sam
+        group: sam
+    - name: Create restic backup systemd user service
+      ansible.builtin.copy:
+        dest: /home/sam/.config/systemd/user/restic-backup.service
+        src: files/restic-backup.service
+        mode: '0644'
+        owner: sam
+        group: sam
+      notify: Reload systemd user
+    - name: Create restic backup systemd user timer
+      ansible.builtin.copy:
+        dest: /home/sam/.config/systemd/user/restic-backup.timer
+        src: files/restic-backup.timer
+        mode: '0644'
+        owner: sam
+        group: sam
+      notify: Reload systemd user
+    - name: Enable and start restic backup timer
+      ansible.builtin.systemd:
+        name: restic-backup.timer
+        enabled: true
+        state: started
+        scope: user
+        daemon_reload: true
+  handlers:
+    - name: Reload systemd user
+      ansible.builtin.systemd:
+        daemon_reload: true
+        scope: user

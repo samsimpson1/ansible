@@ -8,6 +8,12 @@
       ansible.builtin.include_tasks: apps/duplicacy-backup.yaml
       tags:
         - duplicacy
+    # desktop backup access
+    - name: Desktop restic SSH authorised key
+      ansible.posix.authorized_key:
+        user: me
+        key: "{{ lookup('file', 'desktop/backup-linux/files/ssh-key.pub') }}"
+        comment: restic
     - name: Backup
       ansible.builtin.include_role:
         name: backup

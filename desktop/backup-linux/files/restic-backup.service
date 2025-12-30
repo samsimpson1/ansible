@@ -1,0 +1,8 @@
+[Unit]
+Description=Restic Backup Service
+
+[Service]
+Type=oneshot
+ExecStart=/home/sam/.restic-backup/backup.sh
+WorkingDirectory=/home/sam
+Restart=no

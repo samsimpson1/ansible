@@ -1,0 +1,10 @@
+[Unit]
+Description=Run restic backup every 2 hours
+Requires=restic-backup.service
+
+[Timer]
+OnCalendar=00/2:49
+Persistent=true
+
+[Install]
+WantedBy=timers.target
