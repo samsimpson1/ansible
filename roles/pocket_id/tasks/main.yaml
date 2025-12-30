@@ -1,66 +1,8 @@
-- name: Pocket ID docker network
-  community.docker.docker_network:
-    name: "{{ pocket_id_network }}"
-    state: "{{ pocket_id_state }}"
-- name: Pocket ID user
-  ansible.builtin.user:
-    name: pocket-id
-    shell: /usr/bin/bash
-    create_home: true
-    uid: "1985"
-- name: Getent passwd
-  ansible.builtin.getent:
-    database: passwd
-  changed_when: false
-- name: Set pocket-id uid
-  ansible.builtin.set_fact:
-    pocket_id_uid: "{{ getent_passwd['pocket-id'].1 }}"
-  changed_when: false
-- name: Pocket ID data directory
-  ansible.builtin.file:
-    path: "{{ pocket_id_directory }}"
-    state: directory
-    mode: '0750'
-    owner: pocket-id
-    group: pocket-id
-    recurse: true
-- name: Pocket ID Litestream directory
-  ansible.builtin.file:
-    path: "{{ pocket_id_directory }}/litestream"
-    state: directory
-    mode: '0750'
-    owner: pocket-id
-    group: pocket-id
-  when: pocket_id_role == 'secondary'
-- name: Pocket ID Litestream private key
-  ansible.builtin.copy:
-    src: litestream.key
-    dest: "{{ pocket_id_directory }}/ssh-key"
-    mode: '0640'
-    owner: pocket-id
-    group: pocket-id
-  when: pocket_id_role == 'primary'
-- name: Pocket ID Litestream public key
-  ansible.posix.authorized_key:
-    user: pocket-id
-    key: "{{ lookup('file', 'litestream.pub') }}"
-    state: "{{ 'present' if (pocket_id_role == 'secondary' and pocket_id_state == 'present') else 'absent' }}"
-  when: pocket_id_role == 'secondary'
-- name: Litestream config file
-  ansible.builtin.copy:
-    src: "litestream-{{ pocket_id_role }}.yaml"
-    dest: "{{ pocket_id_directory }}/litestream.yaml"
-    mode: '0640'
-    owner: pocket-id
-    group: pocket-id
-- name: Pocket ID encryption key
-  ansible.builtin.copy:
-    src: encryption.key
-    dest: "{{ pocket_id_directory }}/encryption-key.txt"
-    mode: '0640'
-    owner: pocket-id
-    group: pocket-id
-  notify: Restart Pocket ID
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
+  when: pocket_id_state == 'present'
+
 - name: Pocket ID service
   ansible.builtin.include_role:
     name: docker_service
@@ -79,8 +21,8 @@
       ACCENT_COLOR: "{{ pocket_id_accent_colour }}"
       ENCRYPTION_KEY_FILE: "/data/encryption-key.txt"
       TRUST_PROXY: "true"
-      PUID: "{{ pocket_id_uid }}"
-      PGID: "{{ pocket_id_uid }}"
+      PUID: "{{ pocket_id_uid | default('1985') }}"
+      PGID: "{{ pocket_id_uid | default('1985') }}"
       DB_CONNECTION_STRING: "file:/data/pocket-id.db?_pragma=journal_mode(WAL)&_pragma=busy_timeout(2500)&_txlock=immediate"
       FILE_BACKEND: "database"
       KEYS_STORAGE: "database"
@@ -93,6 +35,7 @@
       SMTP_TLS: "{{ smtp_tls }}"
     docker_service_volumes:
       - "{{ pocket_id_directory }}:/data"
+
 - name: Pocket ID Litestream service
   ansible.builtin.include_role:
     name: docker_service
@@ -102,9 +45,14 @@
     docker_service_image: "{{ container_images.litestream }}"
     docker_service_network: source_default
     docker_service_state: "{{ 'present' if pocket_id_role == 'primary' and pocket_id_state == 'present' else 'absent' }}"
-    docker_service_user: "{{ pocket_id_uid }}"
-    docker_service_groups: ["{{ pocket_id_uid }}"]
+    docker_service_user: "{{ pocket_id_uid | default('1985') }}"
+    docker_service_groups: ["{{ pocket_id_uid | default('1985') }}"]
     docker_service_command: "replicate -config /data/litestream.yaml"
     docker_service_volumes:
       - "{{ pocket_id_directory }}:/data:rw"
     docker_service_restart_policy: "always"
+
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
+  when: pocket_id_state == 'absent'

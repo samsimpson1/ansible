@@ -1,0 +1,72 @@
+- name: Pocket ID docker network
+  community.docker.docker_network:
+    name: "{{ pocket_id_network }}"
+    state: "present"
+
+- name: Pocket ID user
+  ansible.builtin.user:
+    name: pocket-id
+    shell: /usr/bin/bash
+    create_home: true
+    uid: "1985"
+
+- name: Getent passwd
+  ansible.builtin.getent:
+    database: passwd
+  changed_when: false
+
+- name: Set pocket-id uid
+  ansible.builtin.set_fact:
+    pocket_id_uid: "{{ getent_passwd['pocket-id'].1 }}"
+  changed_when: false
+
+- name: Pocket ID data directory
+  ansible.builtin.file:
+    path: "{{ pocket_id_directory }}"
+    state: directory
+    mode: '0750'
+    owner: pocket-id
+    group: pocket-id
+    recurse: true
+
+- name: Pocket ID Litestream directory
+  ansible.builtin.file:
+    path: "{{ pocket_id_directory }}/litestream"
+    state: directory
+    mode: '0750'
+    owner: pocket-id
+    group: pocket-id
+  when: pocket_id_role == 'secondary'
+
+- name: Pocket ID Litestream private key
+  ansible.builtin.copy:
+    src: litestream.key
+    dest: "{{ pocket_id_directory }}/ssh-key"
+    mode: '0640'
+    owner: pocket-id
+    group: pocket-id
+  when: pocket_id_role == 'primary'
+
+- name: Pocket ID Litestream public key
+  ansible.posix.authorized_key:
+    user: pocket-id
+    key: "{{ lookup('file', 'litestream.pub') }}"
+    state: present
+  when: pocket_id_role == 'secondary'
+
+- name: Litestream config file
+  ansible.builtin.copy:
+    src: "litestream-{{ pocket_id_role }}.yaml"
+    dest: "{{ pocket_id_directory }}/litestream.yaml"
+    mode: '0640'
+    owner: pocket-id
+    group: pocket-id
+
+- name: Pocket ID encryption key
+  ansible.builtin.copy:
+    src: encryption.key
+    dest: "{{ pocket_id_directory }}/encryption-key.txt"
+    mode: '0640'
+    owner: pocket-id
+    group: pocket-id
+  notify: Restart Pocket ID

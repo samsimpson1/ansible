@@ -1,0 +1,23 @@
+- name: Remove Pocket ID Litestream public key
+  ansible.posix.authorized_key:
+    user: pocket-id
+    key: "{{ lookup('file', 'litestream.pub') }}"
+    state: absent
+  when: pocket_id_role == 'secondary'
+  ignore_errors: true
+
+- name: Remove Pocket ID data directory
+  ansible.builtin.file:
+    path: "{{ pocket_id_directory }}"
+    state: absent
+
+- name: Remove Pocket ID user
+  ansible.builtin.user:
+    name: pocket-id
+    state: absent
+    remove: true
+
+- name: Pocket ID docker network
+  community.docker.docker_network:
+    name: "{{ pocket_id_network }}"
+    state: "absent"
