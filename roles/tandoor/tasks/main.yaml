@@ -2,20 +2,24 @@
   community.docker.docker_network:
     name: tandoor
     state: present
+  when: tandoor_state == 'present'
 - name: Create tandoor user
   ansible.builtin.user:
     name: tandoor
     state: present
     system: true
     create_home: false
+  when: tandoor_state == 'present'
 - name: Getent passwd
   ansible.builtin.getent:
     database: passwd
   changed_when: false
+  when: tandoor_state == 'present'
 - name: Set tandoor uid
   ansible.builtin.set_fact:
     tandoor_uid: "{{ getent_passwd['tandoor'].1 }}"
   changed_when: false
+  when: tandoor_state == 'present'
 - name: Create tandoor directories
   ansible.builtin.file:
     path: "{{ item }}"
@@ -28,6 +32,7 @@
     - "{{ tandoor_dir }}/staticfiles"
     - "{{ tandoor_dir }}/mediafiles"
     - "{{ tandoor_dir }}/postgres"
+  when: tandoor_state == 'present'
 - name: Tandoor PostgreSQL service
   ansible.builtin.include_role:
     name: docker_service
@@ -36,7 +41,7 @@
     docker_service_description: "Tandoor PostgreSQL Database"
     docker_service_image: "{{ container_images.tandoor_postgres }}"
     docker_service_network: "{{ tandoor_network }}"
-    docker_service_user: "{{ tandoor_uid }}"
+    docker_service_user: "{{ tandoor_uid | default(omit) }}"
     docker_service_env_vars:
       POSTGRES_USER: "{{ tandoor_postgres_user }}"
       POSTGRES_PASSWORD: "{{ tandoor_postgres_password }}"
@@ -62,3 +67,27 @@
       POSTGRES_DB: "{{ tandoor_postgres_database }}"
       POSTGRES_USER: "{{ tandoor_postgres_user }}"
       POSTGRES_PASSWORD: "{{ tandoor_postgres_password }}"
+    docker_service_state: "{{ tandoor_state }}"
+
+- name: Remove tandoor directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ tandoor_dir }}/staticfiles"
+    - "{{ tandoor_dir }}/mediafiles"
+    - "{{ tandoor_dir }}/postgres"
+    - "{{ tandoor_dir }}"
+  when: tandoor_state == 'absent'
+
+- name: Remove tandoor user
+  ansible.builtin.user:
+    name: tandoor
+    state: absent
+  when: tandoor_state == 'absent'
+
+- name: Remove Docker network
+  community.docker.docker_network:
+    name: tandoor
+    state: absent
+  when: tandoor_state == 'absent'

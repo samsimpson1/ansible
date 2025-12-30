@@ -95,9 +95,6 @@ sites:
       - name: rss
         target: "http://freshrss:80"
         host: little
-      - name: recipes
-        target: "http://tandoor:80"
-        host: box
       - name: requests
         target: "http://overseerr:80"
         host: little

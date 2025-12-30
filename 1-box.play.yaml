@@ -93,6 +93,8 @@
     - name: Tandoor
       ansible.builtin.include_role:
         name: tandoor
+      vars:
+        tandoor_state: absent
       tags: tandoor
 
     - name: Knot
