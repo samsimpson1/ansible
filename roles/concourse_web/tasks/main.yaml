@@ -122,6 +122,6 @@
 
 - name: Remove PostgreSQL data directory
   ansible.builtin.file:
-    path: "{{ concourse_web_data_directory }}/concourse-postgres"
+    path: "{{ concourse_web_data_directory }}/postgres"
     state: absent
   when: concourse_web_state == 'absent'

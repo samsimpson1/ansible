@@ -2,12 +2,15 @@
   community.docker.docker_network:
     name: "{{ vault_network }}"
     state: "{{ vault_state }}"
+
 - name: Vault user
   ansible.builtin.user:
     name: vault
-    state: "{{ vault_state }}"
+    state: present
     system: true
     create_home: false
+  when: vault_state == 'present'
+
 - name: Getent passwd
   ansible.builtin.getent:
     database: passwd
@@ -63,4 +66,10 @@
   loop:
     - "{{ vault_directory }}/data"
     - "{{ vault_directory }}"
+  when: vault_state == 'absent'
+
+- name: Remove Vault user
+  ansible.builtin.user:
+    name: vault
+    state: absent
   when: vault_state == 'absent'
