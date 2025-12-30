@@ -1,0 +1,31 @@
+- name: Remove cron job for certificate renewal
+  ansible.builtin.cron:
+    name: "Renew ACME certificates"
+    state: absent
+    user: root
+
+- name: Remove certificate renewal script
+  ansible.builtin.file:
+    path: "{{ acme_manager_install_dir }}/renew-certs.sh"
+    state: absent
+
+- name: Remove certificate directory
+  ansible.builtin.file:
+    path: "{{ acme_manager_cert_dir }}"
+    state: absent
+
+- name: Remove acme.sh installation
+  ansible.builtin.file:
+    path: "{{ acme_manager_install_dir }}"
+    state: absent
+
+- name: Remove acme user
+  ansible.builtin.user:
+    name: acme
+    state: absent
+    remove: true
+
+- name: Remove acme group
+  ansible.builtin.group:
+    name: acme
+    state: absent

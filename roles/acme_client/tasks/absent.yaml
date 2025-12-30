@@ -1,0 +1,26 @@
+- name: Remove cron job for certificate sync
+  ansible.builtin.cron:
+    name: "Sync ACME certificates from {{ acme_client_source_host }}"
+    state: absent
+    user: "{{ acme_client_source_user }}"
+
+- name: Remove certificate sync script
+  ansible.builtin.file:
+    path: "/opt/sync-certs.sh"
+    state: absent
+
+- name: Remove certificate directory
+  ansible.builtin.file:
+    path: "{{ acme_client_cert_dir }}"
+    state: absent
+
+- name: Remove acme user
+  ansible.builtin.user:
+    name: "{{ acme_client_source_user }}"
+    state: absent
+    remove: true
+
+- name: Remove acme group
+  ansible.builtin.group:
+    name: acme
+    state: absent

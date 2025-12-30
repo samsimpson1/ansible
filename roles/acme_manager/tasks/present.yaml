@@ -1,0 +1,130 @@
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - curl
+      - socat
+      - cron
+    state: present
+
+- name: Create acme user for certificate syncing
+  ansible.builtin.user:
+    name: acme
+    system: true
+    shell: /bin/bash
+    create_home: true
+    home: /home/acme
+
+- name: Create certificate directory
+  ansible.builtin.file:
+    path: "{{ acme_manager_cert_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Check if acme.sh is installed
+  ansible.builtin.stat:
+    path: "{{ acme_manager_install_dir }}/acme.sh"
+  register: acme_manager_sh_installed
+
+- name: Install git
+  ansible.builtin.package:
+    name: git
+    state: present
+
+- name: Clone acme.sh repository
+  ansible.builtin.git:
+    repo: https://github.com/acmesh-official/acme.sh.git
+    dest: /tmp/acme.sh-repo
+    version: master
+    depth: 1
+  when: not acme_manager_sh_installed.stat.exists
+
+- name: Install acme.sh
+  ansible.builtin.shell:
+    cmd: cd /tmp/acme.sh-repo && ./acme.sh --install --home {{ acme_manager_install_dir }} --email {{ acme_manager_email }}
+  when: not acme_manager_sh_installed.stat.exists
+  changed_when: true
+
+- name: Set Let's Encrypt as default CA
+  ansible.builtin.command:
+    cmd: "{{ acme_manager_install_dir }}/acme.sh --set-default-ca --server letsencrypt"
+  changed_when: false
+
+- name: Create acme group for certificate access
+  ansible.builtin.group:
+    name: acme
+    system: true
+
+- name: Add acme user to acme group
+  ansible.builtin.user:
+    name: acme
+    groups: acme
+    append: true
+
+- name: Add app user to acme group
+  ansible.builtin.user:
+    name: app
+    groups: acme
+    append: true
+
+- name: Create certificate subdirectories
+  ansible.builtin.file:
+    path: "{{ acme_manager_cert_dir }}/{{ item.name }}"
+    state: directory
+    owner: root
+    group: acme
+    mode: '0750'
+  loop: "{{ sites }}"
+
+- name: Issue certificates for domains
+  ansible.builtin.command:
+    cmd: >
+      {{ acme_manager_install_dir }}/acme.sh --issue
+      --dns dns_cf
+      -d {{ item.name }}
+      {% if item.wildcard | default(false) %}-d *.{{ item.name }}{% endif %}
+      --cert-file {{ acme_manager_cert_dir }}/{{ item.name }}/cert.pem
+      --key-file {{ acme_manager_cert_dir }}/{{ item.name }}/key.pem
+      --fullchain-file {{ acme_manager_cert_dir }}/{{ item.name }}/fullchain.pem
+      --force
+    creates: "{{ acme_manager_cert_dir }}/{{ item.name }}/cert.pem"
+  loop: "{{ sites }}"
+  environment:
+    CF_Account_ID: "{{ acme_manager_cloudflare_account_id }}"
+    CF_Token: "{{ acme_manager_cloudflare_account_token }}"
+
+- name: Set certificate directory permissions
+  ansible.builtin.file:
+    path: "{{ acme_manager_cert_dir }}/{{ item.name }}"
+    state: directory
+    owner: root
+    group: acme
+    mode: '0750'
+    recurse: true
+  loop: "{{ sites }}"
+
+- name: Set certificate file permissions
+  ansible.builtin.file:
+    path: "{{ acme_manager_cert_dir }}/{{ item[0].name }}/{{ item[1] }}"
+    owner: root
+    group: acme
+    mode: '0640'
+  loop: "{{ sites | product(['cert.pem', 'key.pem', 'fullchain.pem']) }}"
+  when: item[0].name is defined
+
+- name: Create certificate renewal script
+  ansible.builtin.template:
+    src: renew-certs.sh.j2
+    dest: "{{ acme_manager_install_dir }}/renew-certs.sh"
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create cron job for certificate renewal
+  ansible.builtin.cron:
+    name: "Renew ACME certificates"
+    minute: "{{ acme_manager_renew_cron_minute }}"
+    hour: "{{ acme_manager_renew_cron_hour }}"
+    job: "{{ acme_manager_install_dir }}/renew-certs.sh >> /var/log/acme-renew.log 2>&1"
+    user: root
