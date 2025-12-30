@@ -4,7 +4,6 @@
     key: "{{ lookup('file', 'litestream.pub') }}"
     state: absent
   when: pocket_id_role == 'secondary'
-  ignore_errors: true
 
 - name: Remove Pocket ID data directory
   ansible.builtin.file:

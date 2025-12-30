@@ -15,9 +15,9 @@
     state: absent
 
 - name: Remove Caddy HA Docker image
-  community.docker.docker_image_remove:
+  community.docker.docker_image:
     name: "localhost/ha-{{ container_images.caddy }}"
-  ignore_errors: true
+    state: absent
 
 - name: Remove Caddy config file
   ansible.builtin.file:
