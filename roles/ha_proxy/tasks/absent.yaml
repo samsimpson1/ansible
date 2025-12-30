@@ -9,6 +9,16 @@
     path: /etc/keepalived/keepalived.conf
     state: absent
 
+- name: Remove Pocket ID manage script
+  ansible.builtin.file:
+    path: /etc/keepalived/pocket-id-manage.sh
+    state: absent
+
+- name: Remove Caddy HA Docker image
+  community.docker.docker_image_remove:
+    name: "localhost/ha-{{ container_images.caddy }}"
+  ignore_errors: true
+
 - name: Remove Caddy config file
   ansible.builtin.file:
     path: "{{ ha_proxy_directory }}/Caddyfile"
