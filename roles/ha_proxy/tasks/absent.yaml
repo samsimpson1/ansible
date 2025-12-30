@@ -1,0 +1,25 @@
+- name: Stop and disable keepalived
+  ansible.builtin.service:
+    name: keepalived
+    enabled: false
+    state: stopped
+
+- name: Remove keepalived config file
+  ansible.builtin.file:
+    path: /etc/keepalived/keepalived.conf
+    state: absent
+
+- name: Remove Caddy config file
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}/Caddyfile"
+    state: absent
+
+- name: Remove Dockerfile
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}/Dockerfile"
+    state: absent
+
+- name: Remove Caddy data directories
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}"
+    state: absent

@@ -1,0 +1,67 @@
+- name: Caddy data directories
+  ansible.builtin.file:
+    path: "{{ ha_proxy_directory }}/{{ item }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+  loop:
+    - ""
+    - config
+    - data
+
+- name: Install ha packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - keepalived
+
+- name: Pocket ID manage script
+  ansible.builtin.template:
+    src: pocket-id-manage.sh.j2
+    dest: /etc/keepalived/pocket-id-manage.sh
+    owner: root
+    group: root
+    mode: '0750'
+  when: ha_proxy_keepalived_state == 'BACKUP'
+
+- name: Create keepalived config file
+  ansible.builtin.template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart keepalived service
+
+- name: Enable and start keepalived
+  ansible.builtin.service:
+    name: keepalived
+    enabled: true
+    state: started
+
+- name: Dockerfile
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ ha_proxy_directory }}/Dockerfile"
+    owner: app
+    group: app
+    mode: '0644'
+  notify: "Restart caddy ha service"
+
+- name: Caddy image
+  community.docker.docker_image_build:
+    name: "localhost/ha-{{ container_images.caddy }}"
+    path: "{{ ha_proxy_directory }}"
+  notify: "Restart caddy ha service"
+
+- name: Caddy config file
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ ha_proxy_directory }}/Caddyfile"
+    owner: root
+    group: root
+    mode: '0644'
+    lstrip_blocks: true
+  notify: Restart caddy ha service
