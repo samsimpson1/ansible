@@ -122,5 +122,5 @@
         caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["concourse", "tandoor", "knot", "pocket_id"]
+        caddy_networks: ["concourse", "knot", "pocket_id"]
       tags: caddy
