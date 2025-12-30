@@ -1,5 +1,0 @@
-tandoor_network: tandoor
-tandoor_state: present
-tandoor_dir: /srv/app/tandoor
-tandoor_postgres_user: tandoor
-tandoor_postgres_database: tandoor
