@@ -1,22 +1,9 @@
 ---
-- name: Knot Docker network
-  community.docker.docker_network:
-    name: "{{ knot_network }}"
-    state: present
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: knot_state == 'present'
-- name: Create knot directories
-  ansible.builtin.file:
-    path: "{{ knot_directory }}/{{ item }}"
-    state: directory
-    mode: '0750'
-    owner: '1000'
-    group: '1000'
-  loop:
-    - ''
-    - keys
-    - database
-    - repositories
-  when: knot_state == 'present'
+
 - name: Knot service
   ansible.builtin.include_role:
     name: docker_service
@@ -40,19 +27,7 @@
       - "{{ knot_directory }}/keys:/etc/ssh/keys"
       - "{{ knot_directory }}/database:/database"
 
-- name: Remove knot directories
-  ansible.builtin.file:
-    path: "{{ knot_directory }}/{{ item }}"
-    state: absent
-  loop:
-    - keys
-    - database
-    - repositories
-    - ''
-  when: knot_state == 'absent'
-
-- name: Remove Knot Docker network
-  community.docker.docker_network:
-    name: "{{ knot_network }}"
-    state: absent
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
   when: knot_state == 'absent'

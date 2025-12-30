@@ -1,0 +1,22 @@
+---
+- name: Filebrowser config directory
+  ansible.builtin.file:
+    path: "{{ filebrowser_config_directory }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+
+- name: Filebrowser config file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ filebrowser_config_directory }}/config.yaml"
+    owner: app
+    group: app
+    mode: '0640'
+  notify: Restart filebrowser
+
+- name: Filebrowser docker network
+  community.docker.docker_network:
+    name: "{{ filebrowser_network }}"
+    state: present

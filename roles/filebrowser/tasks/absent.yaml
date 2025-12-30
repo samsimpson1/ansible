@@ -1,0 +1,10 @@
+---
+- name: Filebrowser docker network
+  community.docker.docker_network:
+    name: "{{ filebrowser_network }}"
+    state: absent
+
+- name: Remove Filebrowser config directory
+  ansible.builtin.file:
+    path: "{{ filebrowser_config_directory }}"
+    state: absent

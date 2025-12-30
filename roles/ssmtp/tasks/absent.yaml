@@ -1,0 +1,10 @@
+---
+- name: Remove sSMTP config file
+  ansible.builtin.file:
+    path: /etc/ssmtp/ssmtp.conf
+    state: absent
+
+- name: Remove sSMTP
+  ansible.builtin.package:
+    name: ssmtp
+    state: absent

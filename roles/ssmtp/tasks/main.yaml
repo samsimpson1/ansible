@@ -1,27 +1,10 @@
-- name: Install sSMTP
-  ansible.builtin.package:
-    name: ssmtp
-    state: present
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: ssmtp_state == 'present'
 
-- name: Install sSMTP config file
-  ansible.builtin.template:
-    src: ssmtp.conf.j2
-    dest: /etc/ssmtp/ssmtp.conf
-    mode: '0644'
-    owner: root
-    group: root
-  when: ssmtp_state == 'present'
-
-# Removal tasks
-- name: Remove sSMTP config file
-  ansible.builtin.file:
-    path: /etc/ssmtp/ssmtp.conf
-    state: absent
-  when: ssmtp_state == 'absent'
-
-- name: Install sSMTP
-  ansible.builtin.package:
-    name: ssmtp
-    state: absent
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
   when: ssmtp_state == 'absent'

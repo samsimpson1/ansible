@@ -1,0 +1,42 @@
+---
+- name: Vault Docker network
+  community.docker.docker_network:
+    name: "{{ vault_network }}"
+    state: present
+
+- name: Vault user
+  ansible.builtin.user:
+    name: vault
+    state: present
+    system: true
+    create_home: false
+
+- name: Getent passwd
+  ansible.builtin.getent:
+    database: passwd
+  changed_when: false
+
+- name: Set vault uid
+  ansible.builtin.set_fact:
+    vault_uid: "{{ getent_passwd['vault'].1 }}"
+  changed_when: false
+
+- name: Create Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: vault
+    group: vault
+    state: directory
+    mode: '0750'
+  loop:
+    - "{{ vault_directory }}"
+    - "{{ vault_directory }}/data"
+
+- name: Create Vault config file
+  ansible.builtin.template:
+    src: config.hcl.j2
+    dest: "{{ vault_directory }}/config.hcl"
+    owner: vault
+    group: vault
+    mode: '0640'
+  notify: Restart vault service
