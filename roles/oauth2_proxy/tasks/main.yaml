@@ -1,32 +1,8 @@
-- name: OAuth2 Proxy data directory
-  ansible.builtin.file:
-    path: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy"
-    state: directory
-    owner: app
-    group: app
-    mode: '0755'
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: oauth2_proxy_state == 'present'
-
-- name: OAuth2 Proxy config file
-  ansible.builtin.template:
-    src: oauth2-proxy.cfg.j2
-    dest: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy/oauth2-proxy.cfg"
-    owner: app
-    group: app
-    mode: '0644'
-  when: oauth2_proxy_state == 'present'
-
-- name: Remove OAuth2 Proxy config file
-  ansible.builtin.file:
-    path: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy/oauth2-proxy.cfg"
-    state: absent
-  when: oauth2_proxy_state == 'absent'
-
-- name: Remove OAuth2 Proxy data directory
-  ansible.builtin.file:
-    path: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy"
-    state: absent
-  when: oauth2_proxy_state == 'absent'
 
 - name: OAuth2 Proxy service
   ansible.builtin.include_role:
@@ -42,3 +18,8 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy/oauth2-proxy.cfg:/oauth2-proxy.cfg:ro"
     docker_service_state: "{{ oauth2_proxy_state }}"
+
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
+  when: oauth2_proxy_state == 'absent'

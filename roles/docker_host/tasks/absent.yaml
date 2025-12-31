@@ -1,0 +1,24 @@
+---
+- name: Stop and disable Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: stopped
+    enabled: false
+
+- name: Remove Docker package
+  ansible.builtin.apt:
+    name: docker-ce
+    state: absent
+
+- name: Remove Docker repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    filename: docker
+    state: absent
+
+- name: Remove Docker GPG key
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/docker.asc
+    state: absent

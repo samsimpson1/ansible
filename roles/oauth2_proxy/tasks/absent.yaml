@@ -1,0 +1,5 @@
+---
+- name: Remove OAuth2 Proxy data directory
+  ansible.builtin.file:
+    path: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy"
+    state: absent

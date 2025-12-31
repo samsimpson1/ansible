@@ -1,0 +1,48 @@
+---
+- name: Create monitoring data directories
+  ansible.builtin.file:
+    state: directory
+    path: "{{ monitoring_server_storage_path }}/{{ item }}"
+    mode: "0750"
+    owner: "app"
+    group: "app"
+  loop:
+    - grafana
+    - prometheus
+    - alertmanager
+
+- name: Deploy Prometheus alert rules
+  ansible.builtin.copy:
+    src: prometheus-alerts.yaml
+    dest: "{{ monitoring_server_storage_path }}/prometheus/alerts.yaml"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Prometheus
+
+- name: Deploy Prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yaml.j2
+    dest: "{{ monitoring_server_storage_path }}/prometheus/config.yaml"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Prometheus
+
+- name: Deploy Alertmanager configuration
+  ansible.builtin.template:
+    src: alertmanager.yaml.j2
+    dest: "{{ monitoring_server_storage_path }}/alertmanager/config.yaml"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Alertmanager
+
+- name: Deploy Alertmanager Discord template
+  ansible.builtin.copy:
+    src: alertmanager-discord-template.tmpl
+    dest: "{{ monitoring_server_storage_path }}/alertmanager/templates.tmpl"
+    mode: "0644"
+    owner: "app"
+    group: "app"
+  notify: Restart Alertmanager

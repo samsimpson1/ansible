@@ -1,0 +1,33 @@
+---
+- name: Tailscale down
+  ansible.builtin.command: tailscale down
+  register: tailscale_down
+  changed_when: true
+  failed_when: false
+
+- name: Stop and disable Tailscale service
+  ansible.builtin.systemd:
+    name: tailscaled
+    state: stopped
+    enabled: false
+
+- name: Uninstall Tailscale
+  ansible.builtin.apt:
+    name: tailscale
+    state: absent
+
+- name: Remove Tailscale repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
+    filename: tailscale
+    state: absent
+
+- name: Remove Tailscale package signing key
+  ansible.builtin.file:
+    path: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    state: absent
+
+- name: Remove tailscale state directory
+  ansible.builtin.file:
+    path: /var/lib/tailscale
+    state: absent

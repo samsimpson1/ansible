@@ -1,75 +1,10 @@
-- name: Install Tailscale package signing key
-  ansible.builtin.get_url:
-    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
-    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
-    mode: '0644'
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: tailscale_state == 'present'
 
-- name: Add Tailscale repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
-    filename: tailscale
-  register: tailscale_repo
-  when: tailscale_state == 'present'
-
-- name: Install Tailscale
-  ansible.builtin.apt:
-    name: tailscale
-    state: present
-    update_cache: "{{ tailscale_repo.changed | default(false) }}"
-  when: tailscale_state == 'present'
-
-- name: Enable and start Tailscale service
-  ansible.builtin.systemd:
-    name: tailscaled
-    state: started
-    enabled: true
-  when: tailscale_state == 'present'
-
-- name: Tailscale status
-  ansible.builtin.command: tailscale status
-  register: tailscale_status
-  changed_when: false
-  failed_when: false
-  when: tailscale_state == 'present'
-
-- name: Tailscale up
-  ansible.builtin.command: >
-    tailscale up
-      --reset
-      --auth-key={{ tailscale_oauth_key }}
-      --hostname={{ ansible_hostname }}
-      --advertise-tags={{ tailscale_tags | join(',') }}
-  register: tailscale_up
-  # tailscale status returns 130 if not connected to tailnet
-  changed_when: "tailscale_status.rc == 130"
-  failed_when: "tailscale_up.rc != 0"
-  when: tailscale_state == 'present'
-
-# Removal tasks
-- name: Tailscale down
-  ansible.builtin.command: tailscale down
-  register: tailscale_down
-  changed_when: true
-  failed_when: false
-  when: tailscale_state == 'absent'
-
-- name: Stop and disable Tailscale service
-  ansible.builtin.systemd:
-    name: tailscaled
-    state: stopped
-    enabled: false
-  when: tailscale_state == 'absent'
-
-- name: Remove Tailscale repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
-    filename: tailscale
-    state: absent
-  when: tailscale_state == 'absent'
-
-- name: Remove Tailscale package signing key
-  ansible.builtin.file:
-    path: /usr/share/keyrings/tailscale-archive-keyring.gpg
-    state: absent
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
   when: tailscale_state == 'absent'

@@ -1,0 +1,5 @@
+---
+- name: Remove monitoring data directory
+  ansible.builtin.file:
+    path: "{{ monitoring_server_storage_path }}"
+    state: absent

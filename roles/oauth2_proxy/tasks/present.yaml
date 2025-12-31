@@ -1,0 +1,16 @@
+---
+- name: OAuth2 Proxy data directory
+  ansible.builtin.file:
+    path: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy"
+    state: directory
+    owner: app
+    group: app
+    mode: '0755'
+
+- name: OAuth2 Proxy config file
+  ansible.builtin.template:
+    src: oauth2-proxy.cfg.j2
+    dest: "/srv/containers/storage/ssd/{{ oauth2_proxy_id }}-oauth2-proxy/oauth2-proxy.cfg"
+    owner: app
+    group: app
+    mode: '0644'
