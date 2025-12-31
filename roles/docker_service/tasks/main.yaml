@@ -1,8 +1,4 @@
 ---
-- name: Debug
-  ansible.builtin.debug:
-    msg: "Enabled: {{ docker_service_enabled }}"
-
 - name: Set Docker service string
   ansible.builtin.set_fact:
     docker_service_network_string: "--network {{ docker_service_network }}"
