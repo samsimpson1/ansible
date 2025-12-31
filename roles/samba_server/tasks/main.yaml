@@ -25,15 +25,6 @@
       SAMBA_CONTAINER_ID: "general"
     docker_service_state: "{{ samba_server_state }}"
 
-# Removal tasks
-- name: Remove Samba service
-  ansible.builtin.include_role:
-    name: docker_service
-  vars:
-    docker_service_id: "samba"
-    docker_service_state: "{{ samba_server_state }}"
-  when: samba_server_state == 'absent'
-
 - name: Remove Samba config file
   ansible.builtin.file:
     path: /srv/containers/storage/ssd/samba.json
