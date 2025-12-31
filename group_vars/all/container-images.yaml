@@ -11,8 +11,6 @@ container_images:
   concourse_worker: concourse/concourse:7.14.3
   concourse_postgres: postgres:18
   vault: hashicorp/vault:1.21.1
-  tandoor: ghcr.io/tandoorrecipes/recipes:2.3.6
-  tandoor_postgres: postgres:18
   knot: tngl/knot:v1.10.0-alpha
   filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.1.0-stable
   litestream: litestream/litestream:0.5.5

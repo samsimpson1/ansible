@@ -2,7 +2,6 @@
   hosts: box
   vars_files:
     - vars/concourse.yaml
-    - vars/tandoor.yaml
   become: true
   tasks:
     - name: App user
@@ -89,13 +88,6 @@
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
       tags: [concourse, concourse_worker]
-
-    - name: Tandoor
-      ansible.builtin.include_role:
-        name: tandoor
-      vars:
-        tandoor_state: absent
-      tags: tandoor
 
     - name: Knot
       ansible.builtin.include_role:
