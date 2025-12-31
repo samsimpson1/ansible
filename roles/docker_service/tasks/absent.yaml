@@ -1,0 +1,15 @@
+- name: Stop Docker service
+  ansible.builtin.systemd:
+    name: "{{ docker_service_id }}"
+    state: "stopped"
+  when: docker_service_unit_file.stat.exists
+
+- name: Remove systemd service unit
+  ansible.builtin.file:
+    path: /etc/systemd/system/{{ docker_service_id }}.service
+    state: absent
+
+- name: Remove Docker service env var file
+  ansible.builtin.file:
+    path: /opt/docker_service_env/{{ docker_service_id }}.env
+    state: absent

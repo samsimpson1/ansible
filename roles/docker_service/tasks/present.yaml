@@ -1,0 +1,66 @@
+---
+- name: Set Docker service string
+  ansible.builtin.set_fact:
+    docker_service_network_string: "--network {{ docker_service_network }}"
+  when: docker_service_network is string and docker_service_network | length > 0
+
+- name: Set Docker service network list
+  ansible.builtin.set_fact:
+    docker_service_network_string: >-
+      {%- set nets = [] -%}
+      {%- for net in docker_service_network -%}
+      {%-   set _ = nets.append('--network ' ~ net) -%}
+      {%- endfor -%}
+      {{ nets | join(' ') }}
+  when: docker_service_network is iterable and docker_service_network is not string and docker_service_network | length > 0
+
+- name: Set Docker service network fallback
+  ansible.builtin.set_fact:
+    docker_service_network_string: ""
+  when: docker_service_network is not defined or not docker_service_network
+
+- name: Create env var file directory
+  ansible.builtin.file:
+    path: /opt/docker_service_env
+    state: directory
+    mode: "0700"
+    owner: root
+    group: root
+
+- name: Create Docker service env var file
+  ansible.builtin.template:
+    src: envfile.j2
+    dest: /opt/docker_service_env/{{ docker_service_id }}.env
+    mode: "0600"
+    owner: root
+    group: root
+  when: docker_service_env_vars is defined and docker_service_env_vars | length > 0
+  notify: "Restart service {{ docker_service_id }}"
+
+- name: Create systemd service unit
+  ansible.builtin.template:
+    src: service.j2
+    dest: /etc/systemd/system/{{ docker_service_id }}.service
+    mode: "0644"
+  notify: "Restart service {{ docker_service_id }}"
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Check if service unit exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/{{ docker_service_id }}.service
+  register: docker_service_unit_file
+
+- name: Enable Docker service
+  ansible.builtin.systemd:
+    name: "{{ docker_service_id }}"
+    enabled: "{{ docker_service_enabled }}"
+  when: docker_service_unit_file.stat.exists
+
+- name: Start Docker service
+  ansible.builtin.systemd:
+    name: "{{ docker_service_id }}"
+    state: "started"
+  when: docker_service_unit_file.stat.exists and docker_service_enabled
