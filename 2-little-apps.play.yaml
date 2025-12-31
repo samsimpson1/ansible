@@ -1,7 +1,5 @@
 - name: Little (apps)
   hosts: little
-  vars_files:
-    - copyparty.yaml
   become: true
   tasks:
     - name: Wiki
