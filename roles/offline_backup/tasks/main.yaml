@@ -1,47 +1,8 @@
-- name: Create offline backup directories
-  ansible.builtin.file:
-    path: "{{ offline_backup_directory }}/{{ item }}"
-    state: directory
-    mode: '0750'
-    owner: root
-    group: root
-  loop:
-    - ''
-    - mount
-- name: Create offline backup script
-  ansible.builtin.copy:
-    content: "{{ lookup('file', 'offline_backup.ab') | amber_compile }}"
-    dest: "{{ offline_backup_directory }}/offline_backup.sh"
-    mode: '0750'
-    owner: root
-    group: root
-- name: Create offline backup config file
-  ansible.builtin.template:
-    src: config.env.j2
-    dest: "{{ offline_backup_directory }}/config.env"
-    mode: '0640'
-    owner: root
-    group: root
-- name: Create offline backup password file
-  ansible.builtin.copy:
-    content: "{{ backup_target.password }}"
-    dest: "{{ offline_backup_directory }}/password"
-    mode: '0640'
-    owner: root
-    group: root
-- name: Create offline backup systemd service
-  ansible.builtin.template:
-    src: systemd.service.j2
-    dest: /etc/systemd/system/offline-backup.service
-    mode: '0644'
-    owner: root
-    group: root
-  notify: Reload systemd daemon
-- name: Create offline backup udev rules file
-  ansible.builtin.template:
-    src: udev.rules.j2
-    dest: /etc/udev/rules.d/99-offline-backup.rules
-    mode: '0644'
-    owner: root
-    group: root
-  notify: Reload udev rules
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
+  when: offline_backup_state == 'present'
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
+  when: offline_backup_state == 'absent'

@@ -1,0 +1,14 @@
+- name: Remove offline backup udev rules file
+  ansible.builtin.file:
+    path: /etc/udev/rules.d/99-offline-backup.rules
+    state: absent
+  notify: Reload udev rules
+- name: Remove offline backup systemd service
+  ansible.builtin.file:
+    path: /etc/systemd/system/offline-backup.service
+    state: absent
+  notify: Reload systemd daemon
+- name: Remove offline backup directory
+  ansible.builtin.file:
+    path: "{{ offline_backup_directory }}"
+    state: absent
