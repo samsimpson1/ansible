@@ -1,0 +1,52 @@
+---
+- name: Caddy data directories
+  ansible.builtin.file:
+    path: "{{ caddy_data_directory }}/{{ caddy_id }}/{{ item }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+  loop:
+    - ""
+    - config
+    - data
+- name: Dockerfile
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ caddy_data_directory }}/{{ caddy_id }}/Dockerfile"
+    owner: app
+    group: app
+    mode: '0644'
+  notify: "Restart caddy {{ caddy_id }}"
+- name: Caddy image
+  community.docker.docker_image_build:
+    name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
+    path: "{{ caddy_data_directory }}/{{ caddy_id }}"
+  notify: "Restart caddy {{ caddy_id }}"
+- name: Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: "{{ caddy_data_directory }}/{{ caddy_id }}/Caddyfile"
+    owner: app
+    group: app
+    mode: '0644'
+    lstrip_blocks: true
+  notify: "Restart caddy {{ caddy_id }}"
+- name: Resolve additional group names to GIDs
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && getent group {{ item }} | cut -d: -f3"
+    executable: /bin/bash
+  register: caddy_group_gids
+  loop: "{{ caddy_additional_group_names }}"
+  changed_when: false
+- name: Set caddy facts
+  ansible.builtin.set_fact:
+    caddy_volumes_standard:
+      - "{{ caddy_data_directory }}/{{ caddy_id }}/config:/config"
+      - "{{ caddy_data_directory }}/{{ caddy_id }}/data:/data"
+      - "{{ caddy_data_directory }}/{{ caddy_id }}/Caddyfile:/Caddyfile"
+      - "/srv/certificates:/certificates:ro"
+    caddy_ports:
+      - "{{ caddy_http_port }}:{{ caddy_http_port }}"
+      - "{{ caddy_https_port }}:{{ caddy_https_port }}"
+    caddy_all_groups: "{{ caddy_groups + (caddy_group_gids.results | map(attribute='stdout') | list) }}"

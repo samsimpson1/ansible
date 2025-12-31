@@ -1,0 +1,10 @@
+---
+- name: Remove Caddy Docker image
+  community.docker.docker_image:
+    name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
+    state: absent
+
+- name: Remove Caddy data directory
+  ansible.builtin.file:
+    path: "{{ caddy_data_directory }}/{{ caddy_id }}"
+    state: absent

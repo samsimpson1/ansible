@@ -1,60 +1,9 @@
-- name: Caddy data directories
-  ansible.builtin.file:
-    path: "{{ caddy_data_directory }}/{{ caddy_id }}/{{ item }}"
-    state: directory
-    owner: app
-    group: app
-    mode: '0750'
-  loop:
-    - ""
-    - config
-    - data
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: caddy_state == 'present'
-- name: Dockerfile
-  ansible.builtin.template:
-    src: Dockerfile.j2
-    dest: "{{ caddy_data_directory }}/{{ caddy_id }}/Dockerfile"
-    owner: app
-    group: app
-    mode: '0644'
-  notify: "Restart caddy {{ caddy_id }}"
-  when: caddy_state == 'present'
-- name: Caddy image
-  community.docker.docker_image_build:
-    name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
-    path: "{{ caddy_data_directory }}/{{ caddy_id }}"
-  notify: "Restart caddy {{ caddy_id }}"
-  when: caddy_state == 'present'
-- name: Caddyfile
-  ansible.builtin.template:
-    src: Caddyfile.j2
-    dest: "{{ caddy_data_directory }}/{{ caddy_id }}/Caddyfile"
-    owner: app
-    group: app
-    mode: '0644'
-    lstrip_blocks: true
-  notify: "Restart caddy {{ caddy_id }}"
-  when: caddy_state == 'present'
-- name: Resolve additional group names to GIDs
-  ansible.builtin.shell:
-    cmd: "set -o pipefail && getent group {{ item }} | cut -d: -f3"
-    executable: /bin/bash
-  register: caddy_group_gids
-  loop: "{{ caddy_additional_group_names }}"
-  changed_when: false
-  when: caddy_state == 'present'
-- name: Set caddy facts
-  ansible.builtin.set_fact:
-    caddy_volumes_standard:
-      - "{{ caddy_data_directory }}/{{ caddy_id }}/config:/config"
-      - "{{ caddy_data_directory }}/{{ caddy_id }}/data:/data"
-      - "{{ caddy_data_directory }}/{{ caddy_id }}/Caddyfile:/Caddyfile"
-      - "/srv/certificates:/certificates:ro"
-    caddy_ports:
-      - "{{ caddy_http_port }}:{{ caddy_http_port }}"
-      - "{{ caddy_https_port }}:{{ caddy_https_port }}"
-    caddy_all_groups: "{{ caddy_groups + (caddy_group_gids.results | map(attribute='stdout') | list) }}"
-  when: caddy_state == 'present'
+
 - name: Caddy service
   ansible.builtin.include_role:
     name: docker_service
@@ -72,14 +21,7 @@
     docker_service_volumes: "{{ (caddy_volumes_standard | default([])) + (caddy_volumes | default([])) }}"
     docker_service_state: "{{ caddy_state }}"
 
-- name: Remove Caddy Docker image
-  community.docker.docker_image:
-    name: "localhost/{{ caddy_id }}-{{ container_images.caddy }}"
-    state: absent
-  when: caddy_state == 'absent'
-
-- name: Remove Caddy data directory
-  ansible.builtin.file:
-    path: "{{ caddy_data_directory }}/{{ caddy_id }}"
-    state: absent
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
   when: caddy_state == 'absent'

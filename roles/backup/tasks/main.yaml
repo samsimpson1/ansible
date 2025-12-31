@@ -1,81 +1,10 @@
-- name: Install backup dependencies
-  ansible.builtin.package:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - cron
-    - restic
-    - rsync
-    - sshpass
-    - jq
-  when: backup_state == 'present'
-- name: Enable cron daemon
-  ansible.builtin.systemd:
-    name: cron
-    state: started
-    enabled: true
-  when: backup_state == 'present'
-- name: Create backup directory
-  ansible.builtin.file:
-    state: directory
-    path: /srv/backups
-    mode: "0750"
-    owner: root
-    group: root
-  when: backup_state == 'present'
-- name: Create password file
-  ansible.builtin.copy:
-    dest: /srv/backups/password
-    content: "{{ backup_target.password }}"
-    mode: "0600"
-    owner: root
-    group: root
-  when: backup_state == 'present'
-- name: Create repository password file
-  ansible.builtin.copy:
-    dest: /srv/backups/repository-password
-    content: "{{ backup_target.repository_password }}"
-    mode: "0600"
-    owner: root
-    group: root
-  when: backup_state == 'present'
-- name: Sync jobs
-  ansible.builtin.include_tasks: sync.yaml
-  when: backup_state == 'present'
-- name: Restic jobs
-  ansible.builtin.include_tasks: restic.yaml
-  when: backup_state == 'present'
-- name: Schedule jobs
-  ansible.builtin.cron:
-    name: "Backup {{ item.op }} {{ item.name }}"
-    user: root
-    job: "/srv/backups/{{ item.op }}-{{ item.name }}.sh"
-    minute: "{{ item.cron.minute | default('0') }}"
-    hour: "{{ item.cron.hour | default('*') }}"
-    day: "{{ item.cron.day | default('*') }}"
-    month: "{{ item.cron.month | default('*') }}"
-    weekday: "{{ item.cron.weekday | default('*') }}"
-  loop: "{{ backup_jobs }}"
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
   when: backup_state == 'present'
 
-- name: Remove backup job cron entries
-  ansible.builtin.cron:
-    name: "Backup {{ item.op }} {{ item.name }}"
-    state: absent
-    user: root
-  loop: "{{ backup_jobs }}"
-  when: backup_state == 'absent'
-
-- name: Remove prune job cron entries
-  ansible.builtin.cron:
-    name: "Prune {{ item.op }} {{ item.name }}"
-    state: absent
-    user: root
-  loop: "{{ backup_jobs }}"
-  when: backup_state == 'absent' and item.op == 'restic'
-
-- name: Remove backup directory
-  ansible.builtin.file:
-    path: /srv/backups
-    state: absent
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
   when: backup_state == 'absent'
