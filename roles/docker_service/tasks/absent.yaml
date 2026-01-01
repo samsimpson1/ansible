@@ -1,3 +1,8 @@
+- name: Check if service unit exists
+  ansible.builtin.stat:
+    path: /etc/systemd/system/{{ docker_service_id }}.service
+  register: docker_service_unit_file
+
 - name: Stop Docker service
   ansible.builtin.systemd:
     name: "{{ docker_service_id }}"
