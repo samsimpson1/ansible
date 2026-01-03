@@ -25,7 +25,6 @@
       PGID: "{{ pocket_id_uid | default('1985') }}"
       DB_CONNECTION_STRING: "file:/data/pocket-id.db?_pragma=journal_mode(WAL)&_pragma=busy_timeout(2500)&_txlock=immediate"
       FILE_BACKEND: "database"
-      KEYS_STORAGE: "database"
       UI_CONFIG_DISABLED: "true"
       SMTP_FROM: "pocket-id@ses.simpson.id"
       SMTP_USER: "{{ smtp_username }}"

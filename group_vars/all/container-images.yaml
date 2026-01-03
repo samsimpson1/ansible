@@ -14,4 +14,4 @@ container_images:
   knot: tngl/knot:v1.10.0-alpha
   filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.1.0-stable
   litestream: litestream/litestream:0.5.5
-  pocket_id: ghcr.io/pocket-id/pocket-id:v1.16.0
+  pocket_id: ghcr.io/pocket-id/pocket-id:v2.0.1
