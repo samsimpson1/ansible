@@ -13,7 +13,7 @@
   vars:
     docker_service_id: "samba"
     docker_service_description: "Samba"
-    docker_service_image: quay.io/samba.org/samba-server:latest
+    docker_service_image: "{{ container_images.samba }}"
     docker_service_network: source_default
     docker_service_ports: ["445:445"]
     docker_service_volumes:

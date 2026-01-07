@@ -15,7 +15,7 @@
   vars:
     docker_service_id: "qbittorrent"
     docker_service_description: "qBittorrent"
-    docker_service_image: ghcr.io/home-operations/qbittorrent:5.1.4
+    docker_service_image: "{{ container_images.qbittorrent }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -34,7 +34,7 @@
   vars:
     docker_service_id: "sabnzbd"
     docker_service_description: "SABnzbd"
-    docker_service_image: ghcr.io/home-operations/sabnzbd:4.5.5
+    docker_service_image: "{{ container_images.sabnzbd }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -52,7 +52,7 @@
   vars:
     docker_service_id: "unpackerr"
     docker_service_description: "Unpackerr"
-    docker_service_image: ghcr.io/unpackerr/unpackerr:0.14.5
+    docker_service_image: "{{ container_images.unpackerr }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -71,7 +71,7 @@
   vars:
     docker_service_id: "slskd"
     docker_service_description: "Slskd"
-    docker_service_image: slskd/slskd:0.24.1
+    docker_service_image: "{{ container_images.slskd }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
