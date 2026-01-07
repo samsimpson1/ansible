@@ -11,7 +11,7 @@
   vars:
     docker_service_id: "karakeep-meilisearch"
     docker_service_description: "Karakeep Meilisearch"
-    docker_service_image: "{{ container_images.meilisearch }}"
+    docker_service_image: "{{ container_images.karakeep_meilisearch }}"
     docker_service_network: source_default
     docker_service_env_vars:
       MEILI_NO_ANALYTICS: "true"

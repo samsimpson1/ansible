@@ -35,5 +35,5 @@ container_images:
   freshrss: freshrss/freshrss:1.28.0
   home_assistant: ghcr.io/home-assistant/home-assistant:2025.12.5
   karakeep: ghcr.io/karakeep-app/karakeep:0.30.0
-  meilisearch: getmeili/meilisearch:v1.13.3
+  karakeep_meilisearch: getmeili/meilisearch:v1.13.3
   alpine_chrome: gcr.io/zenika-hub/alpine-chrome:124
