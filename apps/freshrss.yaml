@@ -9,7 +9,7 @@
   vars:
     docker_service_id: "freshrss"
     docker_service_description: "FreshRSS"
-    docker_service_image: freshrss/freshrss:1.28.0
+    docker_service_image: "{{ container_images.freshrss }}"
     docker_service_network: source_default
     docker_service_env_vars:
       TZ: Europe/London

@@ -36,7 +36,7 @@
   vars:
     docker_service_id: "audiobookshelf"
     docker_service_description: "Audiobookshelf"
-    docker_service_image: ghcr.io/advplyr/audiobookshelf:2.32.1
+    docker_service_image: "{{ container_images.audiobookshelf }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -57,7 +57,7 @@
   vars:
     docker_service_id: "plex"
     docker_service_description: "Plex Media Server"
-    docker_service_image: ghcr.io/home-operations/plex:rolling
+    docker_service_image: "{{ container_images.plex }}"
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_network: host
@@ -74,7 +74,7 @@
   vars:
     docker_service_id: "jellyfin"
     docker_service_description: "Jellyfin Media Server"
-    docker_service_image: jellyfin/jellyfin:latest
+    docker_service_image: "{{ container_images.jellyfin }}"
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_network: host
@@ -93,7 +93,7 @@
   vars:
     docker_service_id: "lms"
     docker_service_description: "Lyrion Music Server"
-    docker_service_image: lmscommunity/lyrionmusicserver:9.1.0
+    docker_service_image: "{{ container_images.lyrion }}"
     docker_service_network: host
     docker_service_env_vars:
       PUID: "568"
@@ -114,7 +114,7 @@
   vars:
     docker_service_id: "navidrome"
     docker_service_description: "Navidrome Music Server"
-    docker_service_image: deluan/navidrome:latest
+    docker_service_image: "{{ container_images.navidrome }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -137,7 +137,7 @@
   vars:
     docker_service_id: "komga"
     docker_service_description: "Komga Comics Server"
-    docker_service_image: ghcr.io/gotson/komga:1.23.6
+    docker_service_image: "{{ container_images.komga }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -151,7 +151,7 @@
   vars:
     docker_service_id: "overseerr"
     docker_service_description: "Overseerr"
-    docker_service_image: ghcr.io/sct/overseerr:1.34.0
+    docker_service_image: "{{ container_images.overseerr }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
@@ -168,7 +168,7 @@
   vars:
     docker_service_id: "pinchflat"
     docker_service_description: "Pinchflat"
-    docker_service_image: ghcr.io/kieraneglin/pinchflat:v2025.6.6
+    docker_service_image: "{{ container_images.pinchflat }}"
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
