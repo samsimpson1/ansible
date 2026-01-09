@@ -15,7 +15,7 @@ container_images:
   filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.1.0-stable
   litestream: litestream/litestream:0.5.5
   pocket_id: ghcr.io/pocket-id/pocket-id:v2.1.0
-  oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.11.0
+  oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.13.0
   samba: quay.io/samba.org/samba-server:latest
   prowlarr: ghcr.io/home-operations/prowlarr:2.3
   radarr: ghcr.io/home-operations/radarr:6.1.1
