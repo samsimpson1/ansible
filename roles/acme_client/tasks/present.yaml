@@ -24,21 +24,21 @@
 
 - name: Create acme group for certificate access
   ansible.builtin.group:
-    name: acme
+    name: "{{ acme_client_source_user }}"
     system: true
 
 - name: Add app user to acme group
   ansible.builtin.user:
     name: app
-    groups: acme
+    groups: "{{ acme_client_source_user }}"
     append: true
 
 - name: Create certificate directory
   ansible.builtin.file:
     path: "{{ acme_client_cert_dir }}"
     state: directory
-    owner: root
-    group: acme
+    owner: "{{ acme_client_source_user }}"
+    group: "{{ acme_client_source_user }}"
     mode: '0775'
 
 - name: Create certificate sync script
@@ -56,3 +56,11 @@
     hour: "{{ acme_client_sync_cron_hour }}"
     job: "/opt/sync-certs.sh >> /var/log/acme-sync.log 2>&1"
     user: "{{ acme_client_source_user }}"
+
+- name: Create acme sudoers entry
+  community.general.sudoers:
+    name: "acme-client-caddy-restart"
+    user: "{{ acme_client_source_user }}"
+    runas: "root"
+    commands: "/usr/bin/systemctl restart caddy-external caddy-ha"
+    state: present

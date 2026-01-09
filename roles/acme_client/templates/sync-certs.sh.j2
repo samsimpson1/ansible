@@ -1,9 +1,22 @@
 #!/bin/bash
 set -e
 
-rsync -avz --delete \
+RSYNC=$(rsync -avz --delete \
   -e "ssh -o StrictHostKeyChecking=no" \
+  --stats \
   {{ acme_client_source_user }}@{{ acme_client_source_host }}:{{ acme_client_cert_dir }}/ \
-  {{ acme_client_cert_dir }}/
+  {{ acme_client_cert_dir }}/)
+
+echo "${RSYNC}"
+
+CHANGED_FILES=$(grep "Number of regular files transferred" <<< "${RSYNC}" | \
+  awk '{ print $6; }')
+
+echo "Changed files: ${CHANGED_FILES}"
+
+if [ "${CHANGED_FILES}" -ne "0" ]; then
+  echo "Files changed, restarting Caddy"
+  sudo systemctl restart caddy-external caddy-ha
+fi
 
 echo "Certificate sync completed at $(date)"

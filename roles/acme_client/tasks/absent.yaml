@@ -24,3 +24,8 @@
   ansible.builtin.group:
     name: acme
     state: absent
+
+- name: Remove acme sudoers entry
+  community.general.sudoers:
+    name: "acme-client-caddy-restart"
+    state: absent
