@@ -1,0 +1,42 @@
+# configure zsh shell
+- name: Desktop Shell
+  hosts: 127.0.0.1
+  connection: local
+  become: false
+  tasks:
+    - name: Set Facts (MacOS)
+      ansible.builtin.set_fact:
+        zsh_syntax_highlighting_source: "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+      when: ansible_os_family == 'Darwin'
+
+    - name: Set Facts (Linux)
+      ansible.builtin.set_fact:
+        zsh_syntax_highlighting_source: "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+      when: ansible_os_family == 'Linux'
+
+    - name: Install packages (MacOS)
+      ansible.builtin.package:
+        name:
+          - fzf
+          - zsh
+          - zsh-completions
+          - zsh-syntax-highlighting
+          - starship
+        state: present
+      when: ansible_os_family == 'Darwin'
+
+    - name: Create zshrc
+      ansible.builtin.template:
+        src: files/zshrc.j2
+        dest: "{{ ansible_user_dir }}/.zshrc"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0750'
+
+    - name: Create starship config
+      ansible.builtin.copy:
+        src: files/starship.toml
+        dest: "{{ ansible_user_dir }}/.config/starship.toml"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+        mode: '0640'

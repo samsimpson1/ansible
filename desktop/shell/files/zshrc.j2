@@ -1,0 +1,22 @@
+# History
+export HISTSIZE=1000000000
+export SAVEHIST=$HISTSIZE
+setopt EXTENDED_HISTORY
+export HISTFILE="$HOME/.zsh_history"
+
+setopt autocd
+
+# Install fzf
+source <(fzf --zsh)
+
+# zsh-completions on darwin
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+  autoload -Uz compinit
+  compinit -u
+fi
+
+source "{{ zsh_syntax_highlighting_source }}"
+
+eval "$(starship init zsh)"
