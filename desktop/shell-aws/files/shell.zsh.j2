@@ -1,0 +1,37 @@
+#!/usr/bin/env zsh
+
+alias awsume=". $HOME/.awsume-venv/bin/awsume"
+
+c() {
+  awsume -c "${1}-developer"
+}
+
+ca() {
+  awsume -c "${1}-fulladmin"
+}
+
+ce() {
+  awsume --role-duration "3600" -c "${1}-platformengineer"
+}
+
+govuk_awsume() {
+  ${HOME}/bin/aws-subshell.sh $@
+}
+
+e() {
+  ENV_NAME="${1}"
+  shift
+  govuk_awsume "${ENV_NAME}" "developer" "$@"
+}
+
+ea() {
+  ENV_NAME="${1}"
+  shift
+  govuk_awsume "${ENV_NAME}" "fulladmin" "$@"
+}
+
+ee() {
+  ENV_NAME="${1}"
+  shift
+  govuk_awsume "${ENV_NAME}" "platformengineer" "$@"
+}

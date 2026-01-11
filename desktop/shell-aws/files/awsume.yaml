@@ -1,0 +1,8 @@
+colors: true
+fuzzy-match: true
+role-duration: 3600
+yubikey: AWS
+onepassword:
+  mfa_enabled: false
+  vault: Personal
+  item: "AWS Work"

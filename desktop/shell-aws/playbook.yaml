@@ -1,0 +1,81 @@
+- name: Desktop Shell
+  hosts: 127.0.0.1
+  connection: local
+  become: false
+  tasks:
+    - name: Set AWS Account Detail Facts
+      ansible.builtin.set_fact:
+        aws_accounts:
+          production: "172025368201"
+          staging: "696911096973"
+          integration: "210287912431"
+          tools: "900804735337"
+        aws_roles:
+          - developer
+          - platformengineer
+          - fulladmin
+
+    - name: Install packages
+      ansible.builtin.package:
+        name:
+          - asciinema
+          - helm
+          - kubernetes-cli
+          - kubectx
+          - virtualenv
+        state: present
+
+    - name: Install awsume packages
+      ansible.builtin.pip:
+        name:
+          - awsume
+          - awsume-console-plugin
+          - awsume-yubikey-plugin
+          - awsume-1password-gaiden
+        virtualenv: "{{ ansible_facts['user_dir'] }}/.awsume-venv"
+
+    - name: Create awsume config directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.awsume"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
+
+    - name: Create awsume config file
+      ansible.builtin.copy:
+        src: files/awsume.yaml
+        dest: "{{ ansible_facts['user_dir'] }}/.awsume/config.yaml"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0640'
+
+    - name: Create aws config directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.aws"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
+
+    - name: Create aws config file
+      ansible.builtin.template:
+        src: files/aws.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.aws/config"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0640'
+
+    - name: Create aws-subshell.sh
+      ansible.builtin.copy:
+        src: files/aws-subshell.sh
+        dest: "{{ ansible_facts['user_dir'] }}/bin/aws-subshell.sh"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
+
+    - name: Create aws.zsh file
+      ansible.builtin.template:
+        src: files/shell.zsh.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.zshrc.d/aws.zsh"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
