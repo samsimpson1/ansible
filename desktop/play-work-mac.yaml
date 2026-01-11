@@ -1,0 +1,6 @@
+- name: Packages
+  ansible.builtin.import_playbook: play-work-mac-packages.yaml
+- name: Shell
+  ansible.builtin.import_playbook: shell/playbook.yaml
+- name: AWS Shell
+  ansible.builtin.import_playbook: shell-aws/playbook.yaml

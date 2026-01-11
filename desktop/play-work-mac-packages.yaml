@@ -1,0 +1,27 @@
+- name: Work Mac Packages
+  hosts: 127.0.0.1
+  connection: local
+  become: false
+  tasks:
+    - name: Install packages
+      ansible.builtin.package:
+        name:
+          - 1password@beta
+          - firefox
+          - ghostty
+          - rbenv
+          - ripgrep
+          - slack
+          - tenv
+          - uv
+          - visual-studio-code
+
+    - name: Create Ghostty config
+      ansible.builtin.copy:
+        content: |
+          shell-integration-features = ssh-env
+          theme = Catppuccin Macchiato
+        dest: "{{ ansible_facts['user_dir'] }}/.config/ghostty/config"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0640'
