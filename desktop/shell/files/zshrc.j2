@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 # History
 export HISTSIZE=1000000000
 export SAVEHIST=$HISTSIZE
@@ -5,6 +7,8 @@ setopt EXTENDED_HISTORY
 export HISTFILE="$HOME/.zsh_history"
 
 setopt autocd
+
+autoload -U colors
 
 # Install fzf
 source <(fzf --zsh)
@@ -18,5 +22,20 @@ if type brew &>/dev/null; then
 fi
 
 source "{{ zsh_syntax_highlighting_source }}"
+
+# include files in the .zshrc.d directory
+for filename in $HOME/.zshrc.d/*.zsh; do
+  source "${filename}"
+done
+
+alias k="kubectl"
+alias gan="git commit --amend --no-edit"
+alias gpf="git push --force-with-lease"
+alias gp="git push"
+alias gpm="git push origin main"
+
+export PATH="$HOME/bin:$PATH"
+
+eval "$(rbenv init - --no-rehash zsh)"
 
 eval "$(starship init zsh)"
