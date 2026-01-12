@@ -2,9 +2,10 @@ server:
   database: "/config/database.db"
   cacheDir: "/config/cache"
   sources:
-    - path: "/files"
+    - name: "Files"
+      path: "/files"
       config:
-        defaultEnabled: false
+        defaultEnabled: true
         denyByDefault: true
 
 auth:
