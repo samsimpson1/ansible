@@ -21,7 +21,9 @@ if type brew &>/dev/null; then
   compinit -u
 fi
 
-source "{{ zsh_syntax_highlighting_source }}"
+source "{{ zsh_plugin_prefix }}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+source "{{ zsh_plugin_prefix }}/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
 # include files in the .zshrc.d directory
 for filename in $HOME/.zshrc.d/*.zsh; do

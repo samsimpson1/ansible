@@ -1,4 +1,3 @@
-# configure zsh shell
 - name: Desktop Shell
   hosts: 127.0.0.1
   connection: local
@@ -6,24 +5,24 @@
   tasks:
     - name: Set Facts (MacOS)
       ansible.builtin.set_fact:
-        zsh_syntax_highlighting_source: "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+        zsh_plugin_prefix: "/opt/homebrew/share"
       when: ansible_facts['os_family'] == 'Darwin'
 
     - name: Set Facts (Linux)
       ansible.builtin.set_fact:
-        zsh_syntax_highlighting_source: "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+        zsh_plugin_prefix: "/usr/share/zsh/plugins"
       when: ansible_facts['os_family'] == 'Linux'
 
-    - name: Install packages (MacOS)
+    - name: Install packages
       ansible.builtin.package:
         name:
           - fzf
           - zsh
+          - zsh-autosuggestions
           - zsh-completions
           - zsh-syntax-highlighting
           - starship
         state: present
-      when: ansible_facts['os_family'] == 'Darwin'
 
     - name: Create zshrc
       ansible.builtin.template:
