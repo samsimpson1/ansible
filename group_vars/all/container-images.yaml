@@ -7,8 +7,8 @@ container_images:
   alertmanager: prom/alertmanager:v0.30.0
   grafana: grafana/grafana:12.3.1
   copyparty: ghcr.io/9001/copyparty-iv:1.19.23
-  concourse_web: concourse/concourse:7.14.3
-  concourse_worker: concourse/concourse:7.14.3
+  concourse_web: concourse/concourse:8.0.0
+  concourse_worker: concourse/concourse:8.0.0
   concourse_postgres: postgres:18
   vault: hashicorp/vault:1.21.2
   knot: tngl/knot:v1.10.0-alpha
