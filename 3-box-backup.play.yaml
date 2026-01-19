@@ -21,3 +21,9 @@
             cron:
               minute: "58"
               hour: "*/2"
+          - name: box-forgejo
+            op: restic
+            path: /srv/app/forgejo
+            cron:
+              minute: "11"
+              hour: "*/3"
