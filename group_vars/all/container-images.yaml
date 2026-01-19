@@ -37,3 +37,4 @@ container_images:
   karakeep: ghcr.io/karakeep-app/karakeep:0.30.0
   karakeep_meilisearch: getmeili/meilisearch:v1.13.3
   alpine_chrome: gcr.io/zenika-hub/alpine-chrome:124
+  nginx: nginx:1.29.4

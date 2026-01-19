@@ -3,3 +3,23 @@
   ansible.builtin.include_tasks:
     file: present.yaml
   when: nginx_state == 'present'
+
+- name: Nginx container
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "nginx"
+    docker_service_description: "Nginx"
+    docker_service_image: "{{ container_images.nginx }}"
+    # TODO: work out a way to dynamically assign ports
+    # so this can run with the bridge driver
+    docker_service_network: "host"
+    docker_service_volumes:
+      - "/srv/certificates:/certificates:ro"
+      - "{{ nginx_directory }}/nginx.conf:/etc/nginx/nginx.conf:ro"
+    docker_service_state: "{{ nginx_state }}"
+
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
+  when: nginx_state == 'absent'

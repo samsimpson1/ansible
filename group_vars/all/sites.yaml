@@ -20,7 +20,7 @@ sites:
     ipv6: "2a02:8012:419c:0:7a55:36ff:fe02:2067"
     routes: []
     fallback_host: box
-    fallback_target: "http://forgejo:80"
+    fallback_target: "http://example.com:80"
 
   - name: srv.simpson.id
     kind: external

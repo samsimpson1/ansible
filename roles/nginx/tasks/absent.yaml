@@ -1,0 +1,5 @@
+---
+- name: Remove nginx directory
+  ansible.builtin.file:
+    path: "{{ nginx_directory }}"
+    state: absent
