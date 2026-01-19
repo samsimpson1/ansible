@@ -1,4 +1,13 @@
 ---
+- name: Increase max open files
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: "{{ item }}"
+    limit_item: nofile
+    value: 65535
+  loop:
+    - soft
+    - hard
 - name: Concourse Worker data directory
   ansible.builtin.file:
     path: "{{ concourse_worker_data_directory }}"
