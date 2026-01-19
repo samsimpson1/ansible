@@ -14,6 +14,7 @@
           - developer
           - platformengineer
           - fulladmin
+          - dguengineer
 
     - name: Install packages
       ansible.builtin.package:
