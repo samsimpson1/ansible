@@ -1,0 +1,3 @@
+forgejo_network: forgejo
+forgejo_directory: /srv/app/forgejo
+forgejo_state: present

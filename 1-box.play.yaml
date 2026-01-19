@@ -4,7 +4,11 @@
     - vars/concourse.yaml
   become: true
   tasks:
-    - name: nginx
+    - name: Forgejo
+      ansible.builtin.include_role:
+        name: forgejo
+
+    - name: Nginx
       ansible.builtin.include_role:
         name: nginx
 
@@ -112,5 +116,4 @@
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["concourse", "knot", "pocket_id"]
-    
 

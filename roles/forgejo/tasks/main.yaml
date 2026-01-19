@@ -1,0 +1,31 @@
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
+  when: forgejo_state == 'present'
+
+- name: Forgejo container
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: forgejo
+    docker_service_description: Forgejo
+    docker_service_image: "{{ container_images.forgejo }}"
+    docker_service_network: "{{ forgejo_network }}"
+    docker_service_env_vars:
+      USER_UID: "568"
+      USER_GID: "568"
+      FORGEJO__server__DOMAIN: "git.sams.wtf"
+      FORGEJO__server__HTTP_PORT: "3000"
+      FORGEJO__server__REDIRECT_OTHER_PORT: "false"
+      FORGEJO__server__USE_PROXY_PROTOCOL: "false"
+      FORGEJO__server__START_SSH_SERVER: "true"
+      FORGEJO__server__SSH_LISTEN_HOST: "0.0.0.0"
+      FORGEJO__server__SSH_LISTEN_PORT: "222"
+      FORGEJO__server__ROOT_URL: "https://git.sams.wtf/"
+    docker_service_ports:
+      - "127.0.0.1:10089:3000"
+      - "[2a02:8012:419c:0:7a55:36ff:fe02:2067]:22:222"
+    docker_service_volumes:
+      - "{{ forgejo_directory }}:/data"
+      - "/etc/localtime:/etc/localtime:ro"

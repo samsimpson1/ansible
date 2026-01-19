@@ -1,0 +1,5 @@
+---
+- name: Forgejo Docker network
+  community.docker.docker_network:
+    name: "{{ forgejo_network }}"
+    state: "present"
