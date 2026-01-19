@@ -1,0 +1,49 @@
+http {
+  {% for host in sites|selectattr('kind', 'equalto', 'ipv6') %}
+
+  {% for site in host.routes|selectattr('host', 'equalto', inventory_hostname) %}
+  server {
+    listen [{{ host.ipv6 }}]:443 ssl;
+
+    server_name {{ site.name }}.{{ host.name }};
+
+    ssl_certificate /certificates/{{ host.name }}/fullchain.pem;
+    ssl_certificate_key /certificates/{{ host.name }}/key.pem;
+
+    location / {
+      proxy_pass {{ site.target }};
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+  }
+  {% endfor %}
+
+  {% if host.fallback is defined %}
+  {{ host.fallback | indent(width=2, first=False) }}
+  {% endif %}
+
+  {% if host.fallback_host is defined and
+    host.fallback_target is defined and
+    host.fallback_host == inventory_hostname %}
+  server {
+    listen [{{ host.ipv6 }}]:443 ssl;
+
+    server_name {{ host.name }};
+
+    ssl_certificate /certificates/{{ host.name }}/fullchain.pem;
+    ssl_certificate_key /certificates/{{ host.name }}/key.pem;
+
+    location / {
+      proxy_pass {{ host.fallback_target }};
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+  }
+  {% endif %}
+
+  {% endfor %}
+}

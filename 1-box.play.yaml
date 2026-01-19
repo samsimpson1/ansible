@@ -4,18 +4,20 @@
     - vars/concourse.yaml
   become: true
   tasks:
+    - name: nginx
+      ansible.builtin.include_role:
+        name: nginx
+
     - name: App user
       ansible.builtin.include_tasks: apps/app-user.yaml
 
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
-      tags: tailscale
 
     - name: Docker
       ansible.builtin.include_role:
         name: docker_host
-      tags: docker
 
     - name: App data disk directory
       ansible.builtin.file:
@@ -66,7 +68,6 @@
     - name: ACME Client
       ansible.builtin.include_role:
         name: acme_client
-      tags: acme
 
     - name: Concourse Web
       ansible.builtin.include_role:
@@ -79,7 +80,6 @@
         concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
         concourse_web_onepassword_service_account_token: "{{ concourse_onepassword_service_account_token }}"
         concourse_web_vault_token: "{{ concourse_vault_token }}"
-      tags: [concourse, concourse_web]
 
     - name: Concourse Worker
       ansible.builtin.include_role:
@@ -87,12 +87,10 @@
       vars:
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
-      tags: [concourse, concourse_worker]
 
     - name: Knot
       ansible.builtin.include_role:
         name: knot
-      tags: knot
 
     - name: Pocket ID
       ansible.builtin.include_role:
@@ -102,7 +100,6 @@
         pocket_id_directory: "/srv/app/pocket-id"
         pocket_id_app_name: "Pocket ID (Backup)"
         pocket_id_accent_colour: "red"
-      tags: pocket-id
 
     - name: Caddy external
       ansible.builtin.include_role:
@@ -115,4 +112,5 @@
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["concourse", "knot", "pocket_id"]
-      tags: caddy
+    
+

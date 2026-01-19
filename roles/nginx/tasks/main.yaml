@@ -1,0 +1,5 @@
+---
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
+  when: nginx_state == 'present'

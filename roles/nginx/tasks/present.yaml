@@ -1,0 +1,16 @@
+---
+- name: Nginx directory
+  ansible.builtin.file:
+    path: "{{ nginx_directory }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+
+- name: nginx config file
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_directory }}/nginx.conf"
+    owner: app
+    group: app
+    mode: '0640'

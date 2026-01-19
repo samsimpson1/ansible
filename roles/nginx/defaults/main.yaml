@@ -1,0 +1,2 @@
+nginx_directory: /srv/app/nginx
+nginx_state: present
