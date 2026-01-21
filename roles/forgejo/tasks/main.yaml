@@ -21,11 +21,11 @@
       FORGEJO__server__USE_PROXY_PROTOCOL: "false"
       FORGEJO__server__START_SSH_SERVER: "true"
       FORGEJO__server__SSH_LISTEN_HOST: "0.0.0.0"
-      FORGEJO__server__SSH_LISTEN_PORT: "222"
+      FORGEJO__server__SSH_LISTEN_PORT: "2689"
+      FORGEJO__server__SSH_PORT: "2689"
       FORGEJO__server__ROOT_URL: "https://git.sams.wtf/"
     docker_service_ports:
-      - "127.0.0.1:10089:3000"
-      - "[2a02:8012:419c:0:7a55:36ff:fe02:2067]:22:222"
+      - "0.0.0.0:2689:2689"
     docker_service_volumes:
       - "{{ forgejo_directory }}:/data"
       - "/etc/localtime:/etc/localtime:ro"

@@ -16,11 +16,14 @@ sites:
       }
   
   - name: git.sams.wtf
-    kind: ipv6
-    ipv6: "2a02:8012:419c:0:7a55:36ff:fe02:2067"
+    kind: external
     routes: []
     fallback_host: box
-    fallback_target: "http://127.0.0.1:10089"
+    fallback: |
+      @git host git.sams.wtf
+      handle @git {
+        reverse_proxy http://forgejo:3000
+      }
 
   - name: srv.simpson.id
     kind: external
