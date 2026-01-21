@@ -4,7 +4,7 @@
     domain: '*'
     limit_type: "{{ item }}"
     limit_item: nofile
-    value: 65535
+    value: 250000
   loop:
     - soft
     - hard
