@@ -1,13 +1,13 @@
 ---
 - name: Install Tailscale package signing key
   ansible.builtin.get_url:
-    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
+    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts['distribution_release'] }}.noarmor.gpg"
     dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
     mode: '0644'
 
 - name: Add Tailscale repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_facts['distribution_release'] }} main"
     filename: tailscale
   register: tailscale_repo
 
@@ -34,7 +34,7 @@
     tailscale up
       --reset
       --auth-key={{ tailscale_oauth_key }}
-      --hostname={{ ansible_hostname }}
+      --hostname={{ ansible_facts['hostname'] }}
       --advertise-tags={{ tailscale_tags | join(',') }}
   register: tailscale_up
   # tailscale status returns 130 if not connected to tailnet
