@@ -11,6 +11,8 @@
     - name: Nginx
       ansible.builtin.include_role:
         name: nginx
+      vars:
+        nginx_state: absent
 
     - name: App user
       ansible.builtin.include_tasks: apps/app-user.yaml
