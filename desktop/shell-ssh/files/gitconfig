@@ -1,0 +1,8 @@
+[user]
+  email = sam@simpson.id
+  name = Sam Simpson
+  signingkey = ~/.ssh/yubi1.pub
+[gpg]
+  format = ssh
+[commit]
+  gpgsign = true
