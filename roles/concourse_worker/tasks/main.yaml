@@ -20,7 +20,7 @@
       CONCOURSE_TSA_PUBLIC_KEY: "/concourse-keys/tsa_host_key.pub"
       CONCOURSE_TSA_WORKER_PRIVATE_KEY: "/concourse-keys/worker_key"
       CONCOURSE_WORK_DIR: "{{ concourse_worker_data_directory }}/work"
-      CONCOURSE_RUNTIME: guardian
+      CONCOURSE_RUNTIME: containerd
     docker_service_volumes:
       - "{{ concourse_worker_data_directory }}/keys:/concourse-keys:ro"
       - "{{ concourse_worker_data_directory }}/work:{{ concourse_worker_data_directory }}/work"
