@@ -11,18 +11,20 @@
     - name: Set Facts (Linux)
       ansible.builtin.set_fact:
         zsh_plugin_prefix: "/usr/share/zsh/plugins"
-      when: ansible_facts['os_family'] == 'Linux'
+      when: ansible_facts['os_family'] == 'Archlinux'
 
     - name: Install packages
       ansible.builtin.package:
         name:
           - fzf
+          - rbenv
           - zsh
           - zsh-autosuggestions
           - zsh-completions
           - zsh-syntax-highlighting
           - starship
         state: present
+      become: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
 
     - name: Create zshrc
       ansible.builtin.template:
