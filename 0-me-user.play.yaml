@@ -1,0 +1,20 @@
+- name: Me user
+  hosts:
+    - box
+    - little
+  become: true
+  tasks:
+    - name: Create user
+      ansible.builtin.user:
+        name: me
+        create_home: true
+        state: present
+
+    - name: Add authorized keys
+      ansible.posix.authorized_key:
+        user: me
+        state: present
+        key: "{{ lookup('file', 'desktop/shell-ssh/files/' + item + '.pub') }}"
+      loop:
+        - yubi1
+        - yubi2
