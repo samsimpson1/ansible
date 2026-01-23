@@ -3,6 +3,7 @@ acme_manager_cert_dir: "/srv/certificates"
 acme_manager_email: "acme@sams.wtf"
 acme_manager_cloudflare_account_id: ""
 acme_manager_cloudflare_account_token: ""
+acme_manager_hetzner_api_token: ""
 acme_manager_renew_cron_minute: "0"
 acme_manager_renew_cron_hour: "3"
 acme_manager_state: present

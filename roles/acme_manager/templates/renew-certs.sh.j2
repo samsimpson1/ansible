@@ -1,7 +1,6 @@
 #!/bin/bash
 
-export CF_Account_ID='{{ acme_manager_cloudflare_account_id }}'
-export CF_Token='{{ acme_manager_cloudflare_account_token }}'
+export HETZNER_Token='{{ acme_manager_hetzner_api_token }}'
 export LE_WORKING_DIR="/root/.acme.sh"
 
 FAILED_RENEWALS=()
@@ -10,6 +9,7 @@ FAILED_RENEWALS=()
 echo "Attempting renewal for {{ site.name }}..."
 if {{ acme_manager_install_dir }}/acme.sh --renew \
   -d {{ site.name }} \
+  --dns dns_hetzner \
   --cert-file {{ acme_manager_cert_dir }}/{{ site.name }}/cert.pem \
   --key-file {{ acme_manager_cert_dir }}/{{ site.name }}/key.pem \
   --fullchain-file {{ acme_manager_cert_dir }}/{{ site.name }}/fullchain.pem; then

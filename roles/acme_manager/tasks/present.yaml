@@ -81,7 +81,7 @@
   ansible.builtin.command:
     cmd: >
       {{ acme_manager_install_dir }}/acme.sh --issue
-      --dns dns_cf
+      --dns dns_hetzner
       -d {{ item.name }}
       {% if item.wildcard | default(false) %}-d *.{{ item.name }}{% endif %}
       --cert-file {{ acme_manager_cert_dir }}/{{ item.name }}/cert.pem
