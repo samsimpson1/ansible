@@ -26,9 +26,11 @@ source "{{ zsh_plugin_prefix }}/zsh-syntax-highlighting/zsh-syntax-highlighting.
 source "{{ zsh_plugin_prefix }}/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
 # include files in the .zshrc.d directory
-for filename in $HOME/.zshrc.d/*.zsh; do
-  source "${filename}"
-done
+if [[ -n "$(ls -A $HOME/.zshrc.d 2>/dev/null)" ]]; then
+  for filename in $HOME/.zshrc.d/*.zsh; do
+    source "${filename}"
+  done
+fi
 
 alias k="kubectl"
 alias gan="git commit --amend --no-edit"
