@@ -2,6 +2,11 @@
   hosts: 127.0.0.1
   connection: local
   tasks:
+    - name: Tap ssh-askpass
+      community.general.homebrew_tap:
+        name: theseal/ssh-askpass
+      when: ansible_facts['os_family'] == 'Darwin'
+
     - name: Install macos packages
       ansible.builtin.package:
         name:
