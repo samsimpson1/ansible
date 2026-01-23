@@ -2,15 +2,13 @@
   hosts: 127.0.0.1
   connection: local
   tasks:
-    - name: Set Facts (MacOS)
-      ansible.builtin.set_fact:
-        ssh_askpass: "/set/later"
+    - name: Install macos packages
+      ansible.builtin.package:
+        name:
+          - openssh
+          - theseal/ssh-askpass/ssh-askpass
+        state: present
       when: ansible_facts['os_family'] == 'Darwin'
-
-    - name: Set Facts (Linux)
-      ansible.builtin.set_fact:
-        ssh_askpass: "/usr/bin/ksshaskpass"
-      when: ansible_facts['os_family'] == 'Archlinux'
 
     - name: Create SSH key handles
       ansible.builtin.copy:
@@ -25,20 +23,42 @@
         - yubi2.key
         - yubi2.pub
 
-    - name: Create ssh-agent zshrc script
+    - name: Create ssh-agent zshrc script (Linux)
       ansible.builtin.copy:
         dest: "{{ ansible_facts['user_dir'] }}/.zshrc.d/ssh-agent-yubi.zsh"
         content: |
-          eval $(ssh-agent)
+          eval $(ssh-agent) > /dev/null
           ssh-add -q $HOME/.ssh/yubi1.key $HOME/.ssh/yubi2.key
         mode: '0750'
         owner: "{{ ansible_facts['user_uid'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Create ssh-agent zshrc script (MacOS)
+      ansible.builtin.copy:
+        dest: "{{ ansible_facts['user_dir'] }}/.zshrc.d/ssh-agent-yubi.zsh"
+        content: |
+          export SSH_ASKPASS=$(which ssh-askpass)
+          export DISPLAY=":0"
+          eval $(ssh-agent) > /dev/null
+          ssh-add -q $HOME/.ssh/yubi1.key $HOME/.ssh/yubi2.key
+        mode: '0750'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+      when: ansible_facts['os_family'] == 'Darwin'
 
     - name: Create gitconfig
       ansible.builtin.copy:
         src: files/gitconfig
         dest: "{{ ansible_facts['user_dir'] }}/.gitconfig"
         mode: '0640'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+
+    - name: Create ssh config
+      ansible.builtin.copy:
+        src: files/ssh_config
+        dest: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+        mode: '0600'
         owner: "{{ ansible_facts['user_uid'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
