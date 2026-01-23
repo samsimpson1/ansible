@@ -118,4 +118,3 @@
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["concourse", "knot", "pocket_id", "forgejo"]
-

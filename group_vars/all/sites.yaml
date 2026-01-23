@@ -14,7 +14,7 @@ sites:
       handle {
         respond "🤷"
       }
-  
+
   - name: git.sams.wtf
     kind: external
     routes: []

@@ -8,7 +8,10 @@
     docker_service_image: "{{ container_images.node_exporter }}"
     docker_service_network: host
     docker_service_pid: host
-    docker_service_command: "--web.listen-address=0.0.0.0:9100 --path.rootfs=/host{% for collector in monitoring_exporters_node_exporter_collectors %} --collector.{{ collector }}{% endfor %}"
+    docker_service_command: >
+      --web.listen-address=0.0.0.0:9100
+      --path.rootfs=/host
+      {% for collector in monitoring_exporters_node_exporter_collectors %} --collector.{{ collector }}{% endfor %}
     docker_service_volumes:
       - "/:/host:ro,rslave"
     docker_service_state: "{{ monitoring_exporters_state }}"
