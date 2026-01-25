@@ -1,0 +1,16 @@
+#!/bin/bash
+# Outputs the SSH signing key path based on which YubiKey is plugged in
+
+YUBI1_SERIAL="{{ yubikey_serials[0] }}"
+YUBI2_SERIAL="{{ yubikey_serials[1] }}"
+
+CURRENT_SERIAL=$(ykman list --serials 2>/dev/null | head -1)
+
+if [[ "$CURRENT_SERIAL" == "$YUBI1_SERIAL" ]]; then
+    echo "key::$(cat "$HOME/.ssh/yubi1.pub")"
+elif [[ "$CURRENT_SERIAL" == "$YUBI2_SERIAL" ]]; then
+    echo "key::$(cat "$HOME/.ssh/yubi2.pub")"
+else
+    echo "Error: No recognized YubiKey found" >&2
+    exit 1
+fi

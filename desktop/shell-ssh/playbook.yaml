@@ -15,6 +15,10 @@
         state: present
       when: ansible_facts['os_family'] == 'Darwin'
 
+    - name: Set YubiKey serial number fact
+      ansible.builtin.set_fact:
+        yubikey_serials: ["26791998", "36364703"]
+
     - name: Create SSH key handles
       ansible.builtin.copy:
         dest: "{{ ansible_facts['user_dir'] }}/.ssh/{{ item }}"
@@ -27,6 +31,22 @@
         - yubi1.pub
         - yubi2.key
         - yubi2.pub
+
+    - name: Create git SSH key detection script
+      ansible.builtin.template:
+        src: templates/git-ssh-key.sh.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.ssh/git-ssh-key"
+        mode: '0755'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+
+    - name: Create allowed_signers file
+      ansible.builtin.template:
+        src: templates/allowed_signers.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.ssh/allowed_signers"
+        mode: '0600'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
 
     - name: Create ssh-agent zshrc script (Linux)
       ansible.builtin.copy:
@@ -53,8 +73,8 @@
       when: ansible_facts['os_family'] == 'Darwin'
 
     - name: Create gitconfig
-      ansible.builtin.copy:
-        src: files/gitconfig
+      ansible.builtin.template:
+        src: templates/gitconfig.j2
         dest: "{{ ansible_facts['user_dir'] }}/.gitconfig"
         mode: '0640'
         owner: "{{ ansible_facts['user_uid'] }}"
