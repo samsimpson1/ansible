@@ -4,26 +4,32 @@
   vars_files:
     - vars/backup.yaml
   tasks:
-    - name: Backup
+    - name: Concourse backup
       ansible.builtin.include_role:
-        name: backup
+        name: backup_restic
       vars:
-        backup_jobs:
-          - name: box-concourse
-            op: restic
-            path: /srv/app/concourse
-            cron:
-              minute: "49"
-              hour: "*/6"
-          - name: box-knot
-            op: restic
-            path: /srv/app/knot
-            cron:
-              minute: "58"
-              hour: "*/2"
-          - name: box-forgejo
-            op: restic
-            path: /srv/app/forgejo
-            cron:
-              minute: "11"
-              hour: "*/3"
+        backup_restic_name: box-concourse
+        backup_restic_path: /srv/app/concourse
+        backup_restic_cron:
+          minute: "49"
+          hour: "*/6"
+
+    - name: Knot backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: box-knot
+        backup_restic_path: /srv/app/knot
+        backup_restic_cron:
+          minute: "58"
+          hour: "*/2"
+
+    - name: Forgejo backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: box-forgejo
+        backup_restic_path: /srv/app/forgejo
+        backup_restic_cron:
+          minute: "11"
+          hour: "*/3"

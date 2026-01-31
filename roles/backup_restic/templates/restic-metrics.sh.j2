@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+set -e
+
+STATS=$(/srv/backups/restic-util.sh "{{ backup_restic_name }}" stats --json --mode raw-data)
+SIZE_BYTES=$(jq -r '.total_size' <<< "${STATS}")
+SNAPSHOT_COUNT=$(jq -r '.snapshots_count' <<< "${STATS}")
+
+LAST_SNAPSHOT=$(/srv/backups/restic-util.sh "{{ backup_restic_name }}" snapshots --json --latest 1 | jq -r '.[0].time' | date +"%s" -f -)
+
+cat <<EOF | curl --data-binary @- https://prometheus-push.int.simpson.id/metrics/job/backup-restic-{{ backup_restic_name }}
+# HELP backup_restic_last_snapshot Unix time of the latest snapshot in repository
+# TYPE backup_restic_last_snapshot gauge
+backup_restic_last_snapshot{repository="{{ backup_restic_name }}"} ${LAST_SNAPSHOT}
+# HELP backup_size_bytes Size of the backup repository in bytes
+# TYPE backup_size_bytes gauge
+backup_size_bytes{repository="{{ backup_restic_name }}",kind="restic"} ${SIZE_BYTES}
+# HELP backup_restic_snapshot_count Number of snapshots in repository
+# TYPE backup_restic_snapshot_count gauge
+backup_restic_snapshot_count{repository="{{ backup_restic_name }}"} ${SNAPSHOT_COUNT}
+# HELP backup_last_run_timestamp Timestamp of the last successful run
+# TYPE backup_last_run_timestamp gauge
+backup_last_run_timestamp{repository="{{ backup_restic_name }}",kind="restic"} $(date +%s)
+EOF

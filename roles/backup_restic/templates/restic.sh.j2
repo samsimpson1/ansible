@@ -5,7 +5,7 @@ set -e
 set -x
 
 export RESTIC_PASSWORD_FILE="/srv/backups/repository-password"
-export RESTIC_REPOSITORY="sftp:a:{{ item.name }}"
+export RESTIC_REPOSITORY="sftp:a:{{ backup_restic_name }}"
 SFTP_COMMAND="sshpass -f /srv/backups/password ssh -o StrictHostKeyChecking=no -p 23 {{ backup_target.user }}@{{ backup_target.hostname }} -s sftp"
 
 r() {
@@ -19,6 +19,6 @@ else
     echo "repository already exists"
 fi
 
-r backup "{{ item.path }}" {% if item.excludes is defined %}--exclude-file /srv/backups/restic-{{ item.name }}-excludes.txt{% endif %}
+r backup "{{ backup_restic_path }}" {% if backup_restic_excludes is defined and backup_restic_excludes %}--exclude-file /srv/backups/restic-{{ backup_restic_name }}-excludes.txt{% endif %}
 
-/srv/backups/restic-metrics-{{ item.name }}.sh
+/srv/backups/restic-metrics-{{ backup_restic_name }}.sh

@@ -1,0 +1,60 @@
+---
+# Shared infrastructure (idempotent)
+- name: Install sync backup dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - cron
+    - rsync
+    - sshpass
+
+- name: Enable cron daemon
+  ansible.builtin.systemd:
+    name: cron
+    state: started
+    enabled: true
+
+- name: Create backup directory
+  ansible.builtin.file:
+    state: directory
+    path: /srv/backups
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create password file
+  ansible.builtin.copy:
+    dest: /srv/backups/password
+    content: "{{ backup_target.password }}"
+    mode: "0600"
+    owner: root
+    group: root
+
+# Job-specific tasks
+- name: Create sync script
+  ansible.builtin.template:
+    src: sync.sh.j2
+    dest: "/srv/backups/sync-{{ backup_sync_name }}.sh"
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create sync metrics script
+  ansible.builtin.template:
+    src: sync-metrics.sh.j2
+    dest: "/srv/backups/sync-metrics-{{ backup_sync_name }}.sh"
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Schedule sync backup job
+  ansible.builtin.cron:
+    name: "Backup sync {{ backup_sync_name }}"
+    user: root
+    job: "/srv/backups/sync-{{ backup_sync_name }}.sh"
+    minute: "{{ backup_sync_cron.minute | default('0') }}"
+    hour: "{{ backup_sync_cron.hour | default('*') }}"
+    day: "{{ backup_sync_cron.day | default('*') }}"
+    month: "{{ backup_sync_cron.month | default('*') }}"
+    weekday: "{{ backup_sync_cron.weekday | default('*') }}"

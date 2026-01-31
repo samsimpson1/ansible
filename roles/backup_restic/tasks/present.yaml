@@ -1,0 +1,105 @@
+---
+# Shared infrastructure (idempotent)
+- name: Install restic backup dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - cron
+    - restic
+    - sshpass
+    - jq
+
+- name: Enable cron daemon
+  ansible.builtin.systemd:
+    name: cron
+    state: started
+    enabled: true
+
+- name: Create backup directory
+  ansible.builtin.file:
+    state: directory
+    path: /srv/backups
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create password file
+  ansible.builtin.copy:
+    dest: /srv/backups/password
+    content: "{{ backup_target.password }}"
+    mode: "0600"
+    owner: root
+    group: root
+
+- name: Create repository password file
+  ansible.builtin.copy:
+    dest: /srv/backups/repository-password
+    content: "{{ backup_target.repository_password }}"
+    mode: "0600"
+    owner: root
+    group: root
+
+# Job-specific tasks
+- name: Create restic backup script
+  ansible.builtin.template:
+    src: restic.sh.j2
+    dest: "/srv/backups/restic-{{ backup_restic_name }}.sh"
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create restic prune script
+  ansible.builtin.template:
+    src: restic-prune.sh.j2
+    dest: "/srv/backups/restic-prune-{{ backup_restic_name }}.sh"
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create restic metrics script
+  ansible.builtin.template:
+    src: restic-metrics.sh.j2
+    dest: "/srv/backups/restic-metrics-{{ backup_restic_name }}.sh"
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create restic util script
+  ansible.builtin.template:
+    src: restic-util.sh.j2
+    dest: /srv/backups/restic-util.sh
+    mode: "0750"
+    owner: root
+    group: root
+
+- name: Create restic excludes file
+  ansible.builtin.copy:
+    dest: "/srv/backups/restic-{{ backup_restic_name }}-excludes.txt"
+    content: "{{ backup_restic_excludes }}"
+    mode: "0640"
+    owner: root
+    group: root
+  when: backup_restic_excludes is defined and backup_restic_excludes
+
+- name: Schedule restic backup job
+  ansible.builtin.cron:
+    name: "Backup restic {{ backup_restic_name }}"
+    user: root
+    job: "/srv/backups/restic-{{ backup_restic_name }}.sh"
+    minute: "{{ backup_restic_cron.minute | default('0') }}"
+    hour: "{{ backup_restic_cron.hour | default('*') }}"
+    day: "{{ backup_restic_cron.day | default('*') }}"
+    month: "{{ backup_restic_cron.month | default('*') }}"
+    weekday: "{{ backup_restic_cron.weekday | default('*') }}"
+
+- name: Schedule restic prune job
+  ansible.builtin.cron:
+    name: "Prune restic {{ backup_restic_name }}"
+    user: root
+    job: "/srv/backups/restic-prune-{{ backup_restic_name }}.sh"
+    minute: "{{ backup_restic_prune_cron.minute | default('27') }}"
+    hour: "{{ backup_restic_prune_cron.hour | default('3') }}"
+    day: "{{ backup_restic_prune_cron.day | default('*') }}"
+    month: "{{ backup_restic_prune_cron.month | default('*') }}"
+    weekday: "{{ backup_restic_prune_cron.weekday | default('6') }}"
