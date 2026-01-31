@@ -11,6 +11,7 @@
       ansible.builtin.package:
         name:
           - openssh
+          - ykman
           - theseal/ssh-askpass/ssh-askpass
         state: present
       when: ansible_facts['os_family'] == 'Darwin'
@@ -53,7 +54,18 @@
         dest: "{{ ansible_facts['user_dir'] }}/.zshrc.d/ssh-agent-yubi.zsh"
         content: |
           eval $(ssh-agent) > /dev/null
-          ssh-add -q $HOME/.ssh/yubi1.key $HOME/.ssh/yubi2.key
+
+          resk() {
+            ssh-add -Dq
+            local serial=$(ykman list --serials 2>/dev/null | head -1)
+            case "$serial" in
+              {{ yubikey_serials[0] }}) ssh-add -q $HOME/.ssh/yubi1.key ;;
+              {{ yubikey_serials[1] }}) ssh-add -q $HOME/.ssh/yubi2.key ;;
+              *)                        ssh-add -q $HOME/.ssh/yubi1.key $HOME/.ssh/yubi2.key ;;
+            esac
+          }
+
+          resk
         mode: '0750'
         owner: "{{ ansible_facts['user_uid'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
@@ -66,7 +78,18 @@
           export SSH_ASKPASS=$(which ssh-askpass)
           export DISPLAY=":0"
           eval $(ssh-agent) > /dev/null
-          ssh-add -q $HOME/.ssh/yubi1.key $HOME/.ssh/yubi2.key
+
+          resk() {
+            ssh-add -Dq
+            local serial=$(ykman list --serials 2>/dev/null | head -1)
+            case "$serial" in
+              {{ yubikey_serials[0] }}) ssh-add -q $HOME/.ssh/yubi1.key ;;
+              {{ yubikey_serials[1] }}) ssh-add -q $HOME/.ssh/yubi2.key ;;
+              *)                        ssh-add -q $HOME/.ssh/yubi1.key $HOME/.ssh/yubi2.key ;;
+            esac
+          }
+
+          resk
         mode: '0750'
         owner: "{{ ansible_facts['user_uid'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
