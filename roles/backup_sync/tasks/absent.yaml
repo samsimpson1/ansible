@@ -1,4 +1,11 @@
 ---
+- name: Remove sync metrics from Push Gateway
+  ansible.builtin.uri:
+    url: "https://prometheus-push.int.simpson.id/metrics/job/backup-sync-{{ backup_sync_name }}"
+    method: DELETE
+    status_code: 202
+  changed_when: false
+
 - name: Remove sync backup cron job
   ansible.builtin.cron:
     name: "Backup sync {{ backup_sync_name }}"

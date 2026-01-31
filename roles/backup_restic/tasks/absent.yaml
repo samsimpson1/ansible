@@ -1,4 +1,11 @@
 ---
+- name: Remove restic metrics from Push Gateway
+  ansible.builtin.uri:
+    url: "https://prometheus-push.int.simpson.id/metrics/job/backup-restic-{{ backup_restic_name }}"
+    method: DELETE
+    status_code: 202
+  changed_when: false
+
 - name: Remove restic backup cron job
   ansible.builtin.cron:
     name: "Backup restic {{ backup_restic_name }}"
