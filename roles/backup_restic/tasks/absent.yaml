@@ -1,0 +1,32 @@
+---
+- name: Remove restic backup cron job
+  ansible.builtin.cron:
+    name: "Backup restic {{ backup_restic_name }}"
+    state: absent
+    user: root
+
+- name: Remove restic prune cron job
+  ansible.builtin.cron:
+    name: "Prune restic {{ backup_restic_name }}"
+    state: absent
+    user: root
+
+- name: Remove restic backup script
+  ansible.builtin.file:
+    path: "/srv/backups/restic-{{ backup_restic_name }}.sh"
+    state: absent
+
+- name: Remove restic prune script
+  ansible.builtin.file:
+    path: "/srv/backups/restic-prune-{{ backup_restic_name }}.sh"
+    state: absent
+
+- name: Remove restic metrics script
+  ansible.builtin.file:
+    path: "/srv/backups/restic-metrics-{{ backup_restic_name }}.sh"
+    state: absent
+
+- name: Remove restic excludes file
+  ansible.builtin.file:
+    path: "/srv/backups/restic-{{ backup_restic_name }}-excludes.txt"
+    state: absent

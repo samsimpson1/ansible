@@ -14,60 +14,101 @@
         user: me
         key: "{{ lookup('file', 'desktop/backup-linux/files/ssh-key.pub') }}"
         comment: restic
-    - name: Backup
+
+    - name: File storage backup
       ansible.builtin.include_role:
-        name: backup
+        name: backup_restic
       vars:
-        backup_jobs:
-          - name: file-storage
-            op: restic
-            path: /srv/containers/storage/hdd/files/
-            cron:
-              minute: "19"
-              hour: "*/2"
-          - name: karakeep
-            op: restic
-            path: /srv/containers/storage/ssd/karakeep/
-            cron:
-              minute: "14"
-              hour: "*/2"
-          - name: pocket-id
-            op: restic
-            path: /srv/containers/storage/ssd/pocket-id/
-            cron:
-              minute: "18"
-              hour: "*/2"
-          - name: desktop-restic
-            op: sync
-            path: /srv/containers/storage/hdd/restic-backup/
-            cron:
-              minute: "49"
-              hour: "*/6"
-          - name: sabnzbd
-            op: restic
-            path: /srv/containers/storage/ssd/sabnzbd/
-            cron:
-              minute: "17"
-              hour: "5"
-            excludes: "/srv/containers/storage/ssd/sabnzbd/Downloads/*"
-          - name: stonks
-            op: restic
-            path: /srv/containers/storage/ssd/stonks/
-            cron:
-              minute: "16"
-              hour: "*/4"
-          - name: vault
-            op: restic
-            path: /srv/containers/storage/ssd/vault/
-            cron:
-              minute: "11"
-              hour: "*/2"
-          - name: certificates
-            op: restic
-            path: /srv/certificates
-            cron:
-              minute: "0"
-              hour: "5"
+        backup_restic_name: file-storage
+        backup_restic_path: /srv/containers/storage/hdd/files/
+        backup_restic_cron:
+          minute: "19"
+          hour: "*/2"
+      tags:
+        - backup
+
+    - name: Karakeep backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: karakeep
+        backup_restic_path: /srv/containers/storage/ssd/karakeep/
+        backup_restic_cron:
+          minute: "14"
+          hour: "*/2"
+      tags:
+        - backup
+
+    - name: Pocket ID backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: pocket-id
+        backup_restic_path: /srv/containers/storage/ssd/pocket-id/
+        backup_restic_cron:
+          minute: "18"
+          hour: "*/2"
+      tags:
+        - backup
+
+    - name: Desktop restic sync
+      ansible.builtin.include_role:
+        name: backup_sync
+      vars:
+        backup_sync_name: desktop-restic
+        backup_sync_path: /srv/containers/storage/hdd/restic-backup/
+        backup_sync_cron:
+          minute: "49"
+          hour: "*/6"
+      tags:
+        - backup
+
+    - name: SABnzbd backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: sabnzbd
+        backup_restic_path: /srv/containers/storage/ssd/sabnzbd/
+        backup_restic_cron:
+          minute: "17"
+          hour: "5"
+        backup_restic_excludes: "/srv/containers/storage/ssd/sabnzbd/Downloads/*"
+      tags:
+        - backup
+
+    - name: Stonks backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: stonks
+        backup_restic_path: /srv/containers/storage/ssd/stonks/
+        backup_restic_cron:
+          minute: "16"
+          hour: "*/4"
+      tags:
+        - backup
+
+    - name: Vault backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: vault
+        backup_restic_path: /srv/containers/storage/ssd/vault/
+        backup_restic_cron:
+          minute: "11"
+          hour: "*/2"
+      tags:
+        - backup
+
+    - name: Certificates backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: certificates
+        backup_restic_path: /srv/certificates
+        backup_restic_cron:
+          minute: "0"
+          hour: "5"
       tags:
         - backup
 

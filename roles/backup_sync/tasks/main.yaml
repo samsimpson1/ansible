@@ -2,9 +2,9 @@
 - name: Present tasks
   ansible.builtin.include_tasks:
     file: present.yaml
-  when: backup_state == 'present'
+  when: backup_sync_state == 'present'
 
 - name: Absent tasks
   ansible.builtin.include_tasks:
     file: absent.yaml
-  when: backup_state == 'absent'
+  when: backup_sync_state == 'absent'

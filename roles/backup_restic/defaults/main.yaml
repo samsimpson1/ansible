@@ -1,0 +1,6 @@
+---
+backup_restic_state: present
+backup_restic_prune_cron:
+  minute: "27"
+  hour: "3"
+  weekday: "6"

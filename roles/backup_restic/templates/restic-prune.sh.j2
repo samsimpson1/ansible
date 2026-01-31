@@ -5,7 +5,7 @@ set -e
 set -x
 
 export RESTIC_PASSWORD_FILE="/srv/backups/repository-password"
-export RESTIC_REPOSITORY="sftp:a:{{ item.name }}"
+export RESTIC_REPOSITORY="sftp:a:{{ backup_restic_name }}"
 SFTP_COMMAND="sshpass -f /srv/backups/password ssh -o StrictHostKeyChecking=no -p 23 {{ backup_target.user }}@{{ backup_target.hostname }} -s sftp"
 
 r() {
@@ -21,4 +21,4 @@ fi
 
 r forget -H 24 -d 7 -w 8 -m 12 -y 2
 
-/srv/backups/restic-metrics-{{ item.name }}.sh
+/srv/backups/restic-metrics-{{ backup_restic_name }}.sh

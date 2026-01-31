@@ -1,0 +1,16 @@
+---
+- name: Remove sync backup cron job
+  ansible.builtin.cron:
+    name: "Backup sync {{ backup_sync_name }}"
+    state: absent
+    user: root
+
+- name: Remove sync backup script
+  ansible.builtin.file:
+    path: "/srv/backups/sync-{{ backup_sync_name }}.sh"
+    state: absent
+
+- name: Remove sync metrics script
+  ansible.builtin.file:
+    path: "/srv/backups/sync-metrics-{{ backup_sync_name }}.sh"
+    state: absent
