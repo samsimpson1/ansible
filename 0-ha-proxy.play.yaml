@@ -9,6 +9,8 @@
     - name: ACME Manager
       ansible.builtin.include_role:
         name: acme_manager
+      vars:
+        acme_manager_hetzner_api_token: "{{ hetzner_api_token }}"
       tags: acme
       when: inventory_hostname == 'little'
     - name: ACME Client

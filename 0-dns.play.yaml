@@ -1,0 +1,180 @@
+- name: DNS
+  hosts: 127.0.0.1
+  connection: local
+  module_defaults:
+    group/hetzner.hcloud.all:
+      api_token: "{{ hetzner_api_token }}"
+  tasks:
+    # simpson.id - A records
+    - name: Create simpson.id root A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "@"
+        type: "A"
+        ttl: "300"
+        records: [value: "82.69.70.238"]
+
+    - name: Create *.int.simpson.id A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "*.int"
+        type: "A"
+        ttl: "3600"
+        records: [value: "10.0.0.191"]
+
+    - name: Create *.srv.simpson.id A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "*.srv"
+        type: "A"
+        ttl: "3600"
+        records: [value: "82.69.70.238"]
+
+    - name: Create box.int.simpson.id A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "box.int"
+        type: "A"
+        ttl: "3600"
+        records: [value: "10.0.0.202"]
+
+    # simpson.id - AAAA records
+    - name: Create *.int.simpson.id AAAA
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "*.int"
+        type: "AAAA"
+        ttl: "3600"
+        records: [value: "2a02:8012:419c:0:eaea:6aff:feb1:d538"]
+
+    # simpson.id - CNAME records
+    - name: Create simpson.id SES DKIM CNAME 1
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "4uqq4zinxoywxkvp4qai3p7jogu42tkt._domainkey.ses"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "4uqq4zinxoywxkvp4qai3p7jogu42tkt.dkim.amazonses.com."]
+
+    - name: Create simpson.id SES DKIM CNAME 2
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "5s6yqmoehzwykvwlpdik7u33kjdy2xqh._domainkey.ses"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "5s6yqmoehzwykvwlpdik7u33kjdy2xqh.dkim.amazonses.com."]
+
+    - name: Create simpson.id SES DKIM CNAME 3
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "dsyxiqjpmkvhlzxeck5plpvv5vojgv7q._domainkey.ses"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "dsyxiqjpmkvhlzxeck5plpvv5vojgv7q.dkim.amazonses.com."]
+
+    - name: Create simpson.id Mailgun email CNAME
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "email.m"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "eu.mailgun.org."]
+
+    - name: Create simpson.id Fastmail DKIM CNAME 1
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "fm1._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "fm1.simpson.id.dkim.fmhosted.com."]
+
+    - name: Create simpson.id Fastmail DKIM CNAME 2
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "fm2._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "fm2.simpson.id.dkim.fmhosted.com."]
+
+    - name: Create simpson.id Fastmail DKIM CNAME 3
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "fm3._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "fm3.simpson.id.dkim.fmhosted.com."]
+
+    - name: Create simpson.id iCloud DKIM CNAME
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "sig1._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "sig1.dkim.simpson.id.at.icloudmailadmin.com."]
+
+    # simpson.id - MX records
+    - name: Create simpson.id root MX
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "@"
+        type: "MX"
+        ttl: "3600"
+        records:
+          - value: "10 in1-smtp.messagingengine.com."
+          - value: "20 in2-smtp.messagingengine.com."
+
+    - name: Create m.simpson.id MX
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "m"
+        type: "MX"
+        ttl: "3600"
+        records:
+          - value: "10 mxa.eu.mailgun.org."
+          - value: "10 mxb.eu.mailgun.org."
+
+    # simpson.id - TXT records
+    - name: Create simpson.id root TXT
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "@"
+        type: "TXT"
+        ttl: "3600"
+        records:
+          - value: "{{ 'MS=ms65763859' | hetzner.hcloud.txt_record }}"
+          - value: "{{ 'apple-domain=WxuR0F5hzoOEQptY' | hetzner.hcloud.txt_record }}"
+          - value: "{{ 'have-i-been-pwned-verification=dweb_9angftq24w5ic3u11mb45yyt' | hetzner.hcloud.txt_record }}"
+          - value: "{{ 'v=spf1 mx include:spf.messagingengine.com -all' | hetzner.hcloud.txt_record }}"
+
+    - name: Create simpson.id atproto TXT
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "_atproto.sam"
+        type: "TXT"
+        ttl: "3600"
+        records: [value: "{{ 'did=did:plc:3h52iqwillalbu2dmh3z2sx5' | hetzner.hcloud.txt_record }}"]
+
+    - name: Create simpson.id DMARC TXT
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "_dmarc"
+        type: "TXT"
+        ttl: "3600"
+        records: [value: "{{ 'v=DMARC1; p=none; rua=mailto:sam+postmaster@simpson.id' | hetzner.hcloud.txt_record }}"]
+
+    - name: Create m.simpson.id TXT
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "m"
+        type: "TXT"
+        ttl: "3600"
+        records: [value: "{{ 'v=spf1 include:eu.mailgun.org ~all' | hetzner.hcloud.txt_record }}"]
+
+    - name: Create simpson.id Mailgun DKIM TXT
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "smtp._domainkey.m"
+        type: "TXT"
+        ttl: "3600"
+        records:
+          - value: "{{ 'k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzKdsFfUHdVuugox58FCxuv7ImXZuBMK0k2NmI8av80EM6WtRit/xJkBeJAaCoXvhoyt9RFBAFVuySzDZJGympDC3T7y0vag7iQnXXz+yzPf3dq2bszIL5XNopPhShl6DzfBwX98puHzU+vVf+EaEHH3kIyvlHHkAl8mFQtYkd/QIDAQAB' | hetzner.hcloud.txt_record }}"
