@@ -22,6 +22,16 @@ Playbooks use a numbered naming convention (`N-*.play.yaml`) indicating executio
 - `ansible-playbook 3-little-backup.play.yaml` - Deploy little host backup configuration
 - `ansible-playbook 3-box-backup.play.yaml` - Deploy box host backup configuration
 
+#### Desktop Playbooks
+Desktop playbooks run locally (`connection: local`) from the repository root:
+- `ansible-playbook desktop/play-work-mac.yaml` - Full macOS workstation setup (packages, shell, AWS)
+- `ansible-playbook desktop/play-work-mac-packages.yaml` - macOS package installation only
+- `ansible-playbook desktop/play-secure-boot.yaml` - Arch Linux Secure Boot setup
+- `ansible-playbook desktop/shell/playbook.yaml` - Shell configuration (zsh, starship)
+- `ansible-playbook desktop/shell-ssh/playbook.yaml` - SSH and Git signing with YubiKey
+- `ansible-playbook desktop/shell-aws/playbook.yaml` - AWS CLI and work shell setup
+- `ansible-playbook desktop/backup-linux/playbook.yaml` - Linux desktop backup via Restic
+
 #### Dry-run (Check Mode)
 Add `--check` flag to any playbook command for dry-run mode:
 - `ansible-playbook 1-little-infrastructure.play.yaml --check`
@@ -162,6 +172,25 @@ Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Appl
 - **Knot** - DNS server
 - **Vault** - Secrets management
 
+## Desktop Configuration
+
+The `desktop/` directory contains playbooks for configuring local developer workstations. Unlike server playbooks, these run locally (`connection: local`, `hosts: 127.0.0.1`) and do not use custom roles — tasks are defined inline.
+
+### Top-level Playbooks
+
+- **play-work-mac.yaml** - Main macOS orchestrator; imports package installation, shell, and shell-aws playbooks
+- **play-work-mac-packages.yaml** - Installs macOS packages via Homebrew (1Password, Firefox, Ghostty, VS Code, etc.) and configures Ghostty terminal with Catppuccin theme
+- **play-secure-boot.yaml** - Arch Linux Secure Boot: installs signing tools, creates a MOK signing script, and registers a pacman hook to auto-sign kernel and bootloader on updates
+
+### Modular Sub-playbooks
+
+These are reusable across macOS and Linux and can be run independently:
+
+- **shell/** - Zsh environment with fzf, syntax highlighting, autosuggestions, and Starship prompt. OS-aware plugin path configuration (macOS Homebrew vs Arch system paths).
+- **shell-ssh/** - SSH and Git signing with YubiKey support. Deploys key handles for two YubiKeys, a detection script that selects the correct signing key based on which YubiKey is plugged in, SSH client config with shortcuts for `little` and `box`, and OS-specific ssh-agent startup (macOS uses ssh-askpass).
+- **shell-aws/** - AWS CLI for work environments. Configures multiple accounts and roles, installs awsume with YubiKey and 1Password MFA plugins, and provides shell shortcuts for role assumption and session recording.
+- **backup-linux/** - Restic-based desktop backup via systemd user timer (every 2 hours). Backs up to the `little` host over SFTP, excludes caches and large media, and pushes metrics to Prometheus pushgateway.
+
 ## Important Patterns
 
 ### Service Definitions
@@ -246,7 +275,7 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 - **Host variables**: `host_vars/` (little.yaml, box.yaml for HA Proxy configuration)
 - **Group variables**: `group_vars/all/` (container-images.yaml, sites.yaml, secret.yaml)
 - **Playbook variables**: `vars/` (backup.yaml, concourse.yaml, tandoor.yaml)
-- **Desktop playbooks**: `desktop/` directory
+- **Desktop playbooks**: `desktop/` directory (local workstation setup for macOS and Linux, see Desktop Configuration section)
 
 ## Development Workflow
 1. **For faster iterations**: Use split playbooks (e.g., `ansible-playbook 2-little-apps.play.yaml` for app changes, `ansible-playbook 1-little-infrastructure.play.yaml` for system changes)
@@ -275,6 +304,7 @@ The numbered prefix indicates execution order:
 
 - Ansible YAML files must always end in a new line
 - Ansible task names should always start with an upper case letter
+- Tasks in Ansible task lists should be separated by an empty line
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
