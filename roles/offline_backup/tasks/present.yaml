@@ -10,7 +10,7 @@
     - mount
 - name: Create offline backup script
   ansible.builtin.copy:
-    content: "{{ lookup('file', 'offline_backup.ab') | amber_compile }}"
+    src: offline_backup.sh
     dest: "{{ offline_backup_directory }}/offline_backup.sh"
     mode: '0750'
     owner: root
