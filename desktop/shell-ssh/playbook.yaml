@@ -103,6 +103,14 @@
         owner: "{{ ansible_facts['user_uid'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
 
+    - name: Create gitignore
+      ansible.builtin.copy:
+        src: files/gitignore
+        dest: "{{ ansible_facts['user_dir'] }}/.gitignore"
+        mode: '0600'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+
     - name: Create ssh config
       ansible.builtin.copy:
         src: files/ssh_config
