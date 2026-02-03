@@ -178,3 +178,107 @@
         ttl: "3600"
         records:
           - value: "{{ 'k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzKdsFfUHdVuugox58FCxuv7ImXZuBMK0k2NmI8av80EM6WtRit/xJkBeJAaCoXvhoyt9RFBAFVuySzDZJGympDC3T7y0vag7iQnXXz+yzPf3dq2bszIL5XNopPhShl6DzfBwX98puHzU+vVf+EaEHH3kIyvlHHkAl8mFQtYkd/QIDAQAB' | hetzner.hcloud.txt_record }}"
+
+    # sams.wtf - A records
+    - name: Create sams.wtf root A
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "@"
+        type: "A"
+        ttl: "3600"
+        records: [value: "82.69.70.238"]
+
+    # sams.wtf - CNAME records
+    - name: Create email.m.sams.wtf CNAME
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "email.m"
+        type: "CNAME"
+        ttl: "13600"
+        records: [value: "eu.mailgun.org."]
+
+    - name: Create sams.wtf Fastmail DKIM CNAME 1
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "fm1._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "fm1.sams.wtf.dkim.fmhosted.com."]
+
+    - name: Create sams.wtf Fastmail DKIM CNAME 2
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "fm2._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "fm2.sams.wtf.dkim.fmhosted.com."]
+
+    - name: Create sams.wtf Fastmail DKIM CNAME 3
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "fm3._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "fm3.sams.wtf.dkim.fmhosted.com."]
+
+    - name: Create git.sams.wtf CNAME
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "git"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "sams.wtf."]
+
+    - name: Create sams.wtf iCloud DKIM CNAME
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "sig1._domainkey"
+        type: "CNAME"
+        ttl: "3600"
+        records: [value: "sig1.dkim.sams.wtf.at.icloudmailadmin.com."]
+
+    # sams.wtf - MX records
+    - name: Create sams.wtf root MX
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "@"
+        type: "MX"
+        ttl: "3600"
+        records:
+          - value: "10 in1-smtp.messagingengine.com."
+          - value: "20 in2-smtp.messagingengine.com."
+
+    - name: Create m.sams.wtf MX
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "m"
+        type: "MX"
+        ttl: "3600"
+        records:
+          - value: "10 mxa.eu.mailgun.org."
+          - value: "10 mxb.eu.mailgun.org."
+
+    # sams.wtf - TXT records
+    - name: Create sams.wtf root TXT
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "@"
+        type: "TXT"
+        ttl: "3600"
+        records: [value: "{{ 'v=spf1 include:spf.messagingengine.com mx -all' | hetzner.hcloud.txt_record }}"]
+
+    - name: Create _dmarc.sams.wtf TXT
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "_dmarc"
+        type: "TXT"
+        ttl: "3600"
+        records: [value: "{{ 'v=DMARC1; p=none; rua=mailto:me+postmaster@sams.wtf' | hetzner.hcloud.txt_record }}"]
+
+    - name: Create m.sams.wtf TXT
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "m"
+        type: "TXT"
+        ttl: "3600"
+        records: [value: "{{ 'v=spf1 include:eu.mailgun.org ~all' | hetzner.hcloud.txt_record }}"]
