@@ -85,6 +85,7 @@
         backup_restic_cron:
           minute: "16"
           hour: "*/4"
+        backup_restic_forget_policy: "-H 24 -d 7 -w 8 -m 6 -y 0"
       tags:
         - backup
 
