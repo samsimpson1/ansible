@@ -4,3 +4,4 @@ backup_restic_prune_cron:
   minute: "27"
   hour: "3"
   weekday: "6"
+backup_restic_forget_policy: "-H 24 -d 7 -w 8 -m 12 -y 2"
