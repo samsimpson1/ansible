@@ -19,7 +19,25 @@ fi
 
 $RESTIC backup --exclude-file $HOME/.restic-backup/excludes.txt "/home/sam"
 
-$RESTIC forget -H 24 -d 7 -w 8 -m 12 -y 2
+LAST_FORGET_FILE="$HOME/.restic-backup/last_forget"
+FORGET_INTERVAL=$((3 * 24 * 60 * 60))
+
+run_forget=true
+if [[ -f "$LAST_FORGET_FILE" ]]; then
+    last_forget=$(cat "$LAST_FORGET_FILE")
+    now=$(date +%s)
+    if (( now - last_forget < FORGET_INTERVAL )); then
+        run_forget=false
+        echo "skipping forget, last run $(( (now - last_forget) / 3600 )) hours ago"
+    fi
+fi
+
+if [[ "$run_forget" == true ]]; then
+    $RESTIC unlock
+    $RESTIC forget -H 24 -d 7 -w 8 -m 12 -y 2
+    $RESTIC prune
+    date +%s > "$LAST_FORGET_FILE"
+fi
 
 STATS=$($RESTIC stats --json --mode raw-data)
 SIZE_BYTES=$(jq -r '.total_size' <<< "${STATS}")
