@@ -39,5 +39,7 @@ ExecStart=/usr/bin/docker run --rm \
 ExecStop=/usr/bin/docker stop {{ docker_service_id }}
 ExecReload=/usr/bin/docker restart {{ docker_service_id }}
 
+{{ docker_service_extra_systemd_content }}
+
 [Install]
 WantedBy=multi-user.target
