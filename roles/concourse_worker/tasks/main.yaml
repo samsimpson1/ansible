@@ -25,6 +25,8 @@
       - "{{ concourse_worker_data_directory }}/keys:/concourse-keys:ro"
       - "{{ concourse_worker_data_directory }}/work:{{ concourse_worker_data_directory }}/work"
     docker_service_state: "{{ concourse_worker_state }}"
+    docker_service_extra_systemd_content: |
+      ExecStartPre=/usr/bin/bash -c 'rm -r {{ concourse_worker_data_directory }}/work/* || true'
 
 - name: Absent tasks
   ansible.builtin.include_tasks:
