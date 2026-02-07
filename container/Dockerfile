@@ -8,6 +8,6 @@ RUN apt-get update && apt-get install -y curl gnupg sudo && \
 
 RUN apt-get update && apt-get install -y git openssh-client python3-pip 1password-cli
 
-RUN pip install --break-system-packages ansible ansible-lint
+RUN pip install --break-system-packages ansible ansible-lint requests
 
 LABEL org.opencontainers.image.source="https://github.com/samsimpson1/ansible"
