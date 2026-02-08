@@ -122,3 +122,13 @@ groups:
         annotations:
           summary: "Storage box {{ $labels.storage_box }} low on free space"
           description: "The storage box {{ $labels.storage_box }} is over 90% full."
+
+      - alert: VaultIsSealed
+        expr: vault_sealed_bool == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: vault
+        annotations:
+          summary: "Vault is sealed"
+          description: "Vault is currently sealed."

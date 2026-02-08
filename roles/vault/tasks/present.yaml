@@ -40,3 +40,18 @@
     group: vault
     mode: '0640'
   notify: Restart vault service
+
+- name: Create Vault health pusher script
+  ansible.builtin.copy:
+    src: vault_health_pusher.sh
+    dest: "{{ vault_directory }}/vault_health_pusher.sh"
+    owner: vault
+    group: vault
+    mode: '0750'
+
+- name: Schedule Vault health pusher cron job
+  ansible.builtin.cron:
+    name: "Vault Health Pusher"
+    user: vault
+    minute: "*/5"
+    job: "{{ vault_directory }}/vault_health_pusher.sh"

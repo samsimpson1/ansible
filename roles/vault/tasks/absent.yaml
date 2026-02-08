@@ -13,3 +13,9 @@
   ansible.builtin.user:
     name: vault
     state: absent
+
+- name: Remove Vault health pusher cron job
+  ansible.builtin.cron:
+    name: "Vault Health Pusher"
+    user: vault
+    state: absent
