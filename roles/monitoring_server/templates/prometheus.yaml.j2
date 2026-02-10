@@ -39,3 +39,7 @@ scrape_configs:
       - targets: ["prometheus-pushgateway:9091"]
         labels:
           environment: homelab
+
+  - job_name: "stonks-scraper"
+    static_configs:
+      - targets: ["stonks-scraper:9100"]
