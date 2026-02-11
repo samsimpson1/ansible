@@ -1,5 +1,7 @@
 - name: Linux packages
   ansible.builtin.import_playbook: play-linux-packages.yaml
+- name: Linux Backup
+  ansible.builtin.import_playbook: backup-linux/playbook.yaml
 - name: Shell
   ansible.builtin.import_playbook: shell/playbook.yaml
 - name: SSH Shell
