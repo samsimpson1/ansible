@@ -1,0 +1,15 @@
+# a playbook for installing required user packages
+- name: Desktop Packages
+  hosts: 127.0.0.1
+  connection: local
+  become: true
+  tasks:
+    - name: Install packages
+      ansible.builtin.package:
+        name:
+          - ansible
+          - ansible-lint
+          - aws-cli-v2
+          - terraform
+          - uv
+        state: present
