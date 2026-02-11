@@ -4,3 +4,5 @@
   ansible.builtin.import_playbook: shell/playbook.yaml
 - name: AWS Shell
   ansible.builtin.import_playbook: shell-aws/playbook.yaml
+- name: SSH Shell
+  ansible.builtin.import_playbook: shell-ssh/playbook.yaml
