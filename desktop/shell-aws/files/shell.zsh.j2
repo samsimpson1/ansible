@@ -14,6 +14,10 @@ ce() {
   awsume --role-duration "3600" -c "${1}-platformengineer"
 }
 
+cr() {
+  awsume -c "${1}-readonly"
+}
+
 govuk_awsume() {
   ${HOME}/bin/aws-subshell.sh $@
 }
@@ -34,4 +38,10 @@ ee() {
   ENV_NAME="${1}"
   shift
   govuk_awsume "${ENV_NAME}" "platformengineer" "$@"
+}
+
+er() {
+  ENV_NAME="${1}"
+  shift
+  govuk_awsume "${ENV_NAME}" "readonly" "$@"
 }
