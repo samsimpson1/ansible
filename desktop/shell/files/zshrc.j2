@@ -10,6 +10,10 @@ setopt autocd
 
 autoload -U colors
 
+# Word navigation with Ctrl+Left/Right
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+
 # Install fzf
 source <(fzf --zsh)
 
