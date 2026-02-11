@@ -10,5 +10,7 @@
   gpgsign = true
 [push]
   autoSetupRemote = true
+[pull]
+  rebase = true
 [core]
   excludesFile = {{ ansible_facts['user_dir'] }}/.gitignore
