@@ -38,3 +38,4 @@ container_images:
   alpine_chrome: gcr.io/zenika-hub/alpine-chrome:124
   nginx: nginx:1.29.4
   forgejo: codeberg.org/forgejo/forgejo:14.0.2
+  stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
