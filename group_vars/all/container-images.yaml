@@ -4,8 +4,8 @@ container_images:
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
   prometheus: prom/prometheus:v3.9.1
   prometheus_pushgateway: prom/pushgateway:v1.11.2
-  alertmanager: prom/alertmanager:v0.30.0
-  grafana: grafana/grafana:12.3.1
+  alertmanager: prom/alertmanager:v0.31.1
+  grafana: grafana/grafana:12.3.2
   concourse_web: concourse/concourse:8.0.1
   concourse_worker: concourse/concourse:8.0.1
   concourse_postgres: postgres:18
