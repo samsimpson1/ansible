@@ -9,7 +9,7 @@ container_images:
   concourse_web: concourse/concourse:8.0.1
   concourse_worker: concourse/concourse:8.0.1
   concourse_postgres: postgres:18
-  vault: hashicorp/vault:1.21.2
+  vault: hashicorp/vault:1.21.3
   knot: tngl/knot:v1.10.0-alpha
   filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.1.1-stable
   litestream: litestream/litestream:0.5.6
