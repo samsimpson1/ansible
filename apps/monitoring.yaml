@@ -1,7 +1,0 @@
-- name: Monitoring server
-  ansible.builtin.include_role:
-    name: monitoring_server
-  vars:
-    monitoring_server_grafana_extra_volumes:
-      - "/srv/containers/storage/ssd/stonks:/stonks:rw"
-      - "/srv/containers/storage/ssd/nutrition:/nutrition:rw"

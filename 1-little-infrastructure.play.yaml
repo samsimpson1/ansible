@@ -7,43 +7,38 @@
         user: me
         state: present
         key: "{{ lookup('file', 'github-actions.pub') }}"
-      tags:
-        - github-ssh
+
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
-      tags:
-        - tailscale
+
     - name: Docker
       ansible.builtin.include_role:
         name: docker_host
-      tags:
-        - docker
+
     - name: SSMTP
       ansible.builtin.include_role:
         name: ssmtp
-      tags:
-        - ssmtp
+
     - name: Caddy
       ansible.builtin.include_tasks: apps/caddy.yaml
-      tags:
-        - caddy
+
     - name: Pocket ID
       ansible.builtin.include_role:
         name: pocket_id
       vars:
         pocket_id_role: primary
-      tags:
-        - pocket-id
-    - name: Monitoring
-      ansible.builtin.include_tasks: apps/monitoring.yaml
-      tags:
-        - monitoring
-        - prometheus
-        - grafana
-        - node-exporter
+
+
+    - name: Monitoring server
+      ansible.builtin.include_role:
+        name: monitoring_server
+      vars:
+        monitoring_server_grafana_extra_volumes:
+          - "/srv/containers/storage/ssd/stonks:/stonks:rw"
+          - "/srv/containers/storage/ssd/nutrition:/nutrition:rw"
+
     - name: Vault
       ansible.builtin.include_role:
         name: vault
-      tags:
-        - vault
+
