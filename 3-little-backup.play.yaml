@@ -89,6 +89,18 @@
       tags:
         - backup
 
+    - name: KOSync backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: kosync
+        backup_restic_path: /srv/containers/storage/ssd/kosync/
+        backup_restic_cron:
+          minute: "12"
+          hour: "*/4"
+      tags:
+        - backup
+
     - name: Vault backup
       ansible.builtin.include_role:
         name: backup_restic

@@ -1,0 +1,16 @@
+- name: KOSync data directory
+  ansible.builtin.file:
+    path: /srv/containers/storage/ssd/kosync
+    state: directory
+    mode: '0750'
+
+- name: KOSync service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "kosync"
+    docker_service_description: "KOReader Sync Server"
+    docker_service_image: "{{ container_images.kosync }}"
+    docker_service_network: source_default
+    docker_service_volumes:
+      - /srv/containers/storage/ssd/kosync/redis-data:/var/lib/redis

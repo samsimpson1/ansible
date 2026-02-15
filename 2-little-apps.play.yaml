@@ -38,3 +38,7 @@
     - name: Filebrowser
       ansible.builtin.include_role:
         name: filebrowser
+    - name: KOSync
+      ansible.builtin.include_tasks: apps/kosync.yaml
+      tags:
+        - kosync

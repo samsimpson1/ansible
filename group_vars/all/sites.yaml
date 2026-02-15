@@ -127,6 +127,9 @@ sites:
       - name: garage
         target: "http://10.0.0.191:3903"
         host: little
+      - name: ko-sync
+        target: "http://kosync:17200"
+        host: little
       - name: prowlarr
         target: "http://prowlarr:80"
         host: little
