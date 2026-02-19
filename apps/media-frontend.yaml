@@ -18,7 +18,6 @@
     - lms/config
     - lms/playlists
     - navidrome
-    - komga
     - overseerr
     - pinchflat
 
@@ -141,6 +140,7 @@
     docker_service_network: source_default
     docker_service_user: "568"
     docker_service_groups: ["568"]
+    docker_service_state: absent
     docker_service_volumes:
       - "/srv/containers/storage/ssd/komga:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
