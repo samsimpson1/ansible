@@ -1,5 +1,11 @@
 /home/sam/.cache/*
 /home/sam/.local/*
+!/home/sam/.local/share
+/home/sam/.local/share/containers
+/home/sam/.local/share/flatpak
+/home/sam/.local/share/JetBrains
+/home/sam/.local/share/NuGet
+/home/sam/.local/share/Steam
 /home/sam/.ollama/*
 /home/sam/Scratch/*
 /home/sam/g/*
