@@ -28,7 +28,6 @@ container_images:
   audiobookshelf: ghcr.io/advplyr/audiobookshelf:2.32.1
   lyrion: lmscommunity/lyrionmusicserver:9.1.0
   navidrome: deluan/navidrome:latest
-  komga: ghcr.io/gotson/komga:1.24.1
   overseerr: ghcr.io/sct/overseerr:1.34.0
   pinchflat: ghcr.io/kieraneglin/pinchflat:v2025.6.6
   freshrss: freshrss/freshrss:1.28.0
