@@ -38,3 +38,4 @@ container_images:
   nginx: nginx:1.29.5
   forgejo: codeberg.org/forgejo/forgejo:14.0.2
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
+  kavita: ghcr.io/kareadita/kavita:0.8.9

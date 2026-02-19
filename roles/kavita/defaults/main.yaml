@@ -1,0 +1,4 @@
+kavita_data_directory: "/srv/containers/storage/ssd/kavita"
+kavita_media_directory: "/srv/containers/storage/hdd/media"
+kavita_state: "present"
+kavita_network: "source_default"

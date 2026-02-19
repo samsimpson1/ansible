@@ -1,0 +1,32 @@
+---
+- name: Create kavita data directory
+  ansible.builtin.file:
+    path: "{{ kavita_data_directory }}"
+    state: directory
+    owner: app
+    group: app
+    mode: '0750'
+  when: kavita_state == 'present'
+
+- name: Kavita service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "kavita"
+    docker_service_description: "Kavita reading server"
+    docker_service_image: "{{ container_images.kavita }}"
+    docker_service_network: "{{ kavita_network }}"
+    docker_service_user: "568"
+    docker_service_groups: ["568"]
+    docker_service_env_vars:
+      TZ: "Europe/London"
+    docker_service_volumes:
+      - "{{ kavita_data_directory }}:/kavita/config"
+      - "{{ kavita_media_directory }}:/media:ro"
+    docker_service_state: "{{ kavita_state }}"
+
+- name: Remove kavita data directory
+  ansible.builtin.file:
+    path: "{{ kavita_data_directory }}"
+    state: absent
+  when: kavita_state == 'absent'

@@ -121,6 +121,9 @@ sites:
     kind: internal
     wildcard: true
     routes:
+      - name: books
+        target: "http://kavita:5000"
+        host: little
       - name: firefly-di
         target: "http://firefly-iii-data-importer:8080"
         host: little

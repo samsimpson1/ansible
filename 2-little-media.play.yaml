@@ -29,3 +29,7 @@
         - komga
         - overseerr
         - pinchflat
+
+    - name: Kavita
+      ansible.builtin.include_role:
+        name: kavita
