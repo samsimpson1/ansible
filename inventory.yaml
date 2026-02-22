@@ -6,3 +6,9 @@ home:
     box:
       ansible_host: 10.0.0.202
       ansible_user: me
+
+cloud:
+  hosts:
+    nextcloud:
+      ansible_host: 89.167.54.101
+      ansible_user: root

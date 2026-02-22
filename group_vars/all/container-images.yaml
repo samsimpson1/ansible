@@ -39,3 +39,4 @@ container_images:
   forgejo: codeberg.org/forgejo/forgejo:14.0.2
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
   kavita: ghcr.io/kareadita/kavita:0.8.9
+  nextcloud_aio: ghcr.io/nextcloud-releases/all-in-one:20260218_123804

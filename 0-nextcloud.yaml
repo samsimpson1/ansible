@@ -1,0 +1,95 @@
+- name: Nextcloud
+  hosts: nextcloud
+  become: false
+  vars:
+    nextcloud_data_volume_id: "104743661"
+  vars_files:
+    - vars/backup.yaml
+  tasks:
+    - name: Tailscale
+      ansible.builtin.include_role:
+        name: tailscale
+      vars:
+        tailscale_accept_routes: true
+
+    - name: Docker
+      ansible.builtin.include_role:
+        name: docker_host
+
+    - name: Unmount default data volume
+      ansible.posix.mount:
+        path: "/mnt/HC_Volume_{{ nextcloud_data_volume_id }}"
+        state: absent
+
+    - name: Nextcloud data volume directory
+      ansible.builtin.file:
+        path: "/srv/nextcloud-data"
+        owner: root
+        group: root
+        mode: "0750"
+        state: directory
+
+    - name: Nextcloud data volume filesystem
+      community.general.filesystem:
+        fstype: ext4
+        dev: "/dev/disk/by-id/scsi-0HC_Volume_{{ nextcloud_data_volume_id }}"
+        state: present
+
+    - name: Mount Nextcloud data volume
+      ansible.posix.mount:
+        path: "/srv/nextcloud-data"
+        src: "/dev/disk/by-id/scsi-0HC_Volume_{{ nextcloud_data_volume_id }}"
+        fstype: ext4
+        state: mounted
+
+    - name: Create Docker volumes directory
+      ansible.builtin.file:
+        path: "/srv/nextcloud-data/docker-volumes"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Remove default Docker volumes directory
+      ansible.builtin.file:
+        path: "/var/lib/docker/volumes"
+        state: absent
+
+    - name: Link Docker volumes directory
+      ansible.builtin.file:
+        src: "/srv/nextcloud-data/docker-volumes"
+        path: "/var/lib/docker/volumes"
+        state: link
+
+    - name: Nextcloud AIO volume
+      community.general.docker_volume:
+        name: "nextcloud_aio_mastercontainer"
+        state: present
+
+    - name: Nextcloud AIO service
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "nextcloud-aio-mastercontainer"
+        docker_service_description: "Nextcloud AIO"
+        docker_service_image: "{{ container_images.nextcloud_aio }}"
+        docker_service_env_vars:
+          AIO_DISABLE_BACKUP_SECTION: "true"
+        docker_service_volumes:
+          - "nextcloud_aio_mastercontainer:/mnt/docker-aio-config:rw"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        docker_service_ports:
+          - "80:80"
+          - "8080:8080"
+          - "8443:8443"
+        docker_service_state: present
+
+    - name: Nextcloud backups
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: "nextcloud-nextcloud"
+        backup_restic_path: /srv/nextcloud-data/docker-volumes
+        backup_restic_cron:
+          minute: "07"
+          hour: "*/2"

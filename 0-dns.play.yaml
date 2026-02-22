@@ -188,6 +188,14 @@
         ttl: "3600"
         records: [value: "82.69.70.238"]
 
+    - name: Create cloud.sams.wtf A
+      hetzner.hcloud.zone_rrset:
+        zone: sams.wtf
+        name: "cloud"
+        type: "A"
+        ttl: "3600"
+        records: [value: "89.167.54.101"]
+
     # sams.wtf - CNAME records
     - name: Create email.m.sams.wtf CNAME
       hetzner.hcloud.zone_rrset:
