@@ -38,6 +38,7 @@
       --auth-key={{ tailscale_oauth_key }}
       --hostname={{ ansible_facts['hostname'] }}
       --advertise-tags={{ tailscale_tags | join(',') }}
+      --accept-routes={{ tailscale_accept_routes | ternary('true', 'false') }}
   register: tailscale_up
   # tailscale status returns 130 if not connected to tailnet
   changed_when: "tailscale_status.rc == 130"

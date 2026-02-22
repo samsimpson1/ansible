@@ -1,3 +1,4 @@
 tailscale_state: present
 tailscale_tags:
   - "tag:automation"
+tailscale_accept_routes: false
