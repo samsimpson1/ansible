@@ -31,7 +31,7 @@ container_images:
   overseerr: ghcr.io/sct/overseerr:1.34.0
   pinchflat: ghcr.io/kieraneglin/pinchflat:v2025.6.6
   freshrss: freshrss/freshrss:1.28.0
-  home_assistant: ghcr.io/home-assistant/home-assistant:2026.2.1
+  home_assistant: ghcr.io/home-assistant/home-assistant:2026.2.3
   karakeep: ghcr.io/karakeep-app/karakeep:0.30.0
   karakeep_meilisearch: getmeili/meilisearch:v1.13.3
   alpine_chrome: gcr.io/zenika-hub/alpine-chrome:124
