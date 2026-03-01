@@ -12,7 +12,7 @@
       ansible.builtin.include_role:
         name: nginx
       vars:
-        nginx_state: absent
+        nginx_state: present
 
     - name: App user
       ansible.builtin.include_tasks: apps/app-user.yaml
@@ -86,6 +86,14 @@
         concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
         concourse_web_onepassword_service_account_token: "{{ concourse_onepassword_service_account_token }}"
         concourse_web_vault_token: "{{ concourse_vault_token }}"
+
+    - name: Concourse nginx service
+      ansible.builtin.include_role:
+        name: nginx_service
+      vars:
+        nginx_service_kind: external
+        nginx_service_hostname: ci.srv.simpson.id
+        nginx_service_target: "http://concourse-web:8080"
 
     - name: Concourse Worker
       ansible.builtin.include_role:

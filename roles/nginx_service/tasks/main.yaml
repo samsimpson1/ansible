@@ -1,0 +1,16 @@
+- name: Create nginx service config file
+  ansible.builtin.template:
+    src: server.conf.j2
+    dest: "{{ nginx_directory }}/{{ nginx_service_kind }}.d/{{ nginx_service_hostname }}.conf"
+    mode: "0644"
+    owner: root
+    group: root
+  vars:
+    host: "{{ nginx_hosts | selectattr('name', 'equalto', nginx_service_kind) | first }}"
+  when: nginx_service_state == "present"
+
+- name: Remove nginx service config file
+  ansible.builtin.file:
+    path: "{{ nginx_directory }}/{{ nginx_service_kind }}.d/{{ nginx_service_hostname }}.conf"
+    state: absent
+  when: nginx_service_state == "absent"

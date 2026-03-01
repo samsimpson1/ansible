@@ -2,3 +2,8 @@ ha_proxy_keepalived_state: BACKUP
 ha_proxy_interface: enp1s0
 ha_proxy_priority: "100"
 ha_proxy_directory: /srv/app/caddy-ha
+
+nginx_hosts:
+  - name: external
+    listen_port: 8925
+    certificate_name: srv.simpson.id

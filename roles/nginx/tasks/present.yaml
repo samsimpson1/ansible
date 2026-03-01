@@ -1,11 +1,14 @@
 ---
-- name: Nginx directory
+- name: Nginx directories
   ansible.builtin.file:
-    path: "{{ nginx_directory }}"
+    path: "{{ nginx_directory }}/{{ item }}"
     state: directory
     owner: app
     group: app
     mode: '0750'
+  loop:
+    - ""
+    - "sites.d"
 
 - name: Nginx config file
   ansible.builtin.template:

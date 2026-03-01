@@ -1,0 +1,3 @@
+nginx_service_kind: internal
+nginx_service_hostname: null
+nginx_service_state: present

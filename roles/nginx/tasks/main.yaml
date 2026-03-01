@@ -17,7 +17,7 @@
     docker_service_volumes:
       - "/srv/certificates:/certificates:ro"
       - "{{ nginx_directory }}/nginx.conf:/etc/nginx/nginx.conf:ro"
-    docker_service_state: "{{ nginx_state }}"
+    docker_service_state: "absent"
 
 - name: Absent tasks
   ansible.builtin.include_tasks:
