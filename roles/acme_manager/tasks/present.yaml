@@ -81,7 +81,7 @@
   ansible.builtin.command:
     cmd: >
       {{ acme_manager_install_dir }}/acme.sh --issue
-      --dns dns_hetzner
+      --dns dns_hetznercloud
       -d {{ item.name }}
       {% if item.wildcard | default(false) %}-d *.{{ item.name }}{% endif %}
       --cert-file {{ acme_manager_cert_dir }}/{{ item.name }}/cert.pem
@@ -91,8 +91,7 @@
     creates: "{{ acme_manager_cert_dir }}/{{ item.name }}/cert.pem"
   loop: "{{ sites }}"
   environment:
-    CF_Account_ID: "{{ acme_manager_cloudflare_account_id }}"
-    CF_Token: "{{ acme_manager_cloudflare_account_token }}"
+    HETZNER_TOKEN: "{{ acme_manager_hetzner_api_token }}"
 
 - name: Set certificate directory permissions
   ansible.builtin.file:
