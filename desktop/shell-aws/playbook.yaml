@@ -10,6 +10,7 @@
           staging: "696911096973"
           integration: "210287912431"
           tools: "900804735337"
+          test: "430354129336"
         aws_roles:
           - developer
           - platformengineer
