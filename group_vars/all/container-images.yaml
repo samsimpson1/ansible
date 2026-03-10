@@ -30,7 +30,7 @@ container_images:
   navidrome: deluan/navidrome:latest
   overseerr: ghcr.io/sct/overseerr:1.35.0
   pinchflat: ghcr.io/kieraneglin/pinchflat:v2025.6.6
-  freshrss: freshrss/freshrss:1.28.0
+  freshrss: freshrss/freshrss:1.28.1
   home_assistant: ghcr.io/home-assistant/home-assistant:2026.3.1
   karakeep: ghcr.io/karakeep-app/karakeep:0.31.0
   karakeep_meilisearch: getmeili/meilisearch:v1.13.3
