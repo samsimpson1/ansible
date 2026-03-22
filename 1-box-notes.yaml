@@ -30,10 +30,20 @@
         state: directory
         owner: notes
         group: notes
-        mode: "0750"
+        mode: "0700"
       loop:
         - "Obsidian"
         - "Recordings"
+        - ".config"
+        - ".config/obsidian-headless"
+
+    - name: Create Obsidian auth_token file
+      ansible.builtin.copy:
+        content: "{{ obsidian_auth_token }}"
+        dest: "/home/notes/.config/obsidian-headless/auth_token"
+        owner: notes
+        group: notes
+        mode: "0600"
 
     - name: Set facts
       ansible.builtin.set_fact:
