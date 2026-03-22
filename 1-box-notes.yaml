@@ -3,6 +3,7 @@
   become: true
   vars_files:
     - vars/obsidian.yaml
+    - vars/backup.yaml
   tasks:
     - name: Create notes user
       ansible.builtin.user:
@@ -67,3 +68,13 @@
           HOME: "/home"
         docker_service_volumes:
           - "/home/notes:/home"
+
+    - name: Vault backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: box-obsidian
+        backup_restic_path: /home/notes/Obsidian
+        backup_restic_cron:
+          minute: "54"
+          hour: "*/2"
