@@ -5,6 +5,11 @@
     - vars/obsidian.yaml
     - vars/backup.yaml
   tasks:
+    - name: Install ffmpeg
+      ansible.builtin.package:
+        name: ffmpeg
+        state: present
+
     - name: Create notes user
       ansible.builtin.user:
         name: notes
@@ -78,6 +83,40 @@
           HOME: "/home"
         docker_service_volumes:
           - "/home/notes:/home"
+
+    - name: Create processing script
+      ansible.builtin.copy:
+        content: |
+          #!/usr/bin/env bash
+
+          FILE_NAME="${1}"
+          FILE_EXT="${2}"
+
+          OUT_FILE="/home/notes/Recordings/${FILE_NAME}.${FILE_EXT}"
+
+          if [ -f "${OUT_FILE}" ]; then
+            echo "File ${OUT_FILE} already exists"
+            exit 0
+          fi
+
+          cp /dev/stdin /home/notes/Recordings/${FILE_NAME}.${FILE_EXT}
+
+          ffmpeg -y -i "/home/notes/Recordings/${FILE_NAME}.${FILE_EXT}" "/home/notes/Recordings/${FILE_NAME}.mp3"
+
+          API_KEY="{{ obsidian_api_key }}"
+          NOTES_PATH="/home/notes/Obsidian/Voice"
+
+          docker run --rm -i \
+            -e "API_KEY=$API_KEY" \
+            -e "NOTES_PATH=$NOTES_PATH" \
+            -v "/home/notes:/home/notes" \
+            -u $(id -u notes):$(id -g notes) \
+            ghcr.io/samsimpson1/notes-agent:2026.3.23-215648 \
+            "/home/notes/Recordings/${FILE_NAME}.mp3"
+        dest: /home/notes/process.sh
+        owner: notes
+        group: notes
+        mode: "0750"
 
     - name: Vault backup
       ansible.builtin.include_role:
