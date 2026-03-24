@@ -104,7 +104,7 @@
           ffmpeg -y -i "/home/notes/Recordings/${FILE_NAME}.${FILE_EXT}" "/home/notes/Recordings/${FILE_NAME}.mp3"
 
           API_KEY="{{ obsidian_api_key }}"
-          NOTES_PATH="/home/notes/Obsidian/Voice"
+          NOTES_PATH="/home/notes/Obsidian"
 
           docker run --rm -i \
             -e "API_KEY=$API_KEY" \
