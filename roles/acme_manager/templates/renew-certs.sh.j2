@@ -32,4 +32,5 @@ if [ ${{ '{#FAILED_RENEWALS[@]}' }} -gt 0 ]; then
   exit 1
 else
   echo "Certificate renewal completed successfully at $(date)"
+  systemctl restart caddy-external caddy-internal caddy-ha
 fi
