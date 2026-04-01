@@ -17,7 +17,7 @@ container_images:
   oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.14.3
   samba: quay.io/samba.org/samba-server:latest
   prowlarr: ghcr.io/home-operations/prowlarr:2.3
-  radarr: ghcr.io/home-operations/radarr:6.1.1
+  radarr: ghcr.io/home-operations/radarr:6.1.2
   sonarr: ghcr.io/home-operations/sonarr:4.0.17
   qbittorrent: ghcr.io/home-operations/qbittorrent:5.1.4
   sabnzbd: ghcr.io/home-operations/sabnzbd:4.5.5
@@ -25,7 +25,7 @@ container_images:
   slskd: slskd/slskd:0.24.5
   plex: ghcr.io/home-operations/plex:rolling
   jellyfin: jellyfin/jellyfin:latest
-  audiobookshelf: ghcr.io/advplyr/audiobookshelf:2.33.0
+  audiobookshelf: ghcr.io/advplyr/audiobookshelf:2.33.1
   lyrion: lmscommunity/lyrionmusicserver:9.2.0
   navidrome: deluan/navidrome:latest
   overseerr: ghcr.io/sct/overseerr:1.35.0
