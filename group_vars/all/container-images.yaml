@@ -5,7 +5,7 @@ container_images:
   prometheus: prom/prometheus:v3.10.0
   prometheus_pushgateway: prom/pushgateway:v1.11.2
   alertmanager: prom/alertmanager:v0.31.1
-  grafana: grafana/grafana:12.4.2
+  grafana: grafana/grafana:13.0.0
   concourse_web: concourse/concourse:8.1.1
   concourse_worker: concourse/concourse:8.1.1
   concourse_postgres: postgres:18
