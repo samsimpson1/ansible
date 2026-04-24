@@ -111,7 +111,7 @@
             -e "NOTES_PATH=$NOTES_PATH" \
             -v "/home/notes:/home/notes" \
             -u $(id -u notes):$(id -g notes) \
-            ghcr.io/samsimpson1/notes-agent:2026.3.23-215648 \
+            ghcr.io/samsimpson1/notes-agent:2026.4.24-124605 \
             "/home/notes/Recordings/${FILE_NAME}.mp3"
         dest: /home/notes/process.sh
         owner: notes
