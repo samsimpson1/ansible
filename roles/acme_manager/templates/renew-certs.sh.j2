@@ -7,28 +7,28 @@ FAILED_RENEWALS=()
 
 {% for site in sites %}
 echo "Attempting renewal for {{ site.name }}..."
-if {{ acme_manager_install_dir }}/acme.sh --renew \
+{{ acme_manager_install_dir }}/acme.sh --renew \
   -d {{ site.name }} \
   --dns dns_hetznercloud \
   --cert-file {{ acme_manager_cert_dir }}/{{ site.name }}/cert.pem \
   --key-file {{ acme_manager_cert_dir }}/{{ site.name }}/key.pem \
-  --fullchain-file {{ acme_manager_cert_dir }}/{{ site.name }}/fullchain.pem; then
+  --fullchain-file {{ acme_manager_cert_dir }}/{{ site.name }}/fullchain.pem
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ]; then
   echo "  ✓ {{ site.name }} renewed successfully"
+elif [ $EXIT_CODE -eq 2 ]; then
+  echo "  - {{ site.name }} not due for renewal"
 else
-  EXIT_CODE=$?
-  if [ $EXIT_CODE -eq 2 ]; then
-    echo "  - {{ site.name }} not due for renewal"
-  else
-    echo "  ✗ {{ site.name }} renewal failed with exit code $EXIT_CODE"
-    FAILED_RENEWALS+=("{{ site.name }}")
-  fi
+  echo "  ✗ {{ site.name }} renewal failed with exit code $EXIT_CODE"
+  FAILED_RENEWALS+=("{{ site.name }}")
 fi
 
 {% endfor %}
 
-if [ ${{ '{#FAILED_RENEWALS[@]}' }} -gt 0 ]; then
+if [ {% raw %}${#FAILED_RENEWALS[@]}{% endraw %} -gt 0 ]; then
   echo "Certificate renewal completed with failures at $(date)"
-  echo "Failed renewals: ${{ '{FAILED_RENEWALS[*]}' }}"
+  echo "Failed renewals: {% raw %}${FAILED_RENEWALS[*]}{% endraw %}"
   exit 1
 else
   echo "Certificate renewal completed successfully at $(date)"
