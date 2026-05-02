@@ -1,5 +1,5 @@
 container_images:
-  caddy: caddy:2.10
+  caddy: caddy:2.11
   node_exporter: prom/node-exporter:v1.11.1
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
   prometheus: prom/prometheus:v3.11.3
