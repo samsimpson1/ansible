@@ -7,13 +7,18 @@
       ansible.builtin.package:
         name:
           - 1password@beta
+          - awscli
           - firefox
           - ghostty
+          - obsidian
           - rbenv
           - ripgrep
           - slack
           - tenv
           - uv
+          - visual-studio-code
+          - ykman
+          - yubico-authenticator
 
     - name: Create Ghostty config
       ansible.builtin.copy:
