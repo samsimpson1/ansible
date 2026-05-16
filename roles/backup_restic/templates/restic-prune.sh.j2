@@ -19,6 +19,8 @@ else
     echo "repository already exists"
 fi
 
+r unlock
+
 r forget {{ backup_restic_forget_policy }}
 
 r prune
