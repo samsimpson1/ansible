@@ -19,13 +19,13 @@ container_images:
   prowlarr: ghcr.io/home-operations/prowlarr:2.3
   radarr: ghcr.io/home-operations/radarr:6.2.0
   sonarr: ghcr.io/home-operations/sonarr:4.0.17
-  qbittorrent: ghcr.io/home-operations/qbittorrent:5.1.4
+  qbittorrent: ghcr.io/home-operations/qbittorrent:5.2.0
   sabnzbd: ghcr.io/home-operations/sabnzbd:4.5.5
   unpackerr: ghcr.io/unpackerr/unpackerr:0.15.2
   slskd: slskd/slskd:0.25.1
   plex: ghcr.io/home-operations/plex:rolling
   jellyfin: jellyfin/jellyfin:latest
-  audiobookshelf: ghcr.io/advplyr/audiobookshelf:2.34.0
+  audiobookshelf: ghcr.io/advplyr/audiobookshelf:2.35.0
   lyrion: lmscommunity/lyrionmusicserver:9.2.0
   navidrome: deluan/navidrome:latest
   overseerr: ghcr.io/sct/overseerr:1.35.0
