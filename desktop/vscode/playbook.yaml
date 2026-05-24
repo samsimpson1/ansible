@@ -1,0 +1,54 @@
+- name: Visual Studio Code
+  hosts: 127.0.0.1
+  connection: local
+  become: false
+  tasks:
+    - name: Install VSCode
+      ansible.builtin.package:
+        name: visual-studio-code
+        state: present
+      become: "{{ ansible_facts['os_family'] == 'Darwin' }}"
+
+    - name: VSCode extensions
+      ansible.builtin.set_fact:
+        vscode_extensions:
+          - Anthropic.claude-code
+          - redhat.ansible
+
+    - name: Set facts (macOS)
+      ansible.builtin.set_fact:
+        vscode_config_directory: "{{ ansible_facts['user_dir'] }}/Library/Application Support/Code/User"
+      when: ansible_facts['os_family'] == 'Darwin'
+
+    - name: Set facts (Linux)
+      ansible.builtin.set_fact:
+        vscode_config_directory: "{{ ansible_facts['user_dir'] }}/.config/Code/User"
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Create settings directory
+      ansible.builtin.file:
+        path: "{{ vscode_config_directory }}"
+        state: directory
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
+
+    - name: Create settings.json
+      ansible.builtin.copy:
+        src: files/settings.json
+        dest: "{{ vscode_config_directory }}/settings.json"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0640'
+
+    - name: Install VSCode extensions
+      ansible.builtin.command:
+        cmd: code {% for ext in vscode_extensions %}--install-extension {{ ext }} {% endfor %}
+      changed_when: '"successfully installed." in vscode_extension_install.stdout'
+      register: vscode_extension_install
+
+    - name: Update VSCode extensions
+      ansible.builtin.command:
+        cmd: code --update-extensions
+      changed_when: '"was successfully updated." in vscode_extension_update.stdout'
+      register: vscode_extension_update

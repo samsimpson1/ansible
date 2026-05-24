@@ -14,7 +14,6 @@
           - slack
           - tenv
           - uv
-          - visual-studio-code
 
     - name: Create Ghostty config
       ansible.builtin.copy:

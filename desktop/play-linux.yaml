@@ -6,3 +6,5 @@
   ansible.builtin.import_playbook: shell/playbook.yaml
 - name: SSH Shell
   ansible.builtin.import_playbook: shell-ssh/playbook.yaml
+- name: Visual Studio Code
+  ansible.builtin.import_playbook: vscode/playbook.yaml

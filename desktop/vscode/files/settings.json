@@ -1,0 +1,31 @@
+{
+    "editor.tabSize": 2,
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "docker.extension.enableComposeLanguageServer": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "python.analysis.typeCheckingMode": "standard",
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "jinja": false
+    },
+    "[dockercompose]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "claudeCode.preferredLocation": "panel",
+    "terminal.integrated.suggest.enabled": false,
+    "claudeCode.selectedModel": "default"
+}
