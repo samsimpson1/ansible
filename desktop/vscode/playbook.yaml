@@ -6,13 +6,18 @@
     - name: Install VSCode
       ansible.builtin.package:
         name: visual-studio-code
-        state: present
-      become: "{{ ansible_facts['os_family'] == 'Darwin' }}"
+      when: ansible_facts['os_family'] == 'Darwin'
 
     - name: VSCode extensions
       ansible.builtin.set_fact:
         vscode_extensions:
           - Anthropic.claude-code
+          - astral-sh.ty
+          - charliermarsh.ruff
+          - golang.go
+          - hashicorp.hcl
+          - hashicorp.terraform
+          - ms-vscode.makefile-tools
           - redhat.ansible
 
     - name: Set facts (macOS)
