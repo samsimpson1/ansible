@@ -9,7 +9,7 @@ Restart=always
 RestartSec=10
 
 ExecStart=/usr/bin/docker run --rm \
-  --name {{ docker_service_id }} {{ docker_service_network_string }} \
+  --name {{ docker_service_id }} {{ docker_service_network_string }} --dns-search "{{ docker_service_dns_search }}" \
   {% if docker_service_ports|length > 0 %}{{ '-p ' + ' -p '.join(docker_service_ports) }} \
   {% endif -%}
   {% if docker_service_volumes|length > 0 %}-v {{ ' -v '.join(docker_service_volumes) }} \

@@ -17,3 +17,4 @@ docker_service_cgroupns: null
 docker_service_state: present
 docker_service_capabilities: []
 docker_service_extra_systemd_content: ""
+docker_service_dns_search: "int.simpson.id"
