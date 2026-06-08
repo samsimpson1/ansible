@@ -17,24 +17,30 @@
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0750'
 
-    - name: Clone Pi extensions repo
-      ansible.builtin.git:
-        repo: "https://git.sams.wtf/tophattedcat/pi.git"
-        dest: "{{ pi_dir }}/user-exts"
-        version: main
+    - name: Install custom package
+      ansible.builtin.command:
+        cmd: pi install https://git.sams.wtf/tophattedcat/pi.git
+      register: pi_install
+      changed_when: '"Cloning" in pi_install.stderr'
 
-    - name: Link extensions directory
-      ansible.builtin.file:
-        src: "{{ pi_dir }}/user-exts/.pi/extensions"
-        dest: "{{ pi_dir }}/agent/extensions"
-        owner: "{{ ansible_facts['user_id'] }}"
-        group: "{{ ansible_facts['user_gid'] }}"
-        state: link
+    - name: Update custom package
+      ansible.builtin.command:
+        cmd: pi update https://git.sams.wtf/tophattedcat/pi.git
+      register: pi_update
+      changed_when: '"HEAD is now at" in pi_update.stderr'
 
     - name: Create web-tools config file
       ansible.builtin.template:
         src: files/web.json.j2
         dest: "{{ pi_dir }}/web.json"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0600'
+
+    - name: Create subagent config file
+      ansible.builtin.copy:
+        src: files/subagent.json
+        dest: "{{ pi_dir }}/subagent.json"
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0600'
