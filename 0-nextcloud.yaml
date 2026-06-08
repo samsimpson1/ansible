@@ -11,6 +11,7 @@
         name: tailscale
       vars:
         tailscale_accept_routes: true
+        tailscale_advertise_exit_node: true
 
     - name: Docker
       ansible.builtin.include_role:
