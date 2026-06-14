@@ -2,9 +2,11 @@
   "allow": [
     "find *",
     "ls *",
+    "grep *",
     "cat *",
     "echo *",
     "head *",
+    "sort *",
     "tail *",
     "wc *",
     "git status *",
