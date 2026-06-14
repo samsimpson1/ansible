@@ -1,0 +1,14 @@
+{
+  "allow": [
+    "find *",
+    "ls *",
+    "cat *",
+    "echo *",
+    "head *",
+    "tail *",
+    "wc *",
+    "git status *",
+    "git log *",
+    "git diff *"
+  ]
+}

@@ -7,7 +7,7 @@
   tasks:
     - name: Set facts
       ansible.builtin.set_fact:
-        pi_dir: "{{ ansible_facts['user_dir'] }}/.pi"
+        pi_dir: "{{ ansible_facts['user_dir'] }}/.pi/agent"
 
     - name: Create Pi directory
       ansible.builtin.file:
@@ -44,3 +44,19 @@
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0600'
+
+    - name: Create bash-permissions config file
+      ansible.builtin.copy:
+        src: files/bash-permissions.json
+        dest: "{{ pi_dir }}/bash-permissions.json"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0600'
+
+    - name: Clean up old config files
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.pi/{{ item }}"
+        state: absent
+      loop:
+        - web.json
+        - subagent.json
