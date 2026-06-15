@@ -1,19 +1,19 @@
 {
   "allow": [
-    "find *",
-    "ls *",
-    "grep *",
     "cat *",
+    "cd *",
+    "col *",
     "echo *",
+    "find *",
+    "git diff *",
+    "git log *",
+    "git status *",
+    "grep *",
     "head *",
+    "ls *",
+    "rg *",
     "sort *",
     "tail *",
-    "wc *",
-    "git status *",
-    "git log *",
-    "git diff *",
-    "col *",
-    "cd *",
-    "rg *"
+    "wc *"
   ]
 }
