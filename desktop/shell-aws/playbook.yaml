@@ -40,9 +40,10 @@
     - name: Create awsume config directory
       ansible.builtin.file:
         path: "{{ ansible_facts['user_dir'] }}/.awsume"
+        state: directory
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
-        mode: '0750'
+        mode: '0700'
 
     - name: Create awsume config file
       ansible.builtin.copy:
@@ -55,9 +56,10 @@
     - name: Create aws config directory
       ansible.builtin.file:
         path: "{{ ansible_facts['user_dir'] }}/.aws"
+        state: directory
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
-        mode: '0750'
+        mode: '0700'
 
     - name: Create aws config file
       ansible.builtin.template:
@@ -66,6 +68,14 @@
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0640'
+
+    - name: Create bin directory
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/bin"
+        state: directory
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0700'
 
     - name: Create aws-subshell.sh
       ansible.builtin.copy:

@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-alias awsume=". $HOME/.awsume-venv/bin/awsume"
+alias awsume="PATH=$PATH:$HOME/.awsume-venv/bin . $HOME/.awsume-venv/bin/awsume"
 
 c() {
   awsume -c "${1}-developer"
