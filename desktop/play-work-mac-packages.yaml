@@ -6,7 +6,7 @@
     - name: Install packages
       ansible.builtin.package:
         name:
-          - 1password@beta
+          - 1password
           - awscli
           - firefox
           - ghostty
@@ -19,6 +19,14 @@
           - visual-studio-code
           - ykman
           - yubico-authenticator
+
+    - name: Create Ghostty config dir
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.config/ghostty"
+        state: directory
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0700'
 
     - name: Create Ghostty config
       ansible.builtin.copy:
