@@ -44,6 +44,7 @@
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0600'
 
+    # subagents aren't useful when you only have 1 model available
     - name: Create subagent config file
       ansible.builtin.copy:
         src: files/subagent.json
@@ -51,6 +52,7 @@
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0600'
+      when: "not ansible_facts['hostname'] is match('MAC-Dev-.*')"
 
     - name: Create bash-permissions config file
       ansible.builtin.copy:
