@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>id.simpson.sam.llama-server</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/llama-server</string>
+        <string>-hf</string>
+        <string>{{ llama_model }}</string>
+        <string>--temp</string>
+        <string>{{ llama_temp }}</string>
+        <string>--top-p</string>
+        <string>{{ llama_top_p }}</string>
+        <string>--top-k</string>
+        <string>{{ llama_top_k }}</string>
+        <string>--min-p</string>
+        <string>{{ llama_min_p }}</string>
+        <string>--spec-type</string>
+        <string>draft-mtp</string>
+        <string>--spec-draft-n-max</string>
+        <string>{{ llama_mtp_n_max }}</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/SSimpson/Library/Logs/llama-server/server.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/SSimpson/Library/Logs/llama-server/server-error.log</string>
+</dict>
+</plist>
