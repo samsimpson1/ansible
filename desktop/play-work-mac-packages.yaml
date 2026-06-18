@@ -11,6 +11,7 @@
           - ansible-lint
           - awscli
           - firefox
+          - fzf
           - gh
           - ghostty
           - obsidian
