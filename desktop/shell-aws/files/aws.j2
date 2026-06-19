@@ -1,6 +1,6 @@
 [default]
 region = eu-west-1
-mfa_serial = arn:aws:iam::622626885786:mfa/sam.simpson@digital.cabinet-office.gov.uk-1pw
+login_session = arn:aws:iam::622626885786:user/sam.simpson@digital.cabinet-office.gov.uk
 
 {% for account in aws_accounts | dict2items %}
 {% for role in aws_roles %}

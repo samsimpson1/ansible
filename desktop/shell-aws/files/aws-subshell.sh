@@ -4,14 +4,8 @@
 govuk_awsume() {
   ENV_NAME="${1}"
   ROLE_NAME="${2}"
-  ROLE="${ENV_NAME}-${ROLE_NAME}"
 
-  ASSUME_DURATION="28800"
-  if [ "${ROLE_NAME}" = "platformengineer" ]; then
-    ASSUME_DURATION="3600"
-  fi
-
-  . awsume --role-duration "${ASSUME_DURATION}" "${ROLE}"
+  . aws-login "${ENV_NAME}" "${ROLE_NAME}"
   if [ "${ENV_NAME}" != "test" ]; then
     kubectx "${1}"
     kubens apps

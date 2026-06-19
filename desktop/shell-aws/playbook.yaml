@@ -28,31 +28,6 @@
           - virtualenv
         state: present
 
-    - name: Install awsume packages
-      ansible.builtin.pip:
-        name:
-          - awsume
-          - awsume-console-plugin
-          - awsume-yubikey-plugin
-          - awsume-1password-gaiden
-        virtualenv: "{{ ansible_facts['user_dir'] }}/.awsume-venv"
-
-    - name: Create awsume config directory
-      ansible.builtin.file:
-        path: "{{ ansible_facts['user_dir'] }}/.awsume"
-        state: directory
-        owner: "{{ ansible_facts['user_id'] }}"
-        group: "{{ ansible_facts['user_gid'] }}"
-        mode: '0700'
-
-    - name: Create awsume config file
-      ansible.builtin.copy:
-        src: files/awsume.yaml
-        dest: "{{ ansible_facts['user_dir'] }}/.awsume/config.yaml"
-        owner: "{{ ansible_facts['user_id'] }}"
-        group: "{{ ansible_facts['user_gid'] }}"
-        mode: '0640'
-
     - name: Create aws config directory
       ansible.builtin.file:
         path: "{{ ansible_facts['user_dir'] }}/.aws"
@@ -81,6 +56,22 @@
       ansible.builtin.copy:
         src: files/aws-subshell.sh
         dest: "{{ ansible_facts['user_dir'] }}/bin/aws-subshell.sh"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
+
+    - name: Create aws-login
+      ansible.builtin.copy:
+        src: files/aws-login.sh
+        dest: "{{ ansible_facts['user_dir'] }}/bin/aws-login"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
+
+    - name: Create aws-console
+      ansible.builtin.copy:
+        src: files/aws-console.sh
+        dest: "{{ ansible_facts['user_dir'] }}/bin/aws-console"
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0750'

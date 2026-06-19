@@ -1,47 +1,23 @@
 #!/usr/bin/env zsh
 
-alias awsume="PATH=$PATH:$HOME/.awsume-venv/bin . $HOME/.awsume-venv/bin/awsume"
+alias co=aws-console
 
-c() {
-  awsume -c "${1}-developer"
-}
-
-ca() {
-  awsume -c "${1}-fulladmin"
-}
-
-ce() {
-  awsume --role-duration "3600" -c "${1}-platformengineer"
-}
-
-cr() {
-  awsume -c "${1}-readonly"
-}
-
-govuk_awsume() {
+govuk_aws() {
   ${HOME}/bin/aws-subshell.sh $@
 }
 
 e() {
-  ENV_NAME="${1}"
-  shift
-  govuk_awsume "${ENV_NAME}" "developer" "$@"
+  govuk_aws "${1}" "developer"
 }
 
 ea() {
-  ENV_NAME="${1}"
-  shift
-  govuk_awsume "${ENV_NAME}" "fulladmin" "$@"
+  govuk_aws "${1}" "fulladmin"
 }
 
 ee() {
-  ENV_NAME="${1}"
-  shift
-  govuk_awsume "${ENV_NAME}" "platformengineer" "$@"
+  govuk_aws "${1}" "platformengineer"
 }
 
 er() {
-  ENV_NAME="${1}"
-  shift
-  govuk_awsume "${ENV_NAME}" "readonly" "$@"
+  govuk_aws "${1}" "readonly"
 }
