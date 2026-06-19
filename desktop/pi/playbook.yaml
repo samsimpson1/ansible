@@ -44,6 +44,16 @@
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0600'
 
+    - name: Create models.json file
+      ansible.builtin.copy:
+        src: "files/personal-models.json"
+        dest: "{{ pi_dir }}/models.json"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0600'
+      # no openrouter use on work mac, so don't bother creating the models file
+      when: "not ansible_facts['hostname'] is match('MAC-Dev-.*')"
+
     # subagents aren't useful when you only have 1 model available
     - name: Create subagent config file
       ansible.builtin.copy:

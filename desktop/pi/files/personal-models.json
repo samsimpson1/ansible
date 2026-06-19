@@ -1,0 +1,15 @@
+{
+  "providers": {
+    "openrouter": {
+      "modelOverrides": {
+        "z-ai/glm-5.2": {
+          "compat": {
+            "openRouterRouting": {
+              "quantizations": ["fp8"]
+            }
+          }
+        }
+      }
+    }
+  }
+}
