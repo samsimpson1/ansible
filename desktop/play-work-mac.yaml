@@ -6,6 +6,8 @@
   ansible.builtin.import_playbook: shell-aws/playbook.yaml
 - name: SSH Shell
   ansible.builtin.import_playbook: shell-ssh/playbook.yaml
+- name: Shell (work)
+  ansible.builtin.import_playbook: shell-work/playbook.yaml
 - name: Visual Studio Code
   ansible.builtin.import_playbook: vscode/playbook.yaml
 - name: Pi
