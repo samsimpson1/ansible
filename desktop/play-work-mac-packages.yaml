@@ -10,6 +10,7 @@
           - ansible
           - ansible-lint
           - awscli
+          - claude-code@latest
           - firefox
           - fzf
           - gh
