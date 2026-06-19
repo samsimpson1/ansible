@@ -47,6 +47,7 @@
           - hashicorp.terraform
           - ms-vscode.makefile-tools
           - redhat.ansible
+          - timonwong.shellcheck
 
     - name: Set facts (macOS)
       ansible.builtin.set_fact:
