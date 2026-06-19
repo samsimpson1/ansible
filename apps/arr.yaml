@@ -6,6 +6,7 @@
     owner: "app"
     group: "app"
   loop:
+    - lidarr
     - prowlarr
     - radarr
     - sonarr
@@ -55,4 +56,20 @@
       SONARR__PORT: "80"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/sonarr:/config:rw"
+      - "/srv/containers/storage/hdd/media:/media:rw"
+- name: Lidarr service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: "lidarr"
+    docker_service_description: "lidarr"
+    docker_service_image: "{{ container_images.lidarr }}"
+    docker_service_network: source_default
+    docker_service_user: "568"
+    docker_service_groups: ["568"]
+    docker_service_env_vars:
+      TZ: Europe/London
+      PORT: "8080"
+    docker_service_volumes:
+      - "/srv/containers/storage/ssd/lidarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"

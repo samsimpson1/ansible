@@ -127,8 +127,8 @@ sites:
       - name: firefly-di
         target: "http://firefly-iii-data-importer:8080"
         host: little
-      - name: garage
-        target: "http://10.0.0.191:3903"
+      - name: lidarr
+        target: "http://lidarr:8080"
         host: little
       - name: prowlarr
         target: "http://prowlarr:80"
