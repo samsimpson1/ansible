@@ -17,6 +17,7 @@
           - fulladmin
           - dguengineer
           - readonly
+          - tempadmin
 
     - name: Install packages
       ansible.builtin.package:
