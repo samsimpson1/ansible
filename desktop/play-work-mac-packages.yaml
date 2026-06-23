@@ -24,6 +24,7 @@
           - uv
           - visual-studio-code
           - ykman
+          - yq
           - yubico-authenticator
 
     - name: Create Ghostty config dir
