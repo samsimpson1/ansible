@@ -5,7 +5,11 @@
       "api": "openai-completions",
       "apiKey": "aaaa",
       "models": [
-        { "id": "{{ llama_model }}", "reasoning": true }
+        {
+          "id": "{{ llama_model }}",
+          "reasoning": true,
+          "contextWindow": {{ llama_ctx_size }}
+        }
       ]
     }
   }
