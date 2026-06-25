@@ -19,6 +19,7 @@
 /home/sam/Games/*
 /home/sam/.cargo/*
 /home/sam/.xlcore/ffxiv/*
+/home/sam/.local/share/dev.goats.xivlauncher/ffxiv/*
 /home/sam/.steam/*
 /home/sam/.steampid/*
 /home/sam/.steampath/*
