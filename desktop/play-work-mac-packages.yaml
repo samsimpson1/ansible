@@ -16,6 +16,7 @@
           - fzf
           - gh
           - ghostty
+          - go
           - obsidian
           - rbenv
           - ripgrep
@@ -26,6 +27,7 @@
           - ykman
           - yq
           - yubico-authenticator
+          - zed
 
     - name: Create Ghostty config dir
       ansible.builtin.file:
