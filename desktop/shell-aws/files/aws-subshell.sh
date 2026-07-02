@@ -7,6 +7,7 @@ govuk_awsume() {
 
   . aws-login "${ENV_NAME}" "${ROLE_NAME}"
   if [ "${ENV_NAME}" != "test" ]; then
+    aws eks update-kubeconfig --name govuk --alias "${ENV_NAME}"
     kubectx "${1}"
     kubens apps
   fi
