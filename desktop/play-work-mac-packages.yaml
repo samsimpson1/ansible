@@ -12,11 +12,13 @@
           - ansible-lint
           - awscli
           - claude-code@latest
+          - docker-desktop
           - firefox
           - fzf
           - gh
           - ghostty
           - go
+          - k3d
           - obsidian
           - rbenv
           - ripgrep
