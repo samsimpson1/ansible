@@ -17,6 +17,7 @@
       ansible.builtin.package:
         name:
           - fzf
+          - mise
           - rbenv
           - zsh
           - zsh-autosuggestions
