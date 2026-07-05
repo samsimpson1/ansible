@@ -7,6 +7,8 @@
     "find *",
     "git diff *",
     "git log *",
+    "git ls-tree *",
+    "git show *",
     "git status *",
     "grep *",
     "head *",
