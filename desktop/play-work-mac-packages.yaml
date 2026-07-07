@@ -19,6 +19,7 @@
           - ghostty
           - go
           - k3d
+          - kind
           - obsidian
           - rbenv
           - ripgrep
