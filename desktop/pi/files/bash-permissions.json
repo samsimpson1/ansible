@@ -13,9 +13,11 @@
     "grep *",
     "head *",
     "ls *",
+    "nl *",
     "rg *",
     "sort *",
     "tail *",
+    "true",
     "wc *"
   ]
 }
