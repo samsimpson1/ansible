@@ -33,7 +33,7 @@ container_images:
   pinchflat: ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202 # v2025.9.26
   freshrss: freshrss/freshrss:1.28.1
   home_assistant: ghcr.io/home-assistant/home-assistant:2026.4.4
-  karakeep: ghcr.io/karakeep-app/karakeep:0.31.0
+  karakeep: ghcr.io/karakeep-app/karakeep:0.32.0
   karakeep_meilisearch: getmeili/meilisearch:v1.13.3
   alpine_chrome: gcr.io/zenika-hub/alpine-chrome:124
   nginx: nginx:1.31.1
