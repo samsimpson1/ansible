@@ -77,13 +77,17 @@
         mode: '0640'
 
     - name: Install VSCode extensions
-      ansible.builtin.shell:
-        cmd: NODE_EXTRA_CA_CERTS="{{ vscode_node_extra_ca_certs | default('') }}" code {% for ext in vscode_extensions %}--install-extension {{ ext }} {% endfor %}
+      ansible.builtin.command:
+        argv: "{{ ['code'] + (vscode_extensions | map('regex_replace', '^(.*)$', '--install-extension=\\1') | list) }}"
+      environment:
+        NODE_EXTRA_CA_CERTS: "{{ vscode_node_extra_ca_certs | default('') }}"
       changed_when: '"successfully installed." in vscode_extension_install.stdout'
       register: vscode_extension_install
 
     - name: Update VSCode extensions
-      ansible.builtin.shell:
-        cmd: NODE_EXTRA_CA_CERTS="{{ vscode_node_extra_ca_certs | default('') }}" code --update-extensions
+      ansible.builtin.command:
+        cmd: code --update-extensions
+      environment:
+        NODE_EXTRA_CA_CERTS: "{{ vscode_node_extra_ca_certs | default('') }}"
       changed_when: '"was successfully updated." in vscode_extension_update.stdout'
       register: vscode_extension_update
