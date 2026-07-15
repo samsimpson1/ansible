@@ -13,7 +13,7 @@
           - awscli
           - claude-code@latest
           - docker-desktop
-          - firefox
+          - firefox@nightly
           - fzf
           - gh
           - ghostty
@@ -49,3 +49,14 @@
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0640'
+
+    # Firefox Nightly doesn't ship with a wrapper script for the firefox executable
+    - name: Create firefox wrapper script
+      ansible.builtin.copy:
+        content: |
+          #!/usr/bin/env bash
+          exec '/Applications/Firefox Nightly.app/Contents/MacOS/firefox' "$@"
+        dest: "{{ ansible_facts['user_dir'] }}/bin/firefox"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0750'
