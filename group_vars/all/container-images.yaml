@@ -6,8 +6,8 @@ container_images:
   prometheus_pushgateway: prom/pushgateway:v1.11.2
   alertmanager: prom/alertmanager:v0.33.1
   grafana: grafana/grafana:12.4.5
-  concourse_web: concourse/concourse:8.2.3
-  concourse_worker: concourse/concourse:8.2.3
+  concourse_web: concourse/concourse:8.2.4
+  concourse_worker: concourse/concourse:8.2.4
   concourse_postgres: postgres:18
   vault: hashicorp/vault:2.0.2
   knot: tngl/knot:v1.10.0-alpha
