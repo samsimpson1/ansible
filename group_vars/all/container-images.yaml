@@ -12,7 +12,7 @@ container_images:
   vault: hashicorp/vault:2.0.3
   knot: tngl/knot:v1.10.0-alpha
   filebrowser: ghcr.io/gtsteffaniak/filebrowser:1.2.1-stable
-  litestream: litestream/litestream:0.5.6
+  litestream: litestream/litestream:0.5.15
   pocket_id: ghcr.io/pocket-id/pocket-id:v2.11.0
   oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.15.3
   samba: quay.io/samba.org/samba-server:latest
