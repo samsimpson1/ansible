@@ -37,7 +37,7 @@ container_images:
   karakeep_meilisearch: getmeili/meilisearch:v1.13.3
   alpine_chrome: gcr.io/zenika-hub/alpine-chrome:124
   nginx: nginx:1.31.1
-  forgejo: codeberg.org/forgejo/forgejo:15.0.4
+  forgejo: codeberg.org/forgejo/forgejo:15.0.5
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
   kavita: ghcr.io/kareadita/kavita:0.9.0
   nextcloud_aio: ghcr.io/nextcloud-releases/all-in-one:20260515_145717
