@@ -18,3 +18,9 @@
       loop:
         - yubi1
         - yubi2
+
+    - name: Add Terminus key
+      ansible.posix.authorized_key:
+        user: me
+        state: present
+        key: "{{ lookup('file', 'terminus.pub') }}"
