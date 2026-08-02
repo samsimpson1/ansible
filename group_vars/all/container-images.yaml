@@ -1,8 +1,8 @@
 container_images:
   caddy: caddy:2.10
-  node_exporter: prom/node-exporter:v1.12.0
+  node_exporter: prom/node-exporter:v1.12.1
   smartctl_exporter: prometheuscommunity/smartctl-exporter:v0.14.0
-  prometheus: prom/prometheus:v3.13.1
+  prometheus: prom/prometheus:v3.13.2
   prometheus_pushgateway: prom/pushgateway:v1.11.2
   alertmanager: prom/alertmanager:v0.33.1
   grafana: grafana/grafana:13.1.1
