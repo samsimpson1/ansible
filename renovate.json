@@ -52,6 +52,7 @@
         "prometheuscommunity/smartctl-exporter",
         "prom/alertmanager",
         "prom/prometheus",
+        "prom/pushgateway",
         "grafana/grafana"
       ],
       "groupName": "Monitoring"
