@@ -18,6 +18,8 @@
     "printf *",
     "rg *",
     "sort *",
+    "sox *",
+    "soxi *",
     "tail *",
     "true",
     "wc *"
