@@ -49,7 +49,9 @@ alias tv="terraform validate"
 
 export PATH="$HOME/bin:$PATH"
 
-eval "$(rbenv init - --no-rehash zsh)"
+if type rbenv &>/dev/null; then
+  eval "$(rbenv init - --no-rehash zsh)"
+fi
 
 eval "$(mise activate zsh)"
 
