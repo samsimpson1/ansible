@@ -160,3 +160,6 @@ sites:
       - name: vault
         target: "http://vault:8200"
         host: little
+      - name: hermes
+        target: "http://hermes-gateway:9119"
+        host: little

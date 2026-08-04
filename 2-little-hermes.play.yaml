@@ -1,0 +1,31 @@
+- name: Little (hermes agent)
+  hosts: little
+  vars_files:
+    - vars/hermes.yaml
+  become: true
+  tasks:
+    - name: Hermes Docker network
+      community.docker.docker_network:
+        name: "hermes"
+        state: present
+
+    - name: Hermes data directory
+      ansible.builtin.file:
+        path: "/srv/containers/storage/ssd/hermes/agent"
+        state: directory
+        owner: "10000"
+        group: "10000"
+        mode: "0750"
+
+    - name: Hermes gateway container
+      ansible.builtin.include_role:
+        name: docker_service
+      vars:
+        docker_service_id: "hermes-gateway"
+        docker_service_description: "Hermes agent gateway"
+        docker_service_image: "{{ container_images.hermes }}"
+        docker_service_command: "gateway run"
+        docker_service_network: "hermes"
+        docker_service_env_vars: "{{ hermes_gateway_env_vars }}"
+        docker_service_volumes:
+          - "/srv/containers/storage/ssd/hermes/agent:/opt/data:rw"

@@ -41,3 +41,4 @@ container_images:
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
   kavita: ghcr.io/kareadita/kavita:0.9.0
   nextcloud_aio: ghcr.io/nextcloud-releases/all-in-one:20260515_145717
+  hermes: nousresearch/hermes-agent:v2026.8.3
