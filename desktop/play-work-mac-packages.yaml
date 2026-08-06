@@ -6,7 +6,6 @@
     - name: Install packages
       ansible.builtin.package:
         name:
-          - 1password
           - actionlint
           - ansible
           - ansible-lint
@@ -19,6 +18,7 @@
           - ghostty
           - go
           - k3d
+          - keepassxc
           - kind
           - obsidian
           - rbenv
