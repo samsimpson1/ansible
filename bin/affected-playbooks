@@ -1,0 +1,571 @@
+#!/usr/bin/env python3
+"""Print top-level Ansible playbooks affected by a Git change.
+
+The deployment pipeline runs the repository's top-level ``*.play.yaml`` files.
+This command compares two Git revisions and prints the subset that may be
+affected, one per line. It examines both revisions so deletions are handled.
+
+The analysis deliberately fails open: global configuration, shared encrypted
+variables, unknown paths, unresolved dynamic references, and unparseable
+variables select every current runbook. An empty result therefore means that
+the change was positively identified as deployment-independent.
+
+PyYAML is required and is installed as a dependency of Ansible.
+"""
+
+from __future__ import annotations
+
+import argparse
+import pathlib
+import re
+import subprocess
+from collections.abc import Iterator
+
+import yaml
+
+ALWAYS_ALL_PATHS = {"ansible.cfg", "inventory.yaml"}
+NO_DEPLOYMENT_PREFIXES = (".claude/", ".github/", "tests/")
+NO_DEPLOYMENT_PATHS = {
+    ".ansible-lint.yaml",
+    ".gitignore",
+    "CLAUDE.md",
+    "bin/affected-playbooks",
+}
+ANALYZED_PREFIXES = ("apps/", "group_vars/all/", "roles/", "vars/")
+DYNAMIC_VARIABLE_LOOKUP_PATTERN = re.compile(
+    r"\b(?:lookup|q|query)\s*\(\s*['\"](?:ansible\.builtin\.)?(?:varnames|vars)['\"]"
+)
+VARIABLE_OBJECT_PATTERN = re.compile(r"(?:\bhostvars\b|\bvars\b(?!/))")
+WITH_VARIABLE_PATTERN = re.compile(r"\bwith_(?:varnames|vars)\s*:")
+
+
+class Revision:
+    def __init__(self, ref: str):
+        self.ref = ref
+        self.files = set(self._git("ls-tree", "-r", "--name-only", ref).splitlines())
+        self.yaml_cache: dict[str, object] = {}
+        self.yaml_failures: set[str] = set()
+
+    @staticmethod
+    def _git(*args: str) -> str:
+        return subprocess.check_output(["git", *args], text=True).rstrip("\n")
+
+    def read(self, path: str) -> str:
+        return self._git("show", f"{self.ref}:{path}")
+
+    def is_vault_file(self, path: str) -> bool:
+        if path not in self.files:
+            return False
+        try:
+            return "$ANSIBLE_VAULT;" in self.read(path)
+        except (subprocess.CalledProcessError, UnicodeDecodeError):
+            return False
+
+    def is_shared_vault_file(self, path: str) -> bool:
+        return path.startswith("group_vars/all/") and self.is_vault_file(path)
+
+    def yaml(self, path: str) -> object:
+        if path not in self.yaml_cache:
+            try:
+                self.yaml_cache[path] = yaml.safe_load(self.read(path))
+            except (subprocess.CalledProcessError, yaml.YAMLError, UnicodeDecodeError):
+                self.yaml_cache[path] = None
+                self.yaml_failures.add(path)
+        return self.yaml_cache[path]
+
+    @property
+    def runbooks(self) -> set[str]:
+        return {
+            path
+            for path in self.files
+            if "/" not in path and path.endswith(".play.yaml")
+        }
+
+
+def objects(value: object) -> Iterator[object]:
+    yield value
+    if isinstance(value, dict):
+        for child in value.values():
+            yield from objects(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from objects(child)
+
+
+def strings(value: object) -> Iterator[str]:
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for child in value.values():
+            yield from strings(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from strings(child)
+
+
+def short_key(value: object) -> str:
+    return str(value).rsplit(".", 1)[-1]
+
+
+def role_name(value: object) -> str | None:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if short_key(key) in {"name", "role"} and isinstance(child, str):
+                return child
+    return None
+
+
+def referenced_roles(document: object) -> set[str]:
+    result: set[str] = set()
+    for item in objects(document):
+        if not isinstance(item, dict):
+            continue
+        for raw_key, value in item.items():
+            key = short_key(raw_key)
+            if key in {"include_role", "import_role"}:
+                name = role_name(value)
+                if name:
+                    result.add(name)
+            elif key in {"roles", "dependencies"} and isinstance(value, list):
+                for candidate in value:
+                    name = role_name(candidate)
+                    if name:
+                        result.add(name)
+    return result
+
+
+def has_dynamic_reference(document: object) -> bool:
+    reference_keys = {
+        "dependencies",
+        "import_playbook",
+        "import_role",
+        "import_tasks",
+        "include_role",
+        "include_tasks",
+        "include_vars",
+        "roles",
+        "vars_files",
+    }
+    for item in objects(document):
+        if not isinstance(item, dict):
+            continue
+        for raw_key, value in item.items():
+            if short_key(raw_key) not in reference_keys:
+                continue
+            if any("{{" in text or "{%" in text for text in strings(value)):
+                return True
+    return False
+
+
+def has_unsupported_reference(document: object) -> bool:
+    for item in objects(document):
+        if not isinstance(item, dict):
+            continue
+        for raw_key, value in item.items():
+            key = short_key(raw_key)
+            if key in {"include_tasks", "import_tasks"}:
+                if not (
+                    isinstance(value, str)
+                    or isinstance(value, dict)
+                    and isinstance(value.get("file"), str)
+                ):
+                    return True
+            elif key in {"include_vars", "vars_files"}:
+                candidates = value if isinstance(value, list) else [value]
+                if any(
+                    not (
+                        isinstance(candidate, str)
+                        or isinstance(candidate, dict)
+                        and isinstance(candidate.get("file"), str)
+                    )
+                    for candidate in candidates
+                ):
+                    return True
+            elif key in {"action", "local_action"} or (
+                key == "import_playbook"
+                and not isinstance(value, str)
+                or key in {"include_role", "import_role"}
+                and role_name(value) is None
+                or key in {"roles", "dependencies"}
+                and (
+                    not isinstance(value, list)
+                    or any(role_name(candidate) is None for candidate in value)
+                )
+            ):
+                return True
+    return False
+
+
+def referenced_tasks(document: object) -> set[str]:
+    result: set[str] = set()
+    for item in objects(document):
+        if not isinstance(item, dict):
+            continue
+        for raw_key, value in item.items():
+            if short_key(raw_key) not in {"include_tasks", "import_tasks"}:
+                continue
+            if isinstance(value, str):
+                result.add(value)
+            elif isinstance(value, dict) and isinstance(value.get("file"), str):
+                result.add(value["file"])
+    return result
+
+
+def referenced_vars(document: object) -> set[str]:
+    result: set[str] = set()
+    for item in objects(document):
+        if not isinstance(item, dict):
+            continue
+        for raw_key, value in item.items():
+            if short_key(raw_key) not in {"vars_files", "include_vars"}:
+                continue
+            candidates = value if isinstance(value, list) else [value]
+            for candidate in candidates:
+                if isinstance(candidate, str):
+                    result.add(candidate)
+                elif isinstance(candidate, dict) and isinstance(
+                    candidate.get("file"), str
+                ):
+                    result.add(candidate["file"])
+    return result
+
+
+def referenced_playbooks(document: object) -> set[str]:
+    result: set[str] = set()
+    for item in objects(document):
+        if not isinstance(item, dict):
+            continue
+        for raw_key, value in item.items():
+            if short_key(raw_key) == "import_playbook" and isinstance(value, str):
+                result.add(value)
+    return result
+
+
+def resolve_task(revision: Revision, source: str, reference: str) -> str | None:
+    if "{{" in reference or "{%" in reference:
+        return None
+    source_path = pathlib.PurePosixPath(source)
+    candidates = [source_path.parent / reference, pathlib.PurePosixPath(reference)]
+    if source_path.parts[:1] == ("roles",) and len(source_path.parts) >= 2:
+        candidates.insert(
+            0,
+            pathlib.PurePosixPath("roles", source_path.parts[1], "tasks", reference),
+        )
+    return next((str(path) for path in candidates if str(path) in revision.files), None)
+
+
+def is_role_dependency_source(path: str) -> bool:
+    parts = pathlib.PurePosixPath(path).parts
+    return (
+        len(parts) >= 4
+        and parts[0] == "roles"
+        and parts[2] in {"handlers", "meta", "tasks"}
+        and path.endswith((".yaml", ".yml"))
+    )
+
+
+def is_dependency_source(path: str) -> bool:
+    if not path.endswith((".yaml", ".yml")):
+        return False
+    if path.startswith(("group_vars/", "host_vars/", "vars/")):
+        return False
+    if path.startswith("roles/"):
+        return is_role_dependency_source(path)
+    return True
+
+
+def dependency_closure(revision: Revision, runbook: str) -> tuple[set[str], set[str]]:
+    files: set[str] = set()
+    roles: set[str] = set()
+    pending_files = [runbook]
+    pending_roles: list[str] = []
+    while pending_files or pending_roles:
+        while pending_files:
+            path = pending_files.pop()
+            if path in files:
+                continue
+            files.add(path)
+            document = revision.yaml(path)
+            pending_roles.extend(referenced_roles(document))
+            task_references = referenced_tasks(document) | referenced_playbooks(
+                document
+            )
+            for reference in task_references:
+                resolved = resolve_task(revision, path, reference)
+                if resolved:
+                    pending_files.append(resolved)
+            for reference in referenced_vars(document):
+                resolved = resolve_task(revision, path, reference)
+                if resolved:
+                    files.add(resolved)
+
+        if not pending_roles:
+            continue
+        role = pending_roles.pop()
+        if role in roles:
+            continue
+        roles.add(role)
+        prefix = f"roles/{role}/"
+        for path in revision.files:
+            if not path.startswith(prefix):
+                continue
+            files.add(path)
+            if not is_role_dependency_source(path):
+                continue
+            document = revision.yaml(path)
+            pending_roles.extend(referenced_roles(document) - roles)
+            task_references = referenced_tasks(document) | referenced_playbooks(
+                document
+            )
+            for reference in task_references:
+                resolved = resolve_task(revision, path, reference)
+                if resolved:
+                    pending_files.append(resolved)
+            for reference in referenced_vars(document):
+                resolved = resolve_task(revision, path, reference)
+                if resolved:
+                    files.add(resolved)
+    return files, roles
+
+
+def shared_variable_keys(revision: Revision, path: str) -> set[str]:
+    if not path.startswith("group_vars/all/") or path not in revision.files:
+        return set()
+    document = revision.yaml(path)
+    if not isinstance(document, dict):
+        return set()
+    return {str(key) for key in document}
+
+
+def variable_consumers(revision: Revision, keys: set[str]) -> tuple[set[str], set[str]]:
+    consumers: set[str] = set()
+    used_keys: set[str] = set()
+    patterns = {
+        key: re.compile(rf"(?<![A-Za-z0-9_]){re.escape(key)}(?![A-Za-z0-9_])")
+        for key in keys
+    }
+    for runbook in revision.runbooks:
+        files, _ = dependency_closure(revision, runbook)
+        texts = []
+        for path in files:
+            try:
+                texts.append(revision.read(path))
+            except (subprocess.CalledProcessError, UnicodeDecodeError):
+                continue
+        combined = "\n".join(texts)
+        matched = {key for key, pattern in patterns.items() if pattern.search(combined)}
+        if matched:
+            consumers.add(runbook)
+            used_keys.update(matched)
+    return consumers, used_keys
+
+
+def revision_has_dynamic_reference(revision: Revision) -> bool:
+    for runbook in revision.runbooks:
+        files, _ = dependency_closure(revision, runbook)
+        for path in files:
+            if is_dependency_source(path) and has_dynamic_reference(
+                revision.yaml(path)
+            ):
+                return True
+    return False
+
+
+def revision_has_unsupported_reference(revision: Revision) -> bool:
+    for runbook in revision.runbooks:
+        files, _ = dependency_closure(revision, runbook)
+        for path in files:
+            if is_dependency_source(path) and has_unsupported_reference(
+                revision.yaml(path)
+            ):
+                return True
+    return False
+
+
+def has_dynamic_variable_access(text: str) -> bool:
+    return bool(
+        DYNAMIC_VARIABLE_LOOKUP_PATTERN.search(text)
+        or VARIABLE_OBJECT_PATTERN.search(text)
+    )
+
+
+def revision_has_dynamic_variable_lookup(revision: Revision) -> bool:
+    for runbook in revision.runbooks:
+        files, _ = dependency_closure(revision, runbook)
+        for path in files:
+            try:
+                content = revision.read(path)
+                if WITH_VARIABLE_PATTERN.search(content):
+                    return True
+                candidates = (
+                    strings(revision.yaml(path))
+                    if path.endswith((".yaml", ".yml"))
+                    else iter((content,))
+                )
+                if any(has_dynamic_variable_access(text) for text in candidates):
+                    return True
+            except (subprocess.CalledProcessError, UnicodeDecodeError):
+                return True
+    return False
+
+
+def revision_has_missing_role(revision: Revision) -> bool:
+    for runbook in revision.runbooks:
+        _, roles = dependency_closure(revision, runbook)
+        for role in roles:
+            if not any(path.startswith(f"roles/{role}/") for path in revision.files):
+                return True
+    return False
+
+
+def revision_has_missing_file_reference(revision: Revision) -> bool:
+    for runbook in revision.runbooks:
+        files, _ = dependency_closure(revision, runbook)
+        for path in files:
+            if not is_dependency_source(path):
+                continue
+            document = revision.yaml(path)
+            references = (
+                referenced_tasks(document)
+                | referenced_vars(document)
+                | referenced_playbooks(document)
+            )
+            for reference in references:
+                if "{{" in reference or "{%" in reference:
+                    continue
+                if resolve_task(revision, path, reference) is None:
+                    return True
+    return False
+
+
+def revision_has_parse_failure(revision: Revision) -> bool:
+    reachable_files: set[str] = set()
+    for runbook in revision.runbooks:
+        files, _ = dependency_closure(revision, runbook)
+        reachable_files.update(path for path in files if is_dependency_source(path))
+    return bool(reachable_files & revision.yaml_failures)
+
+
+def changed_paths(base: str, head: str) -> set[str]:
+    output = subprocess.check_output(
+        ["git", "diff", "--no-renames", "--name-only", base, head], text=True
+    )
+    return set(output.splitlines())
+
+
+def is_understood(path: str) -> bool:
+    return (
+        path in ALWAYS_ALL_PATHS
+        or path in NO_DEPLOYMENT_PATHS
+        or path.endswith(".play.yaml")
+        and "/" not in path
+        or path.startswith(NO_DEPLOYMENT_PREFIXES)
+        or path.startswith(ANALYZED_PREFIXES)
+    )
+
+
+def is_no_deployment_path(path: str) -> bool:
+    return path in NO_DEPLOYMENT_PATHS or path.startswith(NO_DEPLOYMENT_PREFIXES)
+
+
+def affected_in_revision(revision: Revision, changed: set[str]) -> set[str]:
+    changed_roles = {
+        pathlib.PurePosixPath(path).parts[1]
+        for path in changed
+        if len(pathlib.PurePosixPath(path).parts) >= 3
+        and pathlib.PurePosixPath(path).parts[0] == "roles"
+    }
+    affected = set()
+    for runbook in revision.runbooks:
+        files, roles = dependency_closure(revision, runbook)
+        if files & changed or roles & changed_roles:
+            affected.add(runbook)
+    return affected
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base", default="HEAD^", help="base Git revision")
+    parser.add_argument("--head", default="HEAD", help="head Git revision")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    changed = changed_paths(args.base, args.head)
+    base = Revision(args.base)
+    head = Revision(args.head)
+    shared_vault_changed = any(
+        base.is_shared_vault_file(path) or head.is_shared_vault_file(path)
+        for path in changed
+    )
+    unknown_change = any(not is_understood(path) for path in changed)
+    deployment_content_changed = any(
+        not is_no_deployment_path(path) for path in changed
+    )
+    dynamic_reference = deployment_content_changed and (
+        revision_has_dynamic_reference(base) or revision_has_dynamic_reference(head)
+    )
+    unsupported_reference = deployment_content_changed and (
+        revision_has_unsupported_reference(base)
+        or revision_has_unsupported_reference(head)
+    )
+    shared_vars_changed = any(path.startswith("group_vars/all/") for path in changed)
+    dynamic_variable_lookup = shared_vars_changed and (
+        revision_has_dynamic_variable_lookup(base)
+        or revision_has_dynamic_variable_lookup(head)
+    )
+    missing_role = deployment_content_changed and (
+        revision_has_missing_role(base) or revision_has_missing_role(head)
+    )
+    missing_file = deployment_content_changed and (
+        revision_has_missing_file_reference(base)
+        or revision_has_missing_file_reference(head)
+    )
+    parse_failure = deployment_content_changed and (
+        revision_has_parse_failure(base) or revision_has_parse_failure(head)
+    )
+    if (
+        changed & ALWAYS_ALL_PATHS
+        or shared_vault_changed
+        or unknown_change
+        or dynamic_reference
+        or unsupported_reference
+        or dynamic_variable_lookup
+        or missing_role
+        or missing_file
+        or parse_failure
+    ):
+        affected = base.runbooks | head.runbooks
+    else:
+        affected = affected_in_revision(base, changed)
+        affected.update(affected_in_revision(head, changed))
+        for path in changed:
+            if not path.startswith("group_vars/all/"):
+                continue
+            keys = shared_variable_keys(base, path) | shared_variable_keys(head, path)
+            base_consumers, base_used = variable_consumers(base, keys)
+            head_consumers, head_used = variable_consumers(head, keys)
+            if not keys or base_used | head_used != keys:
+                affected = base.runbooks | head.runbooks
+                break
+            affected.update(base_consumers | head_consumers)
+        else:
+            for path in changed:
+                if not path.startswith(("apps/", "roles/", "vars/")):
+                    continue
+                path_affected = affected_in_revision(base, {path})
+                path_affected.update(affected_in_revision(head, {path}))
+                if not path_affected:
+                    affected = base.runbooks | head.runbooks
+                    break
+    affected.intersection_update(head.runbooks)
+    if affected:
+        print("\n".join(sorted(affected)))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
