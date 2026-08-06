@@ -103,6 +103,16 @@ def strings(value: object) -> Iterator[str]:
             yield from strings(child)
 
 
+def dynamic_strings(value: object) -> Iterator[str]:
+    yield from strings(value)
+    for item in objects(value):
+        if not isinstance(item, dict):
+            continue
+        for key in item:
+            if isinstance(key, str) and key not in {"hostvars", "vars"}:
+                yield key
+
+
 def short_key(value: object) -> str:
     return str(value).rsplit(".", 1)[-1]
 
@@ -400,7 +410,7 @@ def revision_has_dynamic_variable_lookup(revision: Revision) -> bool:
                 if WITH_VARIABLE_PATTERN.search(content):
                     return True
                 candidates = (
-                    strings(revision.yaml(path))
+                    dynamic_strings(revision.yaml(path))
                     if path.endswith((".yaml", ".yml"))
                     else iter((content,))
                 )

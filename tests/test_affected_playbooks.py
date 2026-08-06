@@ -722,6 +722,38 @@ class AffectedPlaybooksTest(unittest.TestCase):
                 ],
             )
 
+    def test_templated_mapping_key_falls_back_for_shared_vars_change(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Repository(pathlib.Path(directory))
+            repo.write(
+                "1-direct.play.yaml",
+                "- hosts: direct\n  tasks:\n    - debug: {msg: '{{ value_one }}'}\n",
+            )
+            repo.write(
+                "2-dynamic.play.yaml",
+                """
+                - hosts: dynamic
+                  tasks:
+                    - set_fact:
+                        "derived_{{ hostvars[inventory_hostname]['value_' ~ 'one'] }}": true
+                """,
+            )
+            repo.write("3-other.play.yaml", "- hosts: other\n  tasks: []\n")
+            repo.write("group_vars/all/shared.yaml", "value_one: one\n")
+            repo.commit("initial")
+
+            repo.write("group_vars/all/shared.yaml", "value_one: two\n")
+            repo.commit("change shared var used in templated mapping key")
+
+            self.assertEqual(
+                repo.affected(),
+                [
+                    "1-direct.play.yaml",
+                    "2-dynamic.play.yaml",
+                    "3-other.play.yaml",
+                ],
+            )
+
     def test_with_varnames_falls_back_for_shared_vars_change(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repo = Repository(pathlib.Path(directory))
