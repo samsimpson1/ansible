@@ -48,6 +48,7 @@
       CONCOURSE_OIDC_CLIENT_SECRET: "{{ sso_clients.concourse.secret }}"
       CONCOURSE_OIDC_ISSUER: "{{ concourse_web_oidc_issuer }}"
       CONCOURSE_OIDC_SCOPE: "openid, profile, groups"
+      CONCOURSE_ADD_LOCAL_USER: "{{ concourse_web_add_local_user }}"
       CONCOURSE_MAIN_TEAM_OIDC_GROUP: "admin"
       CONCOURSE_OIDC_USER_NAME_KEY: "preferred_username"
       CONCOURSE_SESSION_SIGNING_KEY: "/concourse-keys/session_signing_key"

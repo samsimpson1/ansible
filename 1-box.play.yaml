@@ -86,6 +86,7 @@
         concourse_web_tsa_authorized_keys: "{{ concourse_worker_key_pub }}"
         concourse_web_onepassword_service_account_token: "{{ concourse_onepassword_service_account_token }}"
         concourse_web_vault_token: "{{ concourse_vault_token }}"
+        concourse_web_add_local_user: "{{ concourse_add_local_user }}"
 
     - name: Concourse Worker
       ansible.builtin.include_role:
