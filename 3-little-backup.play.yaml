@@ -27,6 +27,18 @@
       tags:
         - backup
 
+    - name: Hermes backup
+      ansible.builtin.include_role:
+        name: backup_restic
+      vars:
+        backup_restic_name: hermes
+        backup_restic_path: /srv/containers/storage/ssd/hermes/agent/
+        backup_restic_cron:
+          minute: "15"
+          hour: "*/2"
+      tags:
+        - backup
+
     - name: Karakeep backup
       ansible.builtin.include_role:
         name: backup_restic
