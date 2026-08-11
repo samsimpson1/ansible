@@ -20,6 +20,7 @@
           - k3d
           - keepassxc
           - kind
+          - kubebuilder
           - obsidian
           - rbenv
           - ripgrep
