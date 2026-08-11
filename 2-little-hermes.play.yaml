@@ -27,5 +27,6 @@
         docker_service_command: "gateway run"
         docker_service_network: "hermes"
         docker_service_env_vars: "{{ hermes_gateway_env_vars }}"
+        docker_service_state: absent
         docker_service_volumes:
           - "/srv/containers/storage/ssd/hermes/agent:/opt/data:rw"
