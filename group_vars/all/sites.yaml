@@ -140,3 +140,6 @@ sites:
       - name: hermes
         target: "http://hermes-gateway:9119"
         host: little
+      - name: apple-music-gateway
+        target: "http://apple-music-gateway:8000"
+        host: little
