@@ -7,18 +7,11 @@
     mode: "0750"
 - name: Apple Music Gateway MusicKit key
   ansible.builtin.copy:
-    content: "{{ apple_music_gateway.apple_key_base64 | b64decode }}"
+    content: "{{ apple_music_gateway.authkey }}"
     dest: /srv/containers/storage/ssd/apple-music-gateway/AuthKey.p8
     mode: "0400"
     owner: "10001"
     group: "10001"
-  no_log: true
-- name: Apple Music Gateway registry login
-  community.docker.docker_login:
-    registry_url: https://git.sams.wtf
-    username: "{{ apple_music_gateway.registry_username }}"
-    password: "{{ apple_music_gateway.registry_token }}"
-    reauthorize: true
   no_log: true
 - name: Apple Music Gateway service
   ansible.builtin.include_role:

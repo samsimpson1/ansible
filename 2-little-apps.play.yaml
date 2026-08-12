@@ -1,6 +1,8 @@
 - name: Little (apps)
   hosts: little
   become: true
+  vars_files:
+    - vars/apple-music-gateway.yaml
   tasks:
     - name: Wiki
       ansible.builtin.include_tasks: apps/wiki.yaml
@@ -35,3 +37,5 @@
       ansible.builtin.include_tasks: apps/stonks-scraper.yaml
       tags:
         - stonks
+    - name: Apple Music gateway
+      ansible.builtin.include_tasks: apps/apple-music-gateway.yaml

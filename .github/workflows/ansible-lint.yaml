@@ -35,6 +35,9 @@ jobs:
       
       - name: Configure 1Password CLI
         run: |
+          # Newer runner images ship a stale empty ~/.config/op/config; op 2.38
+          # refuses to run with an invalid config even in service-account mode.
+          rm -f ~/.config/op/config
           echo "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run ansible-lint
