@@ -3,6 +3,11 @@
   connection: local
   become: false
   tasks:
+    - name: Tap casks
+      community.general.homebrew_tap:
+        name:
+          - goreleaser/tap
+
     - name: Install packages
       ansible.builtin.package:
         name:
@@ -17,6 +22,7 @@
           - gh
           - ghostty
           - go
+          - goreleaser/tap/goreleaser
           - k3d
           - keepassxc
           - kind
