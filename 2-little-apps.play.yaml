@@ -38,3 +38,5 @@
     - name: Filebrowser
       ansible.builtin.include_role:
         name: filebrowser
+      vars:
+        filebrowser_state: absent
