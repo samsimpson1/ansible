@@ -95,19 +95,6 @@
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
 
-    - name: Knot
-      ansible.builtin.include_role:
-        name: knot
-
-    - name: Pocket ID
-      ansible.builtin.include_role:
-        name: pocket_id
-      vars:
-        pocket_id_role: secondary
-        pocket_id_directory: "/srv/app/pocket-id"
-        pocket_id_app_name: "Pocket ID (Backup)"
-        pocket_id_accent_colour: "red"
-
     - name: Caddy external
       ansible.builtin.include_role:
         name: caddy
@@ -118,4 +105,19 @@
         caddy_env_vars: {}
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["concourse", "knot", "pocket_id", "forgejo"]
+        caddy_networks: ["concourse", "pocket_id", "forgejo"]
+
+    - name: Knot
+      ansible.builtin.include_role:
+        name: knot
+      vars:
+        knot_state: absent
+
+    - name: Pocket ID
+      ansible.builtin.include_role:
+        name: pocket_id
+      vars:
+        pocket_id_role: secondary
+        pocket_id_directory: "/srv/app/pocket-id"
+        pocket_id_app_name: "Pocket ID (Backup)"
+        pocket_id_accent_colour: "red"
