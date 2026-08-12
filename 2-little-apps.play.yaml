@@ -35,8 +35,3 @@
       ansible.builtin.include_tasks: apps/stonks-scraper.yaml
       tags:
         - stonks
-    - name: Filebrowser
-      ansible.builtin.include_role:
-        name: filebrowser
-      vars:
-        filebrowser_state: absent

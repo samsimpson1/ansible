@@ -15,19 +15,6 @@
         key: "{{ lookup('file', 'desktop/backup-linux/files/ssh-key.pub') }}"
         comment: restic
 
-    - name: File storage backup
-      ansible.builtin.include_role:
-        name: backup_restic
-      vars:
-        backup_restic_name: file-storage
-        backup_restic_path: /srv/containers/storage/hdd/files/
-        backup_restic_state: absent
-        backup_restic_cron:
-          minute: "19"
-          hour: "*/2"
-      tags:
-        - backup
-
     - name: Hermes backup
       ansible.builtin.include_role:
         name: backup_restic

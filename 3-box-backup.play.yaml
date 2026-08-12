@@ -14,17 +14,6 @@
           minute: "49"
           hour: "*/6"
 
-    - name: Knot backup
-      ansible.builtin.include_role:
-        name: backup_restic
-      vars:
-        backup_restic_name: box-knot
-        backup_restic_path: /srv/app/knot
-        backup_restic_state: absent
-        backup_restic_cron:
-          minute: "58"
-          hour: "*/2"
-
     - name: Forgejo backup
       ansible.builtin.include_role:
         name: backup_restic

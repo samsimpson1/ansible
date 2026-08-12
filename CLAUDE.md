@@ -15,8 +15,8 @@ Playbooks use a numbered naming convention (`N-*.play.yaml`) indicating executio
 #### Direct Playbook Execution
 - `ansible-playbook 0-ha-proxy.play.yaml` - Deploy HA Proxy with Keepalived on both hosts
 - `ansible-playbook 1-little-infrastructure.play.yaml` - Deploy little host infrastructure (Tailscale, Docker, SSMTP, Caddy, Pocket ID, Monitoring, Vault)
-- `ansible-playbook 1-box.play.yaml` - Deploy box host infrastructure (Docker, Concourse CI, Tandoor, Knot DNS, Pocket ID secondary)
-- `ansible-playbook 2-little-apps.play.yaml` - Deploy little host applications (Wiki, Karakeep, FreshRSS, Home Assistant, Catbot, Samba, Stonks, Filebrowser)
+- `ansible-playbook 1-box.play.yaml` - Deploy box host infrastructure (Docker, Concourse CI, Tandoor, Pocket ID secondary)
+- `ansible-playbook 2-little-apps.play.yaml` - Deploy little host applications (Wiki, Karakeep, FreshRSS, Home Assistant, Catbot, Samba, Stonks)
 - `ansible-playbook 2-little-media.play.yaml` - Deploy media services (Arr stack, Downloaders, Plex, Jellyfin, Audiobookshelf, etc.)
 - `ansible-playbook 3-monitoring.play.yaml` - Deploy monitoring exporters across home host group
 - `ansible-playbook 3-little-backup.play.yaml` - Deploy little host backup configuration
@@ -50,7 +50,7 @@ All commands use 1Password CLI for vault password retrieval via `onepassword-cli
 
 ### Host Structure
 - **little** (10.0.0.191) - Main application host running containerized services
-- **box** (10.0.0.202) - Secondary host running CI/CD (Concourse), DNS (Knot), recipes (Tandoor)
+- **box** (10.0.0.202) - Secondary host running CI/CD (Concourse), recipes (Tandoor)
 - **home** (group) - Both hosts for shared configurations like monitoring exporters
 
 HA Proxy with Keepalived provides failover between hosts.
@@ -136,14 +136,8 @@ Offline backup management for air-gapped storage.
 
 #### Application Roles
 
-##### knot
-DNS server for internal name resolution.
-
 ##### tandoor
 Recipe management application.
-
-##### filebrowser
-Web-based file browser.
 
 ##### samba_server
 Samba file sharing server.
@@ -161,7 +155,7 @@ Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Appl
 - **Recipes** - Tandoor (on box host)
 - **Monitoring** - Prometheus, Grafana, Alertmanager, Node Exporter
 - **Communication** - Catbot Discord bot with timezone support
-- **File Management** - Filebrowser, Samba
+- **File Management** - Samba
 
 ### Infrastructure Services
 - **Tailscale** - Mesh networking
@@ -169,7 +163,6 @@ Uses **Pocket ID** as SSO provider with OAuth2 integration across services. Appl
 - **sSMTP** - Mail relay configuration
 - **HA Proxy** - High-availability proxy with Keepalived
 - **Concourse CI** - CI/CD automation
-- **Knot** - DNS server
 - **Vault** - Secrets management
 
 ## Desktop Configuration
@@ -264,7 +257,7 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 ### Container Image Versions
 - Container image versions are centrally managed in `group_vars/all/container-images.yaml`
 - Reference images using `{{ container_images.service_name }}` in playbooks
-- Currently managed: Caddy, Prometheus, Grafana, Alertmanager, Node Exporter, Smartctl Exporter, Pushgateway, Concourse, Vault, Tandoor, Knot, Filebrowser, Litestream, Pocket ID, Copyparty
+- Currently managed: Caddy, Prometheus, Grafana, Alertmanager, Node Exporter, Smartctl Exporter, Pushgateway, Concourse, Vault, Tandoor, Litestream, Pocket ID, Copyparty
 
 ## File Structure Notes
 - **Playbooks**: `0-ha-proxy.play.yaml`, `1-little-infrastructure.play.yaml`, `1-box.play.yaml`, `2-little-apps.play.yaml`, `2-little-media.play.yaml`, `3-monitoring.play.yaml`, `3-little-backup.play.yaml`, `3-box-backup.play.yaml`
@@ -293,7 +286,7 @@ OAuth2 proxies are configured using the reusable `oauth2_proxy` role:
 The numbered prefix indicates execution order:
 - **0-ha-proxy.play.yaml**: HA Proxy setup (can run independently)
 - **1-little-infrastructure.play.yaml**: Must run first for little host (provides Docker, networking, Caddy, Pocket ID, Monitoring, Vault)
-- **1-box.play.yaml**: Must run first for box host (provides Docker, Concourse, Tandoor, Knot, Pocket ID secondary)
+- **1-box.play.yaml**: Must run first for box host (provides Docker, Concourse, Tandoor, Pocket ID secondary)
 - **2-little-apps.play.yaml**: Requires little infrastructure
 - **2-little-media.play.yaml**: Requires little infrastructure
 - **3-monitoring.play.yaml**: Requires infrastructure on both hosts (deploys exporters)

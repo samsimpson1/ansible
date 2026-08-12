@@ -107,12 +107,6 @@
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["concourse", "pocket_id", "forgejo"]
 
-    - name: Knot
-      ansible.builtin.include_role:
-        name: knot
-      vars:
-        knot_state: absent
-
     - name: Pocket ID
       ansible.builtin.include_role:
         name: pocket_id
