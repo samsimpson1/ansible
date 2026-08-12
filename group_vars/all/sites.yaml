@@ -55,26 +55,6 @@ sites:
       - name: ci
         target: "http://concourse-web:8080"
         host: box
-      - name: files
-        host: little
-        custom: |
-          @files host files.srv.simpson.id
-          handle @files {
-            rewrite /dav /dav/
-            route /dav/* {
-              basic_auth {
-                me {{ webdav_basic_auth_password_hash }}
-              }
-              webdav {
-                root /webdav-files
-                prefix /dav
-              }
-            }
-
-            route {
-              reverse_proxy http://filebrowser:80
-            }
-          }
       - name: grafana
         target: "http://grafana:3000"
         host: little
@@ -87,9 +67,6 @@ sites:
       - name: comics
         target: "http://komga:25600"
         host: little
-      - name: knot
-        target: "http://knot:5555"
-        host: box
       - name: navidrome
         target: "http://navidrome:4533"
         host: little

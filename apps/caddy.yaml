@@ -13,7 +13,6 @@
     caddy_http_port: "6996"
     caddy_env_vars: {}
     caddy_volumes:
-      - "/srv/containers/storage/hdd/files:/webdav-files"
       - "/srv/containers/storage/ssd/sharex:/sharex"
     caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
     caddy_networks: ["source_default", "pocket_id"]
