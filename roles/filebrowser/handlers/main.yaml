@@ -1,4 +1,0 @@
-- name: "Restart filebrowser"
-  ansible.builtin.systemd:
-    name: "filebrowser"
-    state: restarted
