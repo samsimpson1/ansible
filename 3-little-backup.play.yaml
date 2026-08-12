@@ -21,6 +21,7 @@
       vars:
         backup_restic_name: file-storage
         backup_restic_path: /srv/containers/storage/hdd/files/
+        backup_restic_state: absent
         backup_restic_cron:
           minute: "19"
           hour: "*/2"
