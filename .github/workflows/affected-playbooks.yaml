@@ -44,9 +44,9 @@ jobs:
             echo "base_ref=${BASE_REF}"
             echo "base_sha=${BASE_SHA}"
             echo "head_sha=${HEAD_SHA}"
-            echo "playbooks<<'EOF_PLAYBOOKS'"
-            printf '%s' "${PLAYBOOKS}"
-            echo 'EOF_PLAYBOOKS'
+            echo "playbooks<<EOF_PLAYBOOKS"
+            echo "${PLAYBOOKS}"
+            echo "EOF_PLAYBOOKS"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Comment affected playbooks on PR
