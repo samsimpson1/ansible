@@ -29,6 +29,8 @@ ExecStart=/usr/bin/docker run --rm \
   {% endif -%}
   {% if docker_service_cgroupns %}--cgroupns {{ docker_service_cgroupns }} \
   {% endif -%}
+  {% if docker_service_init %}--init \
+  {% endif -%}
   {% if docker_service_capabilities|length > 0 %}--cap-add {{ ' --cap-add '.join(docker_service_capabilities) }} \
   {% endif -%}
   --pull {{ docker_service_pull_policy }} \
