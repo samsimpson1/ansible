@@ -24,6 +24,8 @@
       FORGEJO__server__SSH_LISTEN_PORT: "2689"
       FORGEJO__server__SSH_PORT: "2689"
       FORGEJO__server__ROOT_URL: "https://git.sams.wtf/"
+      FORGEJO__server__REVERSE_PROXY_LIMIT: "1"
+      FORGEJO__security__REVERSE_PROXY_TRUSTED_PROXIES: "127.0.0.0/8,::1/128,10.0.0.191/32"
     docker_service_ports:
       - "0.0.0.0:2689:2689"
     docker_service_volumes:
