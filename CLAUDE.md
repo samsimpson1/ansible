@@ -72,6 +72,7 @@ Central role for managing containerized services via systemd. Creates systemd un
 - Device mappings (`docker_service_devices`)
 - Privileged mode (`docker_service_privileged`)
 - PID namespace (`docker_service_pid`)
+- Init process (`docker_service_init`)
 
 ##### ha_proxy
 High-availability proxy with Keepalived for failover between hosts. Configured via host_vars with MASTER/BACKUP states and priorities.
