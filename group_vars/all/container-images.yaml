@@ -32,7 +32,7 @@ container_images:
   freshrss: freshrss/freshrss:1.29.1
   home_assistant: ghcr.io/home-assistant/home-assistant:2026.8.1
   karakeep: ghcr.io/karakeep-app/karakeep:0.33.2
-  karakeep_meilisearch: getmeili/meilisearch:v1.53.0
+  karakeep_meilisearch: getmeili/meilisearch:v1.53.1
   karakeep_chrome: ghcr.io/karakeep-app/karakeep-chrome:151.0.7922.47-r1
   nginx: nginx:1.31.1
   forgejo: codeberg.org/forgejo/forgejo:16.0.2
