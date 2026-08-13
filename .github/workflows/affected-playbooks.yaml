@@ -1,0 +1,107 @@
+name: Affected Playbooks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: affected-playbooks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  affected-playbooks:
+    name: Affected Playbooks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Select affected playbooks
+        id: affected
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          BASE_SHA="$(git merge-base "origin/${BASE_REF}" "${HEAD_SHA}")"
+          echo "Comparing ${BASE_REF}@${BASE_SHA} against ${HEAD_SHA}"
+          if command -v uv >/dev/null 2>&1; then
+            PLAYBOOKS="$(uv run --with pyyaml bin/affected-playbooks --base "${BASE_SHA}" --head "${HEAD_SHA}")"
+          else
+            python3 -m venv /tmp/affected-playbooks-venv
+            /tmp/affected-playbooks-venv/bin/pip install --quiet pyyaml
+            PLAYBOOKS="$(/tmp/affected-playbooks-venv/bin/python bin/affected-playbooks --base "${BASE_SHA}" --head "${HEAD_SHA}")"
+          fi
+          {
+            echo "base_ref=${BASE_REF}"
+            echo "base_sha=${BASE_SHA}"
+            echo "head_sha=${HEAD_SHA}"
+            echo "playbooks<<'EOF_PLAYBOOKS'"
+            printf '%s' "${PLAYBOOKS}"
+            echo 'EOF_PLAYBOOKS'
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Comment affected playbooks on PR
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          BASE_REF: ${{ steps.affected.outputs.base_ref }}
+          BASE_SHA: ${{ steps.affected.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.affected.outputs.head_sha }}
+          PLAYBOOKS: ${{ steps.affected.outputs.playbooks }}
+        with:
+          script: |
+            const marker = '<!-- affected-playbooks -->';
+            const playbooks = (process.env.PLAYBOOKS || '')
+              .split('\n')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+            const lines = [marker, '## 📋 Affected playbooks', ''];
+            if (playbooks.length === 0) {
+              lines.push(
+                'No playbooks are affected by this PR — the changes were positively identified as deployment-independent.',
+              );
+            } else {
+              lines.push(
+                `The deployment pipeline may run **${playbooks.length}** playbook${playbooks.length === 1 ? '' : 's'} for this PR:`,
+              );
+              lines.push('');
+              for (const p of playbooks) lines.push(`- \`${p}\``);
+            }
+            lines.push(
+              '',
+              `_Diff: \`${process.env.BASE_REF}\` (${process.env.BASE_SHA.slice(0, 7)}) → PR head (${process.env.HEAD_SHA.slice(0, 7)}). The selector is conservative: it fails open to all runbooks when it cannot prove a change is isolated._`,
+            );
+            const body = lines.join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.body && c.body.includes(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
