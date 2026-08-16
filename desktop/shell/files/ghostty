@@ -1,0 +1,3 @@
+keybind = shift+enter=text:\n
+
+shell-integration-features = ssh-env
