@@ -15,6 +15,7 @@
           - ansible
           - ansible-lint
           - awscli
+          - chart-releaser
           - claude-code@latest
           - docker-desktop
           - firefox@nightly
@@ -26,6 +27,7 @@
           - k3d
           - keepassxc
           - kind
+          - krew
           - kubebuilder
           - obsidian
           - rbenv
