@@ -12,7 +12,7 @@ container_images:
   vault: hashicorp/vault:2.0.4
   litestream: litestream/litestream:0.5.16
   pocket_id: ghcr.io/pocket-id/pocket-id:v2.14.0
-  oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.15.3
+  oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.15.4
   samba: quay.io/samba.org/samba-server:latest
   prowlarr: ghcr.io/home-operations/prowlarr:2.6
   radarr: ghcr.io/home-operations/radarr:6.4.1
