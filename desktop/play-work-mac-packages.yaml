@@ -21,6 +21,7 @@
           - docker-desktop
           - firefox@nightly
           - fzf
+          - gcloud-cli
           - gh
           - ghostty
           - go
