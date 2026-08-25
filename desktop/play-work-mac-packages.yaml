@@ -40,7 +40,6 @@
           - ykman
           - yq
           - yubico-authenticator
-          - zed
 
     - name: Create Ghostty config dir
       ansible.builtin.file:
