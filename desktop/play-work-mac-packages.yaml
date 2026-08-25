@@ -15,6 +15,7 @@
           - ansible
           - ansible-lint
           - awscli
+          - caffeine
           - chart-releaser
           - claude-code@latest
           - docker-desktop
