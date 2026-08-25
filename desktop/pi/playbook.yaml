@@ -26,13 +26,13 @@
 
     - name: Install custom package
       ansible.builtin.command:
-        cmd: pi install https://git.sams.wtf/tophattedcat/pi.git
+        cmd: pi install https://git.sams.wtf/things/pi.git
       register: pi_install
       changed_when: '"Cloning" in pi_install.stderr'
 
     - name: Update custom package
       ansible.builtin.command:
-        cmd: pi update https://git.sams.wtf/tophattedcat/pi.git
+        cmd: pi update https://git.sams.wtf/things/pi.git
       register: pi_update
       changed_when: '"HEAD is now at" in pi_update.stderr'
 
