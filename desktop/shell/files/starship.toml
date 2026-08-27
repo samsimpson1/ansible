@@ -22,3 +22,4 @@ disabled = true
 
 [aws]
 symbol = 'aws '
+format = 'on [$symbol($profile )(\[$duration\] )]($style)'
