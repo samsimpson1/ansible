@@ -2,12 +2,11 @@
   hosts: 127.0.0.1
   connection: local
   vars:
-    llama_model: "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL"
-    llama_temp: "0.6"
+    llama_model: "unsloth/Qwen3.8-27B-GGUF:UD-Q4_K_XL"
+    llama_temp: "1.0"
     llama_top_p: "0.95"
     llama_top_k: "20"
     llama_min_p: "0.00"
-    llama_mtp_n_max: "2"
     llama_ctx_size: "262144"
   tasks:
     - name: Set facts
