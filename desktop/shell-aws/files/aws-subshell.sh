@@ -30,6 +30,8 @@ GOVUK_ENV_COLOURS=(
   ["test"]="blue"
 )
 
+export GOVUK_ENVIRONMENT
+export AWS_ROLE_NAME
 GOVUK_ENVIRONMENT="${1}"
 AWS_ROLE_NAME="${2}"
 
