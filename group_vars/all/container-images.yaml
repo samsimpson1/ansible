@@ -37,7 +37,7 @@ container_images:
   nginx: nginx:1.31.1
   forgejo: codeberg.org/forgejo/forgejo:16.0.3
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
-  kavita: ghcr.io/kareadita/kavita:0.9.0
+  kavita: ghcr.io/kareadita/kavita:0.9.1
   nextcloud_aio: ghcr.io/nextcloud-releases/all-in-one:20260805_083533
   hermes: git.sams.wtf/coop/hermes-image:v2026.8.10.211704
   apple_music_gateway: git.sams.wtf/coop/apple-music-gateway:v2026.8.19.222435
