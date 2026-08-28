@@ -47,7 +47,7 @@ alias tiu="terraform init -upgrade"
 alias tp="terraform plan"
 alias tv="terraform validate"
 
-export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.cargo/bin:$PATH"
 
 if type rbenv &>/dev/null; then
   eval "$(rbenv init - --no-rehash zsh)"
