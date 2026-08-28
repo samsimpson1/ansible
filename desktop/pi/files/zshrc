@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+export PI_FFF_MODE=override

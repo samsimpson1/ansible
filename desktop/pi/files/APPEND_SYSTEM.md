@@ -1,0 +1,3 @@
+- Always use the `grep`/`find` tools when you want to search for files.
+- Use `multi_grep` to search for multiple terms at once.
+- After locating files, use `read`'s offset/limit to only read relevant lines.

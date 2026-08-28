@@ -11,17 +11,20 @@
     "git show *",
     "git status *",
     "go env *",
-    "grep *",
     "head *",
     "ls *",
     "nl *",
     "printf *",
-    "rg *",
     "sort *",
     "sox *",
     "soxi *",
     "tail *",
     "true",
     "wc *"
+  ],
+  "deny": [
+    {"command": "grep *", "reason": "Use 'grep' tool instead"},
+    {"command": "rg *", "reason": "Use 'grep' tool instead"},
+    {"command": "sed *", "reason": "Use built-in read/edit tools instead"}
   ]
 }
