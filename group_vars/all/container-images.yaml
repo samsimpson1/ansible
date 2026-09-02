@@ -34,7 +34,7 @@ container_images:
   karakeep: ghcr.io/karakeep-app/karakeep:0.33.2
   karakeep_meilisearch: getmeili/meilisearch:v1.53.1
   karakeep_chrome: ghcr.io/karakeep-app/karakeep-chrome:151.0.7922.47-r1
-  nginx: nginx:1.31.1
+  nginx: nginx:1.31.5
   forgejo: codeberg.org/forgejo/forgejo:16.0.3
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
   kavita: ghcr.io/kareadita/kavita:0.9.0
