@@ -29,11 +29,13 @@
   "packageRules": [
     {
       "matchPackageNames": [
+        "ghcr.io/home-operations/lidarr",
         "ghcr.io/home-operations/prowlarr",
         "ghcr.io/home-operations/radarr",
         "ghcr.io/home-operations/sonarr",
         "ghcr.io/home-operations/sabnzbd",
         "ghcr.io/home-operations/qbittorrent",
+        "ghcr.io/kareadita/kavita",
         "ghcr.io/sct/overseerr",
         "ghcr.io/advplyr/audiobookshelf",
         "ghcr.io/gotson/komga",
