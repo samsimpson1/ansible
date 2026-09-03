@@ -8,6 +8,13 @@
               "quantizations": ["fp8"]
             }
           }
+        },
+        "z-ai/glm-5.3": {
+          "compat": {
+            "openRouterRouting": {
+              "quantizations": ["fp8"]
+            }
+          }
         }
       }
     }
