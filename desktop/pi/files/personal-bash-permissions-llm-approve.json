@@ -1,0 +1,7 @@
+{
+  "llmApprove": {
+    "enable": true,
+    "model": "openrouter/google/gemini-3.8-flash",
+    "thinking": "low"
+  }
+}

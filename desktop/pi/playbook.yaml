@@ -11,6 +11,11 @@
         pi_extensions:
           - https://git.sams.wtf/things/pi.git
           - npm:@ff-labs/pi-fff
+        pi_personal_bash_permissions_contents: |
+          {{ lookup('file', 'files/bash-permissions.json')
+            | from_json
+            | combine (lookup('file', 'files/personal-bash-permissions-llm-approve.json') | from_json)
+            | to_json }}
 
     - name: Install macos packages
       ansible.builtin.package:
@@ -77,13 +82,23 @@
         mode: '0600'
       when: "not ansible_facts['hostname'] is match('MAC-Dev-.*')"
 
-    - name: Create bash-permissions config file
+    - name: Create bash-permissions config file (work)
       ansible.builtin.copy:
         src: files/bash-permissions.json
         dest: "{{ pi_dir }}/bash-permissions.json"
         owner: "{{ ansible_facts['user_id'] }}"
         group: "{{ ansible_facts['user_gid'] }}"
         mode: '0600'
+      when: "ansible_facts['hostname'] is match('MAC-Dev-.*')"
+
+    - name: Create bash-permissions config file (personal)
+      ansible.builtin.copy:
+        content: "{{ pi_personal_bash_permissions_contents }}"
+        dest: "{{ pi_dir }}/bash-permissions.json"
+        owner: "{{ ansible_facts['user_id'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+        mode: '0600'
+      when: "not ansible_facts['hostname'] is match('MAC-Dev-.*')"
 
     - name: Create APPEND_SYSTEM.md
       ansible.builtin.copy:
