@@ -23,8 +23,12 @@
     "wc *"
   ],
   "deny": [
-    {"command": "grep *", "reason": "Use 'grep' tool instead"},
     {"command": "rg *", "reason": "Use 'grep' tool instead"},
     {"command": "sed *", "reason": "Use built-in read/edit tools instead"}
-  ]
+  ],
+  "llmApprove": {
+    "enable": true,
+    "model": "openrouter/google/gemini-3.8-flash",
+    "thinking": "low"
+  }
 }
