@@ -9,7 +9,7 @@ container_images:
   concourse_web: concourse/concourse:8.3.0
   concourse_worker: concourse/concourse:8.3.0
   concourse_postgres: postgres:18
-  vault: hashicorp/vault:2.0.4
+  vault: hashicorp/vault:2.1.0
   litestream: litestream/litestream:0.5.16
   pocket_id: ghcr.io/pocket-id/pocket-id:v2.14.0
   oauth2_proxy: quay.io/oauth2-proxy/oauth2-proxy:v7.15.3
