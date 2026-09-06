@@ -9,6 +9,18 @@
   bind {{ ha_proxy_address }}
   tls /certificates/{{ host.name }}/fullchain.pem /certificates/{{ host.name }}/key.pem
 
+  handle_path /robots.txt {
+    respond <<EOF
+      User-agent: *
+      Disallow: /
+      EOF 200
+  }
+
+  @fb header User-Agent *meta-externalagent*
+  handle @fb {
+    respond "" 403
+  }
+
   {% for site in host.routes %}
 
   {% if site.host == 'ha' %}
