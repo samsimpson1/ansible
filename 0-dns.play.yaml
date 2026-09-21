@@ -12,7 +12,7 @@
         name: "@"
         type: "A"
         ttl: "300"
-        records: [value: "82.69.70.238"]
+        records: [value: "158.173.147.114"]
 
     - name: Create *.int.simpson.id A
       hetzner.hcloud.zone_rrset:
@@ -28,7 +28,7 @@
         name: "*.srv"
         type: "A"
         ttl: "3600"
-        records: [value: "82.69.70.238"]
+        records: [value: "158.173.147.114"]
 
     - name: Create box.int.simpson.id A
       hetzner.hcloud.zone_rrset:
@@ -186,7 +186,7 @@
         name: "@"
         type: "A"
         ttl: "3600"
-        records: [value: "82.69.70.238"]
+        records: [value: "158.173.147.114"]
 
     - name: Create cloud.sams.wtf A
       hetzner.hcloud.zone_rrset:
