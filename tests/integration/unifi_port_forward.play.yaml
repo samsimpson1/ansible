@@ -1,0 +1,209 @@
+# Run explicitly with ANSIBLE_LIBRARY=./library ANSIBLE_MODULE_UTILS=./module_utils
+# ansible-playbook tests/integration/unifi_port_forward.play.yaml \
+#   -e unifi_live_test=true -e unifi_test_wan_ip=<approved-WAN-address>
+- name: Exercise a temporary UniFi port forward
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../../vars/unifi.yaml
+  module_defaults:
+    unifi_port_forward:
+      api_url: "{{ unifi_host }}"
+      api_key: "{{ unifi_api_key }}"
+      validate_certs: false
+      site: default
+    ansible.builtin.uri:
+      headers:
+        X-API-KEY: "{{ unifi_api_key }}"
+      validate_certs: false
+      use_proxy: false
+      return_content: true
+  tasks:
+    - name: Require an explicit live test and WAN address
+      ansible.builtin.assert:
+        that:
+          - unifi_live_test | default(false) | bool
+          - unifi_test_wan_ip is defined
+          - unifi_test_wan_ip != 'any'
+          - not ansible_check_mode
+        fail_msg: Set unifi_live_test=true and unifi_test_wan_ip to the approved WAN IPv4 address.
+
+    - name: Choose a unique test name
+      ansible.builtin.set_fact:
+        unifi_test_name: "ansible-port-forward-test-{{ now(utc=true, fmt='%Y%m%d%H%M%S%f') }}"
+
+    - name: Snapshot existing rules
+      ansible.builtin.uri:
+        url: "{{ unifi_host }}/proxy/network/api/s/default/rest/portforward"
+      register: unifi_before
+      no_log: true
+
+    - name: Require an unused test name and external port
+      ansible.builtin.assert:
+        that:
+          - unifi_before.json.data | selectattr('name', 'equalto', unifi_test_name) | list | length == 0
+          - unifi_before.json.data | selectattr('dst_port', 'search', '65443') | list | length == 0
+
+    - name: Exercise the temporary rule with guaranteed cleanup
+      block:
+        - name: Predict creation
+          unifi_port_forward: &test_rule
+            name: "{{ unifi_test_name }}"
+            enabled: false
+            protocol: tcp
+            wan:
+              interface: wan
+              ip_address: "{{ unifi_test_wan_ip }}"
+              port: "65443"
+            forward:
+              ip: 192.0.2.10
+              port: "65443"
+            source_limiting:
+              enabled: true
+              ip: 192.0.2.1
+          check_mode: true
+          diff: true
+          register: unifi_predicted_create
+
+        - name: Create a disabled test rule
+          unifi_port_forward: *test_rule
+          register: unifi_created
+
+        - name: Verify creation is idempotent
+          unifi_port_forward: *test_rule
+          register: unifi_created_again
+
+        - name: Assert creation results
+          ansible.builtin.assert:
+            that:
+              - unifi_predicted_create.changed
+              - unifi_predicted_create.id is none
+              - unifi_created.changed
+              - not unifi_created_again.changed
+              - unifi_created.rule == unifi_predicted_create.rule
+
+        - name: Predict an update
+          unifi_port_forward: &update_rule
+            id: "{{ unifi_created.id }}"
+            name: "{{ unifi_test_name }}-renamed"
+            logging: true
+            protocol: udp
+            forward:
+              port: "65444"
+          check_mode: true
+          diff: true
+          register: unifi_predicted_update
+
+        - name: Update and rename the rule
+          unifi_port_forward: *update_rule
+          register: unifi_updated
+
+        - name: Verify update is idempotent
+          unifi_port_forward: *update_rule
+          register: unifi_updated_again
+
+        - name: Assert update results
+          ansible.builtin.assert:
+            that:
+              - unifi_predicted_update.changed
+              - unifi_updated.changed
+              - not unifi_updated_again.changed
+              - unifi_updated.rule == unifi_predicted_update.rule
+              - unifi_updated.rule.wan.ip_address == unifi_test_wan_ip
+              - not unifi_updated.rule.enabled
+
+        - name: Enable the rule restricted to a documentation-only source address
+          unifi_port_forward:
+            id: "{{ unifi_created.id }}"
+            enabled: true
+          register: unifi_enabled
+
+        - name: Verify enable is idempotent
+          unifi_port_forward:
+            id: "{{ unifi_created.id }}"
+            enabled: true
+          register: unifi_enabled_again
+
+        - name: Assert enable results
+          ansible.builtin.assert:
+            that:
+              - unifi_enabled.changed
+              - not unifi_enabled_again.changed
+              - unifi_enabled.rule.source_limiting.enabled
+              - unifi_enabled.rule.source_limiting.ip == '192.0.2.1'
+              - unifi_enabled.rule.wan.ip_address == unifi_test_wan_ip
+
+        - name: Disable the rule and clear source restrictions
+          unifi_port_forward: &clear_rule
+            id: "{{ unifi_created.id }}"
+            enabled: false
+            source_limiting:
+              enabled: false
+              ip: any
+            destination_ips: []
+          register: unifi_cleared
+
+        - name: Verify clearing is idempotent
+          unifi_port_forward: *clear_rule
+          register: unifi_cleared_again
+
+        - name: Assert clearing results
+          ansible.builtin.assert:
+            that:
+              - unifi_cleared.changed
+              - not unifi_cleared_again.changed
+              - not unifi_cleared.rule.enabled
+              - not unifi_cleared.rule.source_limiting.enabled
+              - unifi_cleared.rule.source_limiting.ip == 'any'
+              - unifi_cleared.rule.destination_ips | length == 0
+
+        - name: Predict deletion
+          unifi_port_forward:
+            id: "{{ unifi_created.id }}"
+            state: absent
+          check_mode: true
+          diff: true
+          register: unifi_predicted_delete
+
+        - name: Delete the temporary rule
+          unifi_port_forward:
+            id: "{{ unifi_created.id }}"
+            state: absent
+          register: unifi_deleted
+
+        - name: Verify deletion is idempotent
+          unifi_port_forward:
+            id: "{{ unifi_created.id }}"
+            state: absent
+          register: unifi_deleted_again
+
+        - name: Assert deletion results
+          ansible.builtin.assert:
+            that:
+              - unifi_predicted_delete.changed
+              - unifi_deleted.changed
+              - not unifi_deleted_again.changed
+              - unifi_deleted.rule == {}
+
+      always:
+        # Both names cover a failed create response or a failed rename response.
+        - name: Remove temporary test rules even after a failed assertion
+          unifi_port_forward:
+            name: "{{ item }}"
+            state: absent
+          loop:
+            - "{{ unifi_test_name }}"
+            - "{{ unifi_test_name }}-renamed"
+
+        - name: Read the rules after cleanup
+          ansible.builtin.uri:
+            url: "{{ unifi_host }}/proxy/network/api/s/default/rest/portforward"
+          register: unifi_after
+          no_log: true
+
+        - name: Confirm original rules are unchanged and all test rules are gone
+          ansible.builtin.assert:
+            that:
+              - unifi_after.json.data | sort(attribute='_id') == unifi_before.json.data | sort(attribute='_id')
+            quiet: true
