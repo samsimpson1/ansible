@@ -1,0 +1,20 @@
+Host little
+  User me
+  Hostname 10.0.0.191
+
+Host box
+  User me
+  Hostname 10.0.0.202
+{% if ansible_facts['system'] == 'Linux' %}
+{% for host in onepassword_ssh_hosts %}
+
+Host {{ host.host }}
+  User {{ host.user }}
+  Port {{ host.port }}
+
+Match host {{ host.host }} exec "test %p = {{ host.port }}"
+  IdentityAgent "{{ onepassword_ssh_agent_socket }}"
+  IdentityFile "{{ ansible_facts['user_dir'] }}/.ssh/{{ host.host }}-1password.pub"
+  IdentitiesOnly yes
+{% endfor %}
+{% endif %}

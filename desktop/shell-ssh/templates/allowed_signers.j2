@@ -1,2 +1,7 @@
 sam@simpson.id {{ lookup('file', 'files/yubi1.pub') | trim }}
 sam@simpson.id {{ lookup('file', 'files/yubi2.pub') | trim }}
+{% if ansible_facts['system'] == 'Linux' %}
+{% for host in onepassword_ssh_hosts %}
+sam@simpson.id {{ host.public_key }}
+{% endfor %}
+{% endif %}

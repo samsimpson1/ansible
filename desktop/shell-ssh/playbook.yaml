@@ -1,6 +1,14 @@
 - name: Shell (SSH)
   hosts: 127.0.0.1
   connection: local
+  vars:
+    onepassword_ssh_agent_socket: "{{ ansible_facts['user_dir'] }}/.1password/agent.sock"
+    onepassword_ssh_signer: /opt/1Password/op-ssh-sign
+    onepassword_ssh_hosts:
+      - host: git.sams.wtf
+        user: git
+        port: 2689
+        public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINe/bzJO3dSFJgxUk32R0hAubLZxnZlI1dpFrIx+8Bah
   tasks:
     - name: Tap ssh-askpass
       community.general.homebrew_tap:
@@ -40,6 +48,30 @@
         - yubi1.pub
         - yubi2.key
         - yubi2.pub
+
+    - name: Create 1Password SSH public keys (Linux)
+      ansible.builtin.copy:
+        dest: "{{ ansible_facts['user_dir'] }}/.ssh/{{ item.host }}-1password.pub"
+        content: "{{ item.public_key }}\n"
+        mode: '0600'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+      loop: "{{ onepassword_ssh_hosts }}"
+      loop_control:
+        label: "{{ item.host }}"
+      when: ansible_facts['system'] == 'Linux'
+
+    - name: Create 1Password Git signing configs (Linux)
+      ansible.builtin.template:
+        src: templates/gitconfig-1password.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.ssh/{{ item.host }}-1password.gitconfig"
+        mode: '0640'
+        owner: "{{ ansible_facts['user_uid'] }}"
+        group: "{{ ansible_facts['user_gid'] }}"
+      loop: "{{ onepassword_ssh_hosts }}"
+      loop_control:
+        label: "{{ item.host }}"
+      when: ansible_facts['system'] == 'Linux'
 
     - name: Create git SSH key detection script
       ansible.builtin.template:
@@ -122,8 +154,8 @@
         group: "{{ ansible_facts['user_gid'] }}"
 
     - name: Create ssh config
-      ansible.builtin.copy:
-        src: files/ssh_config
+      ansible.builtin.template:
+        src: templates/ssh_config.j2
         dest: "{{ ansible_facts['user_dir'] }}/.ssh/config"
         mode: '0600'
         owner: "{{ ansible_facts['user_uid'] }}"

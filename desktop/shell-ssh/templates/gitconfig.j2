@@ -14,3 +14,21 @@
   rebase = true
 [core]
   excludesFile = {{ ansible_facts['user_dir'] }}/.gitignore
+{% if ansible_facts['system'] == 'Linux' %}
+{% for host in onepassword_ssh_hosts %}
+{% for prefix in ['', '*@'] %}
+{% for path in ['*', '*/**'] %}
+[includeIf "hasconfig:remote.*.url:{{ prefix }}{{ host.host }}:{{ path }}"]
+  path = "{{ ansible_facts['user_dir'] }}/.ssh/{{ host.host }}-1password.gitconfig"
+{% endfor %}
+{% endfor %}
+{% for scheme in ['ssh', 'https', 'http'] %}
+{% for prefix in ['', '*@'] %}
+{% for port in ['', ':*'] %}
+[includeIf "hasconfig:remote.*.url:{{ scheme }}://{{ prefix }}{{ host.host }}{{ port }}/**"]
+  path = "{{ ansible_facts['user_dir'] }}/.ssh/{{ host.host }}-1password.gitconfig"
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endif %}
