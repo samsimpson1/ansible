@@ -1,0 +1,36 @@
+# Read-only live smoke test. Supply an approved, existing client MAC explicitly:
+# ANSIBLE_LIBRARY=./library ANSIBLE_MODULE_UTILS=./module_utils \
+# ansible-playbook tests/integration/unifi_client.play.yaml \
+#   -e unifi_live_test=true -e unifi_test_client_mac=<approved-existing-MAC> --check --diff
+- name: Inspect an existing UniFi client without writes
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../../vars/unifi.yaml
+  module_defaults:
+    unifi_client:
+      api_url: "{{ unifi_host }}"
+      api_key: "{{ unifi_api_key }}"
+      validate_certs: false
+      site: default
+  tasks:
+    - name: Require an explicit live target and check mode
+      ansible.builtin.assert:
+        that:
+          - unifi_live_test | default(false) | bool
+          - unifi_test_client_mac is defined
+          - ansible_check_mode
+        fail_msg: Supply an approved existing MAC and run with --check.
+
+    - name: Predict client settings reconciliation
+      unifi_client:
+        mac: "{{ unifi_test_client_mac }}"
+        state: present
+      register: unifi_client_prediction
+
+    - name: Require the client to exist
+      ansible.builtin.assert:
+        that:
+          - unifi_client_prediction.id is not none
+          - unifi_client_prediction.client.mac == unifi_test_client_mac | lower

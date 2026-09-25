@@ -24,6 +24,11 @@ jobs:
         run: |
           ansible-galaxy install -r requirements.yaml
 
+      - name: Test UniFi module against a local HTTP fixture
+        env:
+          UNIFI_RUN_LOCAL_INTEGRATION: "1"
+        run: python3 -m unittest discover -s tests -p "test_unifi_*.py"
+
       - name: Install 1Password CLI
         run: |
           curl -sS https://downloads.1password.com/linux/keys/1password.asc | \

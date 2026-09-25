@@ -87,7 +87,7 @@ class UnifiClient:
             raise UnifiUncertain("UniFi operation deadline exceeded during retry")
         time.sleep(delay)
 
-    def request(self, method, path, payload=None):
+    def request(self, method, path, payload=None, raw_json=False):
         headers = {"Accept": "application/json", "Content-Type": "application/json"}
         if self.api_key:
             headers["X-API-KEY"] = self.api_key
@@ -133,7 +133,7 @@ class UnifiClient:
                         f"UniFi returned HTTP {status}; the write outcome may be unknown"
                     ) from None
                 raise UnifiError(
-                    f"UniFi request failed (HTTP {status}); check controller type and rule parameters"
+                    f"UniFi request failed (HTTP {status}); check controller type and resource parameters"
                 ) from None
             except (URLError, OSError, HTTPException) as error:
                 if method == "GET" and attempt < 2:
@@ -149,12 +149,16 @@ class UnifiClient:
                 raise UnifiUncertain(
                     "UniFi returned an invalid JSON response"
                 ) from None
+            if raw_json:
+                if not isinstance(body, (dict, list)):
+                    raise UnifiUncertain("UniFi returned an unexpected response shape")
+                return body
             if not isinstance(body, dict):
                 raise UnifiUncertain("UniFi returned an unexpected response shape")
             meta = body.get("meta", {})
             if not isinstance(meta, dict) or meta.get("rc", "ok") != "ok":
                 raise UnifiError(
-                    "UniFi reported an API error; check rule parameters and permissions"
+                    "UniFi reported an API error; check resource parameters and permissions"
                 )
             return body
         raise UnifiError("UniFi read retries exhausted")
@@ -210,3 +214,95 @@ class UnifiClient:
             self.request("DELETE", self.path + "/" + quote(rule_id, safe=""), {})
         except UnifiNotFound:
             pass
+
+    def _resource_path(self, resource):
+        return self.prefix + "/api/s/" + self.site + "/rest/" + resource
+
+    def list_resource(self, resource):
+        rows = self._rows(self.request("GET", self._resource_path(resource)))
+        ids = [row.get("_id") for row in rows]
+        if any(not isinstance(key, str) or not key for key in ids) or len(ids) != len(
+            set(ids)
+        ):
+            raise UnifiError("UniFi returned objects with missing or duplicate IDs")
+        return rows
+
+    def get_resource(self, resource, resource_id):
+        try:
+            rows = self._rows(
+                self.request(
+                    "GET",
+                    self._resource_path(resource) + "/" + quote(resource_id, safe=""),
+                )
+            )
+        except UnifiNotFound:
+            return None
+        if not rows:
+            return None
+        if len(rows) != 1 or rows[0].get("_id") != resource_id:
+            raise UnifiError("UniFi returned an unexpected object ID")
+        return rows[0]
+
+    def create_resource(self, resource, payload):
+        rows = self._rows(self.request("POST", self._resource_path(resource), payload))
+        if (
+            len(rows) != 1
+            or not isinstance(rows[0].get("_id"), str)
+            or not rows[0]["_id"]
+        ):
+            raise UnifiUncertain("UniFi did not return the created object ID")
+        return rows[0]
+
+    def update_resource(self, resource, resource_id, payload):
+        self.request(
+            "PUT",
+            self._resource_path(resource) + "/" + quote(resource_id, safe=""),
+            payload,
+        )
+
+    def forget_client(self, mac):
+        rows = self._rows(
+            self.request(
+                "POST",
+                self.prefix + "/api/s/" + self.site + "/cmd/stamgr",
+                {"cmd": "forget-sta", "macs": [mac]},
+            )
+        )
+        if len(rows) != 1:
+            raise UnifiUncertain("UniFi did not confirm forgetting the client")
+
+    def _network_group_path(self, plural=False):
+        suffix = "network-members-groups" if plural else "network-members-group"
+        return self.prefix + "/v2/api/site/" + self.site + "/" + suffix
+
+    def list_network_groups(self):
+        rows = self.request("GET", self._network_group_path(plural=True), raw_json=True)
+        if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+            raise UnifiUncertain("UniFi returned an invalid network members group list")
+        ids = [row.get("id") for row in rows]
+        if any(not isinstance(key, str) or not key for key in ids) or len(ids) != len(
+            set(ids)
+        ):
+            raise UnifiError(
+                "UniFi returned network members groups with missing or duplicate IDs"
+            )
+        if any(
+            not isinstance(row.get("name"), str)
+            or not row["name"]
+            or not isinstance(row.get("type"), str)
+            for row in rows
+        ):
+            raise UnifiUncertain("UniFi returned a malformed network members group")
+        return [dict(row, _id=row["id"]) for row in rows]
+
+    def create_network_group(self, payload):
+        row = self.request("POST", self._network_group_path(), payload, raw_json=True)
+        if (
+            not isinstance(row, dict)
+            or not isinstance(row.get("id"), str)
+            or not row["id"]
+        ):
+            raise UnifiUncertain(
+                "UniFi did not return the created network members group ID"
+            )
+        return dict(row, _id=row["id"])

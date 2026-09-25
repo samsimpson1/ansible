@@ -535,11 +535,30 @@ class AnsibleIntegrationTests(unittest.TestCase):
                     }
                 )
             )
-            play = yaml.safe_load(
-                (ROOT / "0-unifi-port-forwards.play.yaml").read_text()
-            )
-            play[0]["vars_files"] = [str(variables)]
-            play[0]["vars"]["ansible_python_interpreter"] = sys.executable
+            play = [
+                {
+                    "name": "UniFi port-forward fixture",
+                    "hosts": "127.0.0.1",
+                    "connection": "local",
+                    "gather_facts": False,
+                    "vars_files": [str(variables)],
+                    "vars": {"ansible_python_interpreter": sys.executable},
+                    "module_defaults": {
+                        "unifi_port_forward": {
+                            "api_url": "{{ unifi_host }}",
+                            "api_key": "{{ unifi_api_key }}",
+                            "validate_certs": False,
+                        }
+                    },
+                    "tasks": [
+                        {
+                            "name": "Reconcile fixture rules",
+                            "unifi_port_forward": "{{ item }}",
+                            "loop": "{{ unifi_port_forwards }}",
+                        }
+                    ],
+                }
+            ]
             playbook = temp / "play.yaml"
             playbook.write_text(yaml.safe_dump(play))
             rule_config = {
