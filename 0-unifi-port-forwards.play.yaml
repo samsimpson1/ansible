@@ -22,3 +22,14 @@
         forward:
           ip: "10.0.0.202"
           port: "2689"
+    - name: Forgejo SSH (2689)
+      unifi_port_forward:
+        name: "Forgejo SSH (2689)"
+        state: "present"
+        protocol: "tcp_udp"
+        wan:
+          ip_address: "158.173.147.115"
+          port: "2689"
+        forward:
+          ip: "10.0.0.202"
+          port: "2689"
