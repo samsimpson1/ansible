@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+docker exec {{ nginx_id | quote }} nginx -t -c /etc/nginx/managed/nginx.conf
+docker exec {{ nginx_id | quote }} nginx -s reload -c /etc/nginx/managed/nginx.conf

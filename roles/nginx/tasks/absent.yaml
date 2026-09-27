@@ -1,5 +1,23 @@
 ---
-- name: Remove nginx directory
+- name: Inspect nginx service
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/{{ nginx_id }}.service"
+  register: nginx_unit
+
+- name: Stop and disable nginx
+  ansible.builtin.systemd_service:
+    name: "{{ nginx_id }}"
+    state: stopped
+    enabled: false
+  when: nginx_unit.stat.exists
+
+- name: Remove nginx service unit
   ansible.builtin.file:
-    path: "{{ nginx_directory }}"
+    path: "/etc/systemd/system/{{ nginx_id }}.service"
+    state: absent
+  notify: Reload systemd after nginx removal
+
+- name: Remove nginx base network
+  community.docker.docker_network:
+    name: "{{ nginx_base_network }}"
     state: absent

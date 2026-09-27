@@ -1,0 +1,22 @@
+---
+nginx_site_state: present
+nginx_site_id: nginx
+nginx_site_directory: /srv/app/nginx
+nginx_site_server_names: []
+nginx_site_kind: internal
+# Explicit existing certificate group: <certificate_directory>/<group>/{fullchain,key}.pem
+nginx_site_certificate: ''
+# Full HTTP(S) origin, using a unique container name/alias or reachable host IP.
+nginx_site_upstream: ''
+nginx_site_networks: []
+# Bind mounts: [{source: /host/path, target: /srv/static, read_only: true}].
+# System/configuration destinations are reserved; shared declarations must match.
+nginx_site_volumes: []
+# Server-context nginx directives. Define location(s) here for static files,
+# auth_request, or response-only behavior. An upstream adds a default location /.
+nginx_site_config: ''
+# Each site owns its config and Docker requirements, including across separate plays.
+nginx_site_files:
+  - {path: 'sites/{{ nginx_site_name }}.conf', template: site.conf.j2}
+  - {path: 'network/{{ nginx_site_name }}.list', template: networks.j2}
+  - {path: 'mount/{{ nginx_site_name }}.list', template: mounts.j2}

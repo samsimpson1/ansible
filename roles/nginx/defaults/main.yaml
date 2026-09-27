@@ -1,2 +1,21 @@
+---
 nginx_directory: /srv/app/nginx
 nginx_state: present
+nginx_id: nginx
+nginx_image: "{{ container_images.nginx }}"
+# Each group contains fullchain.pem and key.pem. ACME installs them here,
+# then calls <nginx_directory>/reload to validate and load the certificates.
+nginx_certificate_directory: /srv/certificates
+nginx_base_network: "{{ nginx_id }}"
+# Published explicitly on IPv4. The container listener ports are fixed; these
+# host ports may be overridden to validate alongside an existing ingress.
+nginx_bind_address: 0.0.0.0
+nginx_internal_http_port: 80
+nginx_internal_https_port: 443
+nginx_external_http_port: 6996
+nginx_external_https_port: 6997
+# Enforced inside nginx against the connection source, including Docker DNAT.
+# Do not add Docker subnets or trust client-supplied forwarding headers here.
+nginx_internal_cidrs:
+  - 10.0.0.0/8
+  - 100.64.0.0/10

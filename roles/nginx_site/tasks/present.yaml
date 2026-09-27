@@ -1,0 +1,12 @@
+---
+- name: Template this site's configuration, networks and mounts
+  ansible.builtin.template:
+    src: "{{ item.template }}"
+    dest: "{{ nginx_site_directory }}/{{ item.path }}"
+    owner: root
+    group: root
+    mode: '0640'
+  loop: "{{ nginx_site_files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: nginx_site_written

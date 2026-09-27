@@ -1,0 +1,48 @@
+---
+- name: Validate nginx site interface
+  ansible.builtin.assert:
+    that:
+      - nginx_site_state in ['present', 'absent']
+      - nginx_site_name is defined
+      - nginx_site_name is match('^[a-zA-Z0-9][a-zA-Z0-9_-]*$')
+
+- name: Validate present nginx site
+  ansible.builtin.assert:
+    that:
+      - nginx_site_kind in ['external', 'internal']
+      - nginx_site_server_names is sequence and nginx_site_server_names is not string
+      - nginx_site_networks is sequence and nginx_site_networks is not string
+      - nginx_site_volumes is sequence and nginx_site_volumes is not string
+      - nginx_site_server_names | length > 0
+      - nginx_site_certificate is match('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$')
+      - nginx_site_upstream | length > 0 or nginx_site_config | length > 0
+      - nginx_site_upstream | length == 0 or nginx_site_upstream is match('^https?://[a-zA-Z0-9_.-]+(:[0-9]+)?/?$')
+  when: nginx_site_state == 'present'
+
+- name: Validate bind mount declarations
+  ansible.builtin.assert:
+    that:
+      - item.source is match('^/[^:\s,]+$')
+      - item.target is match('^/[^:\s,]+$')
+      - "'..' not in item.target.split('/')"
+      - "'//' not in item.target"
+      - not item.target.endswith('/')
+      - item.read_only | default(true) is boolean
+  loop: "{{ nginx_site_volumes }}"
+  when: nginx_site_state == 'present'
+
+- name: Manage site files
+  ansible.builtin.include_tasks: "{{ nginx_site_state }}.yaml"
+
+# Only successful validation of changed files notifies a restart.
+- name: Validate nginx configuration and site requirements
+  ansible.builtin.command:
+    argv: ["{{ nginx_site_directory }}/start", test]
+  register: nginx_site_validation
+  changed_when: nginx_site_written.changed if nginx_site_state == 'present' else nginx_site_removed.changed
+  failed_when: nginx_site_validation.rc != 0 or 'conflicting server name' in nginx_site_validation.stderr
+  notify: 'nginx_site : Restart nginx'
+  when: not ansible_check_mode
+
+- name: Apply site changes
+  ansible.builtin.meta: flush_handlers

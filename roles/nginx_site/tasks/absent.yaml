@@ -1,0 +1,9 @@
+---
+- name: Remove this site's configuration, networks and mounts
+  ansible.builtin.file:
+    path: "{{ nginx_site_directory }}/{{ item.path }}"
+    state: absent
+  loop: "{{ nginx_site_files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: nginx_site_removed

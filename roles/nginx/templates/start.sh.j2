@@ -1,0 +1,50 @@
+#!/bin/bash
+# Collect app-owned registrations every time systemd creates nginx.
+set -euo pipefail
+shopt -s nullglob
+mode=${1:-run}
+directory={{ nginx_directory | quote }}
+certificates=${2:-{{ nginx_certificate_directory | quote }}}
+case "$mode" in
+  run|test) ;;
+  *) echo 'Usage: start [run|test] [certificates]' >&2; exit 2 ;;
+esac
+network_files=("$directory"/network/*.list)
+mount_files=("$directory"/mount/*.list)
+mapfile -t networks < <({ echo {{ nginx_base_network | quote }}; cat "${network_files[@]}" /dev/null; } | sed '/^$/d' | sort -u)
+mapfile -t mounts < <(cat "${mount_files[@]}" /dev/null | sed '/^$/d' | sort -u)
+
+# Repeated compatible mounts are shared; a destination cannot hide another mount.
+declare -A destinations=()
+for mount in "${mounts[@]}"; do
+  IFS=: read -r source target access extra <<< "$mount"
+  [[ $source = /* && $target = /* && $access =~ ^(ro|rw)$ && -z $extra ]] || {
+    echo "Invalid mount: $mount" >&2; exit 1;
+  }
+  for existing in "${!destinations[@]}" /etc/nginx /certificates /proc /sys /dev /run /var/run; do
+    if [[ $target == "$existing" || $target == "$existing/"* || $existing == "$target/"* || $target == / ]]; then
+      echo "Conflicting mount destination: $target and $existing" >&2; exit 1
+    fi
+  done
+  destinations[$target]=$mount
+done
+args=(--mount "type=bind,src=$directory,dst=/etc/nginx/managed,readonly"
+      --mount "type=bind,src=$certificates,dst=/certificates,readonly")
+for network in "${networks[@]}"; do args+=(--network "$network"); done
+for mount in "${mounts[@]}"; do
+  IFS=: read -r source target access <<< "$mount"
+  value="type=bind,src=$source,dst=$target"
+  [[ $access != ro ]] || value+=,readonly
+  args+=(--mount "$value")
+done
+if [[ $mode == test ]]; then
+  exec docker run --rm "${args[@]}" \
+    --entrypoint nginx {{ nginx_image | quote }} -t -c /etc/nginx/managed/nginx.conf
+fi
+exec docker run --rm --name {{ nginx_id | quote }} --stop-signal SIGQUIT \
+  "${args[@]}" \
+  --publish {{ (nginx_bind_address ~ ':' ~ nginx_internal_http_port ~ ':80') | quote }} \
+  --publish {{ (nginx_bind_address ~ ':' ~ nginx_internal_https_port ~ ':443') | quote }} \
+  --publish {{ (nginx_bind_address ~ ':' ~ nginx_external_http_port ~ ':6996') | quote }} \
+  --publish {{ (nginx_bind_address ~ ':' ~ nginx_external_https_port ~ ':6997') | quote }} \
+  --entrypoint nginx {{ nginx_image | quote }} -g 'daemon off;' -c /etc/nginx/managed/nginx.conf

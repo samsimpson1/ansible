@@ -1,0 +1,3 @@
+{% for volume in nginx_site_volumes | sort(attribute='target') %}
+{{ volume.source }}:{{ volume.target }}:{{ 'ro' if volume.read_only | default(true) else 'rw' }}
+{% endfor %}

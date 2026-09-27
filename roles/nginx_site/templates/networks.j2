@@ -1,0 +1,3 @@
+{% for network in nginx_site_networks | unique | sort %}
+{{ network }}
+{% endfor %}

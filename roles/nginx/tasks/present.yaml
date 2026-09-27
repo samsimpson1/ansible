@@ -1,16 +1,76 @@
 ---
-- name: Nginx directory
+- name: Create nginx directories
   ansible.builtin.file:
-    path: "{{ nginx_directory }}"
+    path: "{{ nginx_directory }}/{{ item }}"
     state: directory
-    owner: app
-    group: app
+    owner: root
+    group: root
     mode: '0750'
+  loop: ['', sites, network, mount]
 
-- name: Nginx config file
+- name: Create nginx base network
+  community.docker.docker_network:
+    name: "{{ nginx_base_network }}"
+
+- name: Create nginx certificate directory
+  ansible.builtin.file:
+    path: "{{ nginx_certificate_directory }}"
+    state: directory
+    mode: '0755'
+
+- name: Template nginx startup collector
+  ansible.builtin.template:
+    src: start.sh.j2
+    dest: "{{ nginx_directory }}/start"
+    owner: root
+    group: root
+    mode: '0750'
+    validate: bash -n %s
+  register: nginx_start_script
+
+- name: Template nginx reload command
+  ansible.builtin.template:
+    src: reload.sh.j2
+    dest: "{{ nginx_directory }}/reload"
+    owner: root
+    group: root
+    mode: '0750'
+    validate: bash -n %s
+
+- name: Template nginx configuration
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: "{{ nginx_directory }}/nginx.conf"
-    owner: app
-    group: app
+    owner: root
+    group: root
     mode: '0640'
+  register: nginx_configured
+
+- name: Install nginx systemd service
+  ansible.builtin.template:
+    src: nginx.service.j2
+    dest: "/etc/systemd/system/{{ nginx_id }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+  register: nginx_service_unit
+
+- name: Validate nginx configuration and site requirements
+  ansible.builtin.command:
+    argv: ["{{ nginx_directory }}/start", test]
+  register: nginx_validation
+  changed_when: nginx_start_script.changed or nginx_configured.changed or nginx_service_unit.changed
+  failed_when: nginx_validation.rc != 0 or 'conflicting server name' in nginx_validation.stderr
+  notify: 'nginx : Restart nginx'
+  when: not ansible_check_mode
+
+- name: Apply nginx service changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start nginx
+  ansible.builtin.systemd_service:
+    name: "{{ nginx_id }}"
+    enabled: true
+    daemon_reload: true
+    state: started
+  when: not ansible_check_mode
