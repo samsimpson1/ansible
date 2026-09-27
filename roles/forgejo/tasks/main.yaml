@@ -10,6 +10,7 @@
   vars:
     docker_service_id: forgejo
     docker_service_description: Forgejo
+    docker_service_state: "{{ forgejo_state }}"
     docker_service_image: "{{ container_images.forgejo }}"
     docker_service_network: "{{ forgejo_network }}"
     docker_service_env_vars:
@@ -37,6 +38,7 @@
     name: nginx_site
   vars:
     nginx_site_name: forgejo
+    nginx_site_state: "{{ forgejo_state }}"
     nginx_site_kind: external
     nginx_site_server_names: [git.sams.wtf]
     nginx_site_certificate: git.sams.wtf
