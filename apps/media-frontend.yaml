@@ -29,6 +29,11 @@
     owner: "app"
     group: "app"
 
+- name: Audiobookshelf docker network
+  community.docker.docker_network:
+    name: audiobookshelf
+    state: present
+
 - name: Audiobookshelf service
   ansible.builtin.include_role:
     name: docker_service
@@ -36,7 +41,7 @@
     docker_service_id: "audiobookshelf"
     docker_service_description: "Audiobookshelf"
     docker_service_image: "{{ container_images.audiobookshelf }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, audiobookshelf]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -49,6 +54,18 @@
       - "/srv/containers/storage/ssd/audiobookshelf/config:/config:rw"
       - "/srv/containers/storage/ssd/audiobookshelf/metadata:/metadata:rw"
       - "/srv/containers/storage/ssd/audiobookshelf/cache:/cache:rw"
+
+- name: Audiobookshelf nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: audiobookshelf
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [audiobookshelf.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://audiobookshelf:8080"
+    nginx_site_networks: [audiobookshelf]
 
 - name: Plex service
   ansible.builtin.include_role:
