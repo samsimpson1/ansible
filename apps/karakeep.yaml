@@ -1,3 +1,7 @@
+- name: Karakeep docker network
+  community.docker.docker_network:
+    name: "karakeep"
+    state: present
 - name: Karakeep data directory
   ansible.builtin.file:
     path: /srv/containers/storage/ssd/karakeep
@@ -12,10 +16,11 @@
     docker_service_id: "karakeep-meilisearch"
     docker_service_description: "Karakeep Meilisearch"
     docker_service_image: "{{ container_images.karakeep_meilisearch }}"
-    docker_service_network: source_default
+    docker_service_network: [karakeep]
     docker_service_env_vars:
       MEILI_NO_ANALYTICS: "true"
       MEILI_MASTER_KEY: "{{ karakeep.meilisearch_master_key }}"
+      MEILI_UPGRADE_DB: "true"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/karakeep/meilisearch:/meili_data"
 - name: Karakeep Chrome service
@@ -25,7 +30,7 @@
     docker_service_id: "karakeep-chrome"
     docker_service_description: "Karakeep Chrome"
     docker_service_image: "{{ container_images.karakeep_chrome }}"
-    docker_service_network: source_default
+    docker_service_network: [karakeep]
     docker_service_init: true
     docker_service_command: --disable-gpu --disable-dev-shm-usage --hide-scrollbars --disable-blink-features=AutomationControlled --window-size=1440,900
 - name: Karakeep web service
@@ -35,7 +40,7 @@
     docker_service_id: "karakeep-web"
     docker_service_description: "Karakeep Web"
     docker_service_image: "{{ container_images.karakeep }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, karakeep]
     docker_service_env_vars:
       MEILI_ADDR: http://karakeep-meilisearch:7700
       MEILI_MASTER_KEY: "{{ karakeep.meilisearch_master_key }}"
@@ -63,3 +68,14 @@
       EMBEDDING_ENABLE_AUTO_INDEXING: "true"
     docker_service_volumes:
       - /srv/containers/storage/ssd/karakeep/web:/data
+- name: Karakeep nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: karakeep
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [bookmarks.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://karakeep-web:3000"
+    nginx_site_networks: [karakeep]
