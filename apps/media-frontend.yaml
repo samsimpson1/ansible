@@ -124,6 +124,11 @@
       - "/srv/containers/storage/ssd/lms/config:/config:rw"
       - "/srv/containers/storage/ssd/lms/playlists:/playlists:rw"
 
+- name: Navidrome docker network
+  community.docker.docker_network:
+    name: navidrome
+    state: present
+
 - name: Navidrome service
   ansible.builtin.include_role:
     name: docker_service
@@ -131,7 +136,7 @@
     docker_service_id: "navidrome"
     docker_service_description: "Navidrome Music Server"
     docker_service_image: "{{ container_images.navidrome }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, navidrome]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -146,6 +151,18 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/navidrome:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Navidrome nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: navidrome
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [navidrome.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://navidrome:4533"
+    nginx_site_networks: [navidrome]
 
 - name: Overseerr service
   ansible.builtin.include_role:
