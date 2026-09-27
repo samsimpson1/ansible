@@ -1,3 +1,7 @@
+- name: FreshRSS docker network
+  community.docker.docker_network:
+    name: freshrss
+    state: present
 - name: FreshRSS data directory
   ansible.builtin.file:
     path: /srv/containers/storage/ssd/freshrss
@@ -10,7 +14,7 @@
     docker_service_id: "freshrss"
     docker_service_description: "FreshRSS"
     docker_service_image: "{{ container_images.freshrss }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, freshrss]
     docker_service_env_vars:
       TZ: Europe/London
       CRON_MIN: "15,30,45,0"
@@ -24,3 +28,14 @@
       OIDC_CLIENT_CRYPTO_KEY: "{{ freshrss_crypto_key }}"
     docker_service_volumes:
       - /srv/containers/storage/ssd/freshrss:/var/www/FreshRSS/data
+- name: FreshRSS nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: freshrss
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [rss.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://freshrss:80"
+    nginx_site_networks: [freshrss]
