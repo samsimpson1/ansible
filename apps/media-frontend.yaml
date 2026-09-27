@@ -164,6 +164,11 @@
     nginx_site_upstream: "http://navidrome:4533"
     nginx_site_networks: [navidrome]
 
+- name: Overseerr docker network
+  community.docker.docker_network:
+    name: overseerr
+    state: present
+
 - name: Overseerr service
   ansible.builtin.include_role:
     name: docker_service
@@ -171,7 +176,7 @@
     docker_service_id: "overseerr"
     docker_service_description: "Overseerr"
     docker_service_image: "{{ container_images.overseerr }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, overseerr]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -180,6 +185,18 @@
       PORT: "80"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/overseerr:/app/config:rw"
+
+- name: Overseerr nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: overseerr
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [requests.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://overseerr:80"
+    nginx_site_networks: [overseerr]
 
 - name: Pinchflat service
   ansible.builtin.include_role:
