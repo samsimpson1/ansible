@@ -40,10 +40,10 @@
     name: docker_service
   vars:
     docker_service_id: "pocket-id-litestream"
+    docker_service_state: absent
     docker_service_description: "Pocket ID Litestream"
     docker_service_image: "{{ container_images.litestream }}"
     docker_service_network: source_default
-    docker_service_state: "{{ 'present' if pocket_id_role == 'primary' and pocket_id_state == 'present' else 'absent' }}"
     docker_service_user: "{{ pocket_id_uid | default('1985') }}"
     docker_service_groups: ["{{ pocket_id_uid | default('1985') }}"]
     docker_service_command: "replicate -config /data/litestream.yaml"

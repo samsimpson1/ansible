@@ -1,6 +1,5 @@
 - name: HA Proxy
   hosts:
-    - box
     - little
   become: true
   tasks:

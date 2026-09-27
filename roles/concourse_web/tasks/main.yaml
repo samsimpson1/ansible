@@ -61,6 +61,17 @@
       - "{{ concourse_web_data_directory }}/concourse-web/keys:/concourse-keys:ro"
     docker_service_state: "{{ concourse_web_state }}"
 
+- name: Concourse nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: concourse
+    nginx_site_kind: external
+    nginx_site_server_names: [ci.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://concourse-web:8080"
+    nginx_site_networks: ["{{ concourse_web_network }}"]
+
 - name: Absent tasks
   ansible.builtin.include_tasks:
     file: absent.yaml

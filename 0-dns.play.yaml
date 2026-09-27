@@ -30,6 +30,22 @@
         ttl: "3600"
         records: [value: "158.173.147.114"]
 
+    - name: Create box.srv.simpson.id A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "box.srv"
+        type: "A"
+        ttl: "3600"
+        records: [value: "158.173.147.115"]
+
+    - name: Create ci.srv.simpson.id A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "ci.srv"
+        type: "A"
+        ttl: "3600"
+        records: [value: "158.173.147.115"]
+
     - name: Create box.int.simpson.id A
       hetzner.hcloud.zone_rrset:
         zone: simpson.id
@@ -235,7 +251,7 @@
         name: "git"
         type: "CNAME"
         ttl: "3600"
-        records: [value: "sams.wtf."]
+        records: [value: "box.srv.simpson.id."]
 
     - name: Create sams.wtf iCloud DKIM CNAME
       hetzner.hcloud.zone_rrset:

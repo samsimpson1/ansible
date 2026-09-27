@@ -4,6 +4,12 @@
     - vars/concourse.yaml
   become: true
   tasks:
+    - name: HA Proxy
+      ansible.builtin.include_role:
+        name: ha_proxy
+      vars:
+        ha_proxy_state: absent
+
     - name: Forgejo
       ansible.builtin.include_role:
         name: forgejo
@@ -11,8 +17,20 @@
     - name: Nginx
       ansible.builtin.include_role:
         name: nginx
+
+    - name: Nginx box site
+      ansible.builtin.include_role:
+        name: nginx_site
       vars:
-        nginx_state: absent
+        nginx_site_name: box
+        nginx_site_kind: external
+        nginx_site_server_names: [box.srv.simpson.id]
+        nginx_site_certificate: srv.simpson.id
+        nginx_site_config: |
+          location / {
+            default_type text/plain;
+            return 200 "i'm a box";
+          }
 
     - name: App user
       ansible.builtin.include_tasks: apps/app-user.yaml
@@ -100,6 +118,7 @@
         name: caddy
       vars:
         caddy_id: "external"
+        caddy_state: absent
         caddy_https_port: "6997"
         caddy_http_port: "6996"
         caddy_env_vars: {}
@@ -111,6 +130,7 @@
       ansible.builtin.include_role:
         name: pocket_id
       vars:
+        pocket_id_state: absent
         pocket_id_role: secondary
         pocket_id_directory: "/srv/app/pocket-id"
         pocket_id_app_name: "Pocket ID (Backup)"

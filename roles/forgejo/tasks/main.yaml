@@ -31,3 +31,14 @@
     docker_service_volumes:
       - "{{ forgejo_directory }}:/data"
       - "/etc/localtime:/etc/localtime:ro"
+
+- name: Forgejo nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: forgejo
+    nginx_site_kind: external
+    nginx_site_server_names: [git.sams.wtf]
+    nginx_site_certificate: git.sams.wtf
+    nginx_site_upstream: "http://forgejo:3000"
+    nginx_site_networks: ["{{ forgejo_network }}"]
