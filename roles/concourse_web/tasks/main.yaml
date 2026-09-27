@@ -66,6 +66,7 @@
     name: nginx_site
   vars:
     nginx_site_name: concourse
+    nginx_site_state: "{{ concourse_web_state }}"
     nginx_site_kind: external
     nginx_site_server_names: [ci.srv.simpson.id]
     nginx_site_certificate: srv.simpson.id
