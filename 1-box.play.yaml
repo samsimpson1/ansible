@@ -125,13 +125,3 @@
         caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
         caddy_data_directory: "/srv/app/caddy"
         caddy_networks: ["concourse", "pocket_id", "forgejo"]
-
-    - name: Pocket ID
-      ansible.builtin.include_role:
-        name: pocket_id
-      vars:
-        pocket_id_state: absent
-        pocket_id_role: secondary
-        pocket_id_directory: "/srv/app/pocket-id"
-        pocket_id_app_name: "Pocket ID (Backup)"
-        pocket_id_accent_colour: "red"
