@@ -23,6 +23,18 @@
       SKIP_CHOWN: "true"
     docker_service_state: "{{ vault_state }}"
 
+- name: Vault nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: vault
+    nginx_site_state: "{{ vault_state }}"
+    nginx_site_kind: internal
+    nginx_site_server_names: [vault.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://vault:8200"
+    nginx_site_networks: [vault]
+
 - name: Absent tasks
   ansible.builtin.include_tasks:
     file: absent.yaml
