@@ -53,6 +53,12 @@
       - "{{ monitoring_server_storage_path }}/prometheus/alerts.yaml:/alerts.yaml:ro"
     docker_service_state: "{{ monitoring_server_state }}"
 
+- name: Grafana docker network
+  community.docker.docker_network:
+    name: grafana
+    state: present
+  when: monitoring_server_state == 'present'
+
 - name: Grafana service
   ansible.builtin.include_role:
     name: docker_service
@@ -60,13 +66,25 @@
     docker_service_id: "grafana"
     docker_service_description: "Grafana"
     docker_service_image: "{{ container_images.grafana }}"
-    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_network: ["{{ monitoring_server_network }}", grafana]
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
     docker_service_env_vars:
       GF_SERVER_ROOT_URL: "{{ monitoring_server_grafana_root_url }}"
     docker_service_volumes: "{{ [monitoring_server_storage_path + '/grafana:/var/lib/grafana:rw'] + monitoring_server_grafana_extra_volumes }}"
     docker_service_state: "{{ monitoring_server_state }}"
+
+- name: Grafana nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: grafana
+    nginx_site_state: "{{ monitoring_server_state }}"
+    nginx_site_kind: external
+    nginx_site_server_names: [grafana.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://grafana:3000"
+    nginx_site_networks: [grafana]
 
 - name: Absent tasks
   ansible.builtin.include_tasks:
