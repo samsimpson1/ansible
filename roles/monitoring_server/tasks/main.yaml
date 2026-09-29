@@ -11,7 +11,7 @@
     docker_service_id: "alertmanager"
     docker_service_description: "Prometheus Alertmanager"
     docker_service_image: "{{ container_images.alertmanager }}"
-    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_network: [source_default, "{{ monitoring_server_network }}"]
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
     docker_service_command: "--config.file=/etc/alertmanager/config.yaml --storage.path=/alertmanager"
@@ -21,11 +21,17 @@
       - "{{ monitoring_server_storage_path }}/alertmanager/templates.tmpl:/etc/alertmanager/templates/discord.tmpl:ro"
     docker_service_state: "{{ monitoring_server_state }}"
 
-- name: Prometheus Pushgateway docker network
-  community.docker.docker_network:
-    name: prometheus-pushgateway
-    state: present
-  when: monitoring_server_state == 'present'
+- name: Alertmanager nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: alertmanager
+    nginx_site_state: "{{ monitoring_server_state }}"
+    nginx_site_kind: internal
+    nginx_site_server_names: [alertmanager.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://alertmanager:9003"
+    nginx_site_networks: ["{{ monitoring_server_network }}"]
 
 - name: Prometheus Pushgateway service
   ansible.builtin.include_role:
@@ -34,7 +40,7 @@
     docker_service_id: "prometheus-pushgateway"
     docker_service_description: "Prometheus Pushgateway"
     docker_service_image: "{{ container_images.prometheus_pushgateway }}"
-    docker_service_network: ["{{ monitoring_server_network }}", prometheus-pushgateway]
+    docker_service_network: [source_default, "{{ monitoring_server_network }}"]
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
     docker_service_state: "{{ monitoring_server_state }}"
@@ -49,7 +55,7 @@
     nginx_site_server_names: [prometheus-push.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://prometheus-pushgateway:9091"
-    nginx_site_networks: [prometheus-pushgateway]
+    nginx_site_networks: ["{{ monitoring_server_network }}"]
 
 - name: Prometheus service
   ansible.builtin.include_role:
@@ -58,7 +64,7 @@
     docker_service_id: "prometheus"
     docker_service_description: "Prometheus"
     docker_service_image: "{{ container_images.prometheus }}"
-    docker_service_network: "{{ monitoring_server_network }}"
+    docker_service_network: [source_default, "{{ monitoring_server_network }}"]
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
     docker_service_command: >-
@@ -71,11 +77,17 @@
       - "{{ monitoring_server_storage_path }}/prometheus/alerts.yaml:/alerts.yaml:ro"
     docker_service_state: "{{ monitoring_server_state }}"
 
-- name: Grafana docker network
-  community.docker.docker_network:
-    name: grafana
-    state: present
-  when: monitoring_server_state == 'present'
+- name: Prometheus nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: prometheus
+    nginx_site_state: "{{ monitoring_server_state }}"
+    nginx_site_kind: internal
+    nginx_site_server_names: [prometheus.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://prometheus:9090"
+    nginx_site_networks: ["{{ monitoring_server_network }}"]
 
 - name: Grafana service
   ansible.builtin.include_role:
@@ -84,7 +96,7 @@
     docker_service_id: "grafana"
     docker_service_description: "Grafana"
     docker_service_image: "{{ container_images.grafana }}"
-    docker_service_network: ["{{ monitoring_server_network }}", grafana]
+    docker_service_network: [source_default, "{{ monitoring_server_network }}"]
     docker_service_user: "{{ monitoring_server_user }}"
     docker_service_groups: ["{{ monitoring_server_group }}"]
     docker_service_env_vars:
@@ -102,7 +114,7 @@
     nginx_site_server_names: [grafana.srv.simpson.id]
     nginx_site_certificate: srv.simpson.id
     nginx_site_upstream: "http://grafana:3000"
-    nginx_site_networks: [grafana]
+    nginx_site_networks: ["{{ monitoring_server_network }}"]
 
 - name: Absent tasks
   ansible.builtin.include_tasks:

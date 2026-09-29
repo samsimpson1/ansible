@@ -1,4 +1,9 @@
 ---
+- name: Create monitoring docker network
+  community.docker.docker_network:
+    name: "{{ monitoring_server_network }}"
+    state: "present"
+
 - name: Create monitoring data directories
   ansible.builtin.file:
     state: directory

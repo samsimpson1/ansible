@@ -3,3 +3,8 @@
   ansible.builtin.file:
     path: "{{ monitoring_server_storage_path }}"
     state: absent
+
+- name: Remove monitoring docker network
+  community.docker.docker_network:
+    name: "{{ monitoring_server_network }}"
+    state: "absent"
