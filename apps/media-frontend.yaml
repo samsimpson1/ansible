@@ -29,11 +29,6 @@
     owner: "app"
     group: "app"
 
-- name: Audiobookshelf docker network
-  community.docker.docker_network:
-    name: audiobookshelf
-    state: present
-
 - name: Audiobookshelf service
   ansible.builtin.include_role:
     name: docker_service
@@ -41,7 +36,7 @@
     docker_service_id: "audiobookshelf"
     docker_service_description: "Audiobookshelf"
     docker_service_image: "{{ container_images.audiobookshelf }}"
-    docker_service_network: [source_default, audiobookshelf]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -65,7 +60,7 @@
     nginx_site_server_names: [audiobookshelf.srv.simpson.id]
     nginx_site_certificate: srv.simpson.id
     nginx_site_upstream: "http://audiobookshelf:8080"
-    nginx_site_networks: [audiobookshelf]
+    nginx_site_networks: [media]
 
 - name: Plex service
   ansible.builtin.include_role:
@@ -124,11 +119,6 @@
       - "/srv/containers/storage/ssd/lms/config:/config:rw"
       - "/srv/containers/storage/ssd/lms/playlists:/playlists:rw"
 
-- name: Navidrome docker network
-  community.docker.docker_network:
-    name: navidrome
-    state: present
-
 - name: Navidrome service
   ansible.builtin.include_role:
     name: docker_service
@@ -136,7 +126,7 @@
     docker_service_id: "navidrome"
     docker_service_description: "Navidrome Music Server"
     docker_service_image: "{{ container_images.navidrome }}"
-    docker_service_network: [source_default, navidrome]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -162,12 +152,7 @@
     nginx_site_server_names: [navidrome.srv.simpson.id]
     nginx_site_certificate: srv.simpson.id
     nginx_site_upstream: "http://navidrome:4533"
-    nginx_site_networks: [navidrome]
-
-- name: Overseerr docker network
-  community.docker.docker_network:
-    name: overseerr
-    state: present
+    nginx_site_networks: [media]
 
 - name: Overseerr service
   ansible.builtin.include_role:
@@ -176,7 +161,7 @@
     docker_service_id: "overseerr"
     docker_service_description: "Overseerr"
     docker_service_image: "{{ container_images.overseerr }}"
-    docker_service_network: [source_default, overseerr]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -196,7 +181,7 @@
     nginx_site_server_names: [requests.srv.simpson.id]
     nginx_site_certificate: srv.simpson.id
     nginx_site_upstream: "http://overseerr:80"
-    nginx_site_networks: [overseerr]
+    nginx_site_networks: [media]
 
 - name: Pinchflat service
   ansible.builtin.include_role:
@@ -230,3 +215,18 @@
       - "/feed_image.jpg$"
       - "/stream.mp4$"
       - "/episode_image.jpg$"
+
+- name: Navidrome docker network
+  community.docker.docker_network:
+    name: navidrome
+    state: absent
+
+- name: Overseerr docker network
+  community.docker.docker_network:
+    name: overseerr
+    state: absent
+
+- name: Audiobookshelf docker network
+  community.docker.docker_network:
+    name: audiobookshelf
+    state: absent
