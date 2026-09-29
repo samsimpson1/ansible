@@ -10,6 +10,11 @@
     - prowlarr
     - radarr
     - sonarr
+- name: Prowlarr docker network
+  community.docker.docker_network:
+    name: prowlarr
+    state: present
+
 - name: Prowlarr service
   ansible.builtin.include_role:
     name: docker_service
@@ -17,7 +22,7 @@
     docker_service_id: "prowlarr"
     docker_service_description: "Prowlarr"
     docker_service_image: "{{ container_images.prowlarr }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, prowlarr]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -25,6 +30,19 @@
       PROWLARR__PORT: "80"
     docker_service_volumes:
       - "/srv/containers/storage/ssd/prowlarr:/config:rw"
+
+- name: Prowlarr nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: prowlarr
+    nginx_site_state: present
+    nginx_site_kind: internal
+    nginx_site_server_names: [prowlarr.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://prowlarr:80"
+    nginx_site_networks: [prowlarr]
+
 - name: Radarr service
   ansible.builtin.include_role:
     name: docker_service
