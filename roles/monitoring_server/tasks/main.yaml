@@ -30,7 +30,7 @@
     nginx_site_kind: internal
     nginx_site_server_names: [alertmanager.int.simpson.id]
     nginx_site_certificate: int.simpson.id
-    nginx_site_upstream: "http://alertmanager:9003"
+    nginx_site_upstream: "http://alertmanager:9093"
     nginx_site_networks: ["{{ monitoring_server_network }}"]
 
 - name: Prometheus Pushgateway service
