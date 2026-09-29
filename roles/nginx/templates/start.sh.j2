@@ -11,7 +11,7 @@ case "$mode" in
 esac
 network_files=("$directory"/network/*.list)
 mount_files=("$directory"/mount/*.list)
-mapfile -t networks < <({ echo {{ nginx_base_network | quote }}; cat "${network_files[@]}" /dev/null; } | sed '/^$/d' | sort -u)
+mapfile -t networks < <({ echo {{ nginx_base_network | quote }}; cat "${network_files[@]}" /dev/null; } | sed '/^$/d' | sort -u | uniq)
 mapfile -t mounts < <(cat "${mount_files[@]}" /dev/null | sed '/^$/d' | sort -u)
 
 # Repeated compatible mounts are shared; a destination cannot hide another mount.
