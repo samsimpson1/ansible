@@ -9,10 +9,6 @@
     - qbittorrent
     - sabnzbd
     - slskd
-- name: QBittorrent docker network
-  community.docker.docker_network:
-    name: qbittorrent
-    state: present
 
 - name: QBittorrent service
   ansible.builtin.include_role:
@@ -21,7 +17,7 @@
     docker_service_id: "qbittorrent"
     docker_service_description: "qBittorrent"
     docker_service_image: "{{ container_images.qbittorrent }}"
-    docker_service_network: [source_default, qbittorrent]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -44,12 +40,7 @@
     nginx_site_server_names: [torrent.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://qbittorrent:80"
-    nginx_site_networks: [qbittorrent]
-
-- name: SABnzbd docker network
-  community.docker.docker_network:
-    name: sabnzbd
-    state: present
+    nginx_site_networks: [media]
 
 - name: SABnzbd service
   ansible.builtin.include_role:
@@ -58,7 +49,7 @@
     docker_service_id: "sabnzbd"
     docker_service_description: "SABnzbd"
     docker_service_image: "{{ container_images.sabnzbd }}"
-    docker_service_network: [source_default, sabnzbd]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -79,7 +70,7 @@
     nginx_site_server_names: [sabnzbd.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://sabnzbd:80"
-    nginx_site_networks: [sabnzbd]
+    nginx_site_networks: [media]
 
 - name: Unpackerr service
   ansible.builtin.include_role:
@@ -100,11 +91,6 @@
     docker_service_volumes:
       - "/srv/containers/storage/hdd/media:/media:rw"
 
-- name: Slskd docker network
-  community.docker.docker_network:
-    name: slskd
-    state: present
-
 - name: Slskd service
   ansible.builtin.include_role:
     name: docker_service
@@ -112,7 +98,7 @@
     docker_service_id: "slskd"
     docker_service_description: "Slskd"
     docker_service_image: "{{ container_images.slskd }}"
-    docker_service_network: [source_default, slskd]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -133,4 +119,19 @@
     nginx_site_server_names: [slskd.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://slskd:5030"
-    nginx_site_networks: [slskd]
+    nginx_site_networks: [media]
+
+- name: QBittorrent docker network
+  community.docker.docker_network:
+    name: qbittorrent
+    state: absent
+
+- name: Slskd docker network
+  community.docker.docker_network:
+    name: slskd
+    state: absent
+
+- name: SABnzbd docker network
+  community.docker.docker_network:
+    name: sabnzbd
+    state: absent
