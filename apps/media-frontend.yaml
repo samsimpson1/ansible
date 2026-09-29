@@ -203,6 +203,7 @@
     name: oauth2_proxy
   vars:
     oauth2_proxy_id: "pinchflat"
+    oauth2_proxy_network: media
     oauth2_proxy_upstreams:
       - "http://pinchflat:8945"
     oauth2_proxy_client_id: "{{ sso_clients.pinchflat.id }}"
@@ -213,3 +214,15 @@
       - "/feed_image.jpg$"
       - "/stream.mp4$"
       - "/episode_image.jpg$"
+
+- name: Pinchflat nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: pinchflat
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [pinchflat.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://pinchflat-oauth2-proxy:4180"
+    nginx_site_networks: [media]
