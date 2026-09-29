@@ -1,4 +1,10 @@
 ---
+- name: Assert vars
+  ansible.builtin.assert:
+    that:
+      - oauth2_proxy_network is defined
+  when: oauth2_proxy_state == 'present'
+
 - name: Present tasks
   ansible.builtin.include_tasks:
     file: present.yaml

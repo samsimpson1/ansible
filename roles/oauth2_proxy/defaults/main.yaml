@@ -1,6 +1,6 @@
 ---
 oauth2_proxy_image: "{{ container_images.oauth2_proxy }}"
-oauth2_proxy_network: "source_default"
+oauth2_proxy_network: null
 oauth2_proxy_user: "568"
 oauth2_proxy_group: "568"
 oauth2_proxy_port: "4180"
