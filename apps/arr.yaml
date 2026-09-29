@@ -43,6 +43,11 @@
     nginx_site_upstream: "http://prowlarr:80"
     nginx_site_networks: [prowlarr]
 
+- name: Radarr docker network
+  community.docker.docker_network:
+    name: radarr
+    state: present
+
 - name: Radarr service
   ansible.builtin.include_role:
     name: docker_service
@@ -50,7 +55,7 @@
     docker_service_id: "radarr"
     docker_service_description: "Radarr"
     docker_service_image: "{{ container_images.radarr }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, radarr]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -59,6 +64,19 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/radarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Radarr nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: radarr
+    nginx_site_state: present
+    nginx_site_kind: internal
+    nginx_site_server_names: [radarr.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://radarr:80"
+    nginx_site_networks: [radarr]
+
 - name: Sonarr service
   ansible.builtin.include_role:
     name: docker_service
