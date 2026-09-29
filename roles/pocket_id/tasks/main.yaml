@@ -35,6 +35,18 @@
     docker_service_volumes:
       - "{{ pocket_id_directory }}:/data"
 
+- name: Pocket ID nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: pocket-id
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [pocket-id.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://pocket-id:1411"
+    nginx_site_networks: ["{{ pocket_id_network }}"]
+
 - name: Absent tasks
   ansible.builtin.include_tasks:
     file: absent.yaml
