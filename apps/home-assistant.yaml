@@ -19,3 +19,15 @@
       - "/srv/containers/storage/ssd/home-assistant:/config:rw"
     docker_service_devices:
       - "/dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/ttyUSB0"
+
+- name: Home Assistant nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: home-assistant
+    nginx_site_state: present
+    nginx_site_kind: external
+    nginx_site_server_names: [hass.srv.simpson.id]
+    nginx_site_certificate: srv.simpson.id
+    nginx_site_upstream: "http://10.0.0.191:8123"
+    nginx_site_networks: []
