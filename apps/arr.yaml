@@ -10,9 +10,10 @@
     - prowlarr
     - radarr
     - sonarr
-- name: Prowlarr docker network
+
+- name: Media docker network
   community.docker.docker_network:
-    name: prowlarr
+    name: media
     state: present
 
 - name: Prowlarr service
@@ -22,7 +23,7 @@
     docker_service_id: "prowlarr"
     docker_service_description: "Prowlarr"
     docker_service_image: "{{ container_images.prowlarr }}"
-    docker_service_network: [source_default, prowlarr]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -41,12 +42,7 @@
     nginx_site_server_names: [prowlarr.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://prowlarr:80"
-    nginx_site_networks: [prowlarr]
-
-- name: Radarr docker network
-  community.docker.docker_network:
-    name: radarr
-    state: present
+    nginx_site_networks: [media]
 
 - name: Radarr service
   ansible.builtin.include_role:
@@ -55,7 +51,7 @@
     docker_service_id: "radarr"
     docker_service_description: "Radarr"
     docker_service_image: "{{ container_images.radarr }}"
-    docker_service_network: [source_default, radarr]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -75,7 +71,7 @@
     nginx_site_server_names: [radarr.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://radarr:80"
-    nginx_site_networks: [radarr]
+    nginx_site_networks: [media]
 
 - name: Sonarr service
   ansible.builtin.include_role:
@@ -84,7 +80,7 @@
     docker_service_id: "sonarr"
     docker_service_description: "Sonarr"
     docker_service_image: "{{ container_images.sonarr }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -94,10 +90,17 @@
       - "/srv/containers/storage/ssd/sonarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
 
-- name: Lidarr docker network
-  community.docker.docker_network:
-    name: lidarr
-    state: present
+- name: Sonarr nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: sonarr
+    nginx_site_state: present
+    nginx_site_kind: internal
+    nginx_site_server_names: [sonarr.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://sonarr:8989"
+    nginx_site_networks: [media]
 
 - name: Lidarr service
   ansible.builtin.include_role:
@@ -106,7 +109,7 @@
     docker_service_id: "lidarr"
     docker_service_description: "lidarr"
     docker_service_image: "{{ container_images.lidarr }}"
-    docker_service_network: [source_default, lidarr]
+    docker_service_network: [source_default, media]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -126,4 +129,19 @@
     nginx_site_server_names: [lidarr.int.simpson.id]
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://lidarr:8080"
-    nginx_site_networks: [lidarr]
+    nginx_site_networks: [media]
+
+- name: Prowlarr docker network
+  community.docker.docker_network:
+    name: prowlarr
+    state: absent
+
+- name: Lidarr docker network
+  community.docker.docker_network:
+    name: lidarr
+    state: absent
+
+- name: Radarr docker network
+  community.docker.docker_network:
+    name: radarr
+    state: absent
