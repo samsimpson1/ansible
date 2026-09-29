@@ -9,6 +9,7 @@
     name: caddy
   vars:
     caddy_id: "external"
+    caddy_state: absent
     caddy_https_port: "6997"
     caddy_http_port: "6996"
     caddy_env_vars: {}
@@ -22,6 +23,7 @@
     name: caddy
   vars:
     caddy_id: "internal"
+    caddy_state: absent
     caddy_https_port: "443"
     caddy_http_port: "80"
     caddy_env_vars: {}

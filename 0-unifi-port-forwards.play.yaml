@@ -55,3 +55,25 @@
         forward:
           ip: "10.0.0.202"
           port: "2689"
+    - name: Little HTTP
+      unifi_port_forward:
+        name: "Little HTTP"
+        state: "present"
+        protocol: "tcp_udp"
+        wan:
+          ip_address: "158.173.147.116"
+          port: "80"
+        forward:
+          ip: "10.0.0.191"
+          port: "6996"
+    - name: Little HTTPS
+      unifi_port_forward:
+        name: "Little HTTPS"
+        state: "present"
+        protocol: "tcp_udp"
+        wan:
+          ip_address: "158.173.147.116"
+          port: "443"
+        forward:
+          ip: "10.0.0.191"
+          port: "6997"

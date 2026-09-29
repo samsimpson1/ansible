@@ -20,18 +20,14 @@
       ansible.builtin.include_role:
         name: ssmtp
 
+    - name: Caddy
+      ansible.builtin.include_tasks: apps/caddy.yaml
+
     - name: Nginx
       ansible.builtin.include_role:
         name: nginx
       vars:
         nginx_directory: "/srv/containers/storage/ssd/nginx"
-        nginx_internal_http_port: 44480
-        nginx_internal_https_port: 44443
-        nginx_external_http_port: 44580
-        nginx_external_https_port: 44543
-
-    - name: Caddy
-      ansible.builtin.include_tasks: apps/caddy.yaml
 
     - name: Pocket ID
       ansible.builtin.include_role:

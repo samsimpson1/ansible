@@ -20,4 +20,6 @@
     - name: HA Proxy
       ansible.builtin.include_role:
         name: ha_proxy
+      vars:
+        ha_proxy_state: absent
       tags: ha_proxy
