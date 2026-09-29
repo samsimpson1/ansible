@@ -14,10 +14,6 @@
     - jellyfin
     - jellyfin/config
     - jellyfin/cache
-    - lms
-    - lms/config
-    - lms/playlists
-    - navidrome
     - overseerr
     - pinchflat
 
@@ -103,6 +99,7 @@
     name: docker_service
   vars:
     docker_service_id: "lms"
+    docker_service_state: absent
     docker_service_description: "Lyrion Music Server"
     docker_service_image: "{{ container_images.lyrion }}"
     docker_service_network: host
@@ -124,6 +121,7 @@
     name: docker_service
   vars:
     docker_service_id: "navidrome"
+    docker_service_state: absent
     docker_service_description: "Navidrome Music Server"
     docker_service_image: "{{ container_images.navidrome }}"
     docker_service_network: [source_default, media]
@@ -147,7 +145,7 @@
     name: nginx_site
   vars:
     nginx_site_name: navidrome
-    nginx_site_state: present
+    nginx_site_state: absent
     nginx_site_kind: external
     nginx_site_server_names: [navidrome.srv.simpson.id]
     nginx_site_certificate: srv.simpson.id
