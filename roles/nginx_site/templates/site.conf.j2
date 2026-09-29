@@ -1,9 +1,6 @@
 server {
   listen {{ '6996' if nginx_site_kind == 'external' else '80' }};
   server_name {{ nginx_site_server_names | join(' ') }};
-{% if nginx_site_kind == 'internal' %}
-  if ($internal_client = 0) { return 403; }
-{% endif %}
   return 308 https://$host$request_uri;
 }
 server {
@@ -12,9 +9,6 @@ server {
   ssl_certificate /certificates/{{ nginx_site_certificate }}/fullchain.pem;
   ssl_certificate_key /certificates/{{ nginx_site_certificate }}/key.pem;
   ssl_protocols TLSv1.2 TLSv1.3;
-{% if nginx_site_kind == 'internal' %}
-  if ($internal_client = 0) { return 403; }
-{% endif %}
 {% if nginx_site_upstream | length > 0 %}
   location / {
     # A variable defers lookup until request time, allowing absent backends at
