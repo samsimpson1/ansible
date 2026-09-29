@@ -11,9 +11,6 @@
     - audiobookshelf/metadata
     - audiobookshelf/cache
     - plex
-    - jellyfin
-    - jellyfin/config
-    - jellyfin/cache
     - overseerr
     - pinchflat
 
@@ -80,6 +77,7 @@
     name: docker_service
   vars:
     docker_service_id: "jellyfin"
+    docker_service_state: absent
     docker_service_description: "Jellyfin Media Server"
     docker_service_image: "{{ container_images.jellyfin }}"
     docker_service_user: "568"
