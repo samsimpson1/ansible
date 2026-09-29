@@ -30,6 +30,25 @@
         - overseerr
         - pinchflat
 
+    - name: Kavita docker network
+      community.docker.docker_network:
+        name: kavita
+        state: present
+
     - name: Kavita
       ansible.builtin.include_role:
         name: kavita
+      vars:
+        kavita_network: [source_default, kavita]
+
+    - name: Kavita nginx site
+      ansible.builtin.include_role:
+        name: nginx_site
+      vars:
+        nginx_site_name: kavita
+        nginx_site_state: present
+        nginx_site_kind: internal
+        nginx_site_server_names: [books.int.simpson.id]
+        nginx_site_certificate: int.simpson.id
+        nginx_site_upstream: "http://kavita:5000"
+        nginx_site_networks: [kavita]
