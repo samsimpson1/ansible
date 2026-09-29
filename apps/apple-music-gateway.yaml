@@ -1,3 +1,8 @@
+- name: Apple Music Gateway docker network
+  community.docker.docker_network:
+    name: apple-music-gateway
+    state: present
+
 - name: Apple Music Gateway data directory
   ansible.builtin.file:
     path: /srv/containers/storage/ssd/apple-music-gateway
@@ -20,7 +25,7 @@
     docker_service_id: "apple-music-gateway"
     docker_service_description: "Apple Music Gateway"
     docker_service_image: "{{ container_images.apple_music_gateway }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, apple-music-gateway]
     docker_service_env_vars:
       APPLE_TEAM_ID: "{{ apple_music_gateway.apple_team_id }}"
       APPLE_KEY_ID: "{{ apple_music_gateway.apple_key_id }}"
@@ -32,3 +37,15 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/apple-music-gateway:/data"
       - "/srv/containers/storage/ssd/apple-music-gateway/AuthKey.p8:/secrets/AuthKey.p8:ro"
+
+- name: Apple Music Gateway nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: apple-music-gateway
+    nginx_site_state: present
+    nginx_site_kind: internal
+    nginx_site_server_names: [apple-music-gateway.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://apple-music-gateway:8000"
+    nginx_site_networks: [apple-music-gateway]

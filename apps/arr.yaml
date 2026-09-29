@@ -93,6 +93,12 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/sonarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Lidarr docker network
+  community.docker.docker_network:
+    name: lidarr
+    state: present
+
 - name: Lidarr service
   ansible.builtin.include_role:
     name: docker_service
@@ -100,7 +106,7 @@
     docker_service_id: "lidarr"
     docker_service_description: "lidarr"
     docker_service_image: "{{ container_images.lidarr }}"
-    docker_service_network: source_default
+    docker_service_network: [source_default, lidarr]
     docker_service_user: "568"
     docker_service_groups: ["568"]
     docker_service_env_vars:
@@ -109,3 +115,15 @@
     docker_service_volumes:
       - "/srv/containers/storage/ssd/lidarr:/config:rw"
       - "/srv/containers/storage/hdd/media:/media:rw"
+
+- name: Lidarr nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: lidarr
+    nginx_site_state: present
+    nginx_site_kind: internal
+    nginx_site_server_names: [lidarr.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://lidarr:8080"
+    nginx_site_networks: [lidarr]
