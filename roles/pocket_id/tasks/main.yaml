@@ -35,22 +35,6 @@
     docker_service_volumes:
       - "{{ pocket_id_directory }}:/data"
 
-- name: Pocket ID Litestream service
-  ansible.builtin.include_role:
-    name: docker_service
-  vars:
-    docker_service_id: "pocket-id-litestream"
-    docker_service_state: absent
-    docker_service_description: "Pocket ID Litestream"
-    docker_service_image: "{{ container_images.litestream }}"
-    docker_service_network: source_default
-    docker_service_user: "{{ pocket_id_uid | default('1985') }}"
-    docker_service_groups: ["{{ pocket_id_uid | default('1985') }}"]
-    docker_service_command: "replicate -config /data/litestream.yaml"
-    docker_service_volumes:
-      - "{{ pocket_id_directory }}:/data:rw"
-    docker_service_restart_policy: "always"
-
 - name: Absent tasks
   ansible.builtin.include_tasks:
     file: absent.yaml

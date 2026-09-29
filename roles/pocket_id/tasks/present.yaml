@@ -29,39 +29,6 @@
     group: pocket-id
     recurse: true
 
-- name: Pocket ID Litestream directory
-  ansible.builtin.file:
-    path: "{{ pocket_id_directory }}/litestream"
-    state: directory
-    mode: '0750'
-    owner: pocket-id
-    group: pocket-id
-  when: pocket_id_role == 'secondary'
-
-- name: Pocket ID Litestream private key
-  ansible.builtin.copy:
-    src: litestream.key
-    dest: "{{ pocket_id_directory }}/ssh-key"
-    mode: '0640'
-    owner: pocket-id
-    group: pocket-id
-  when: pocket_id_role == 'primary'
-
-- name: Pocket ID Litestream public key
-  ansible.posix.authorized_key:
-    user: pocket-id
-    key: "{{ lookup('file', 'litestream.pub') }}"
-    state: present
-  when: pocket_id_role == 'secondary'
-
-- name: Litestream config file
-  ansible.builtin.copy:
-    src: "litestream-{{ pocket_id_role }}.yaml"
-    dest: "{{ pocket_id_directory }}/litestream.yaml"
-    mode: '0640'
-    owner: pocket-id
-    group: pocket-id
-
 - name: Pocket ID encryption key
   ansible.builtin.copy:
     src: encryption.key
