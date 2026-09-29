@@ -120,18 +120,3 @@
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://slskd:5030"
     nginx_site_networks: [media]
-
-- name: QBittorrent docker network
-  community.docker.docker_network:
-    name: qbittorrent
-    state: absent
-
-- name: Slskd docker network
-  community.docker.docker_network:
-    name: slskd
-    state: absent
-
-- name: SABnzbd docker network
-  community.docker.docker_network:
-    name: sabnzbd
-    state: absent

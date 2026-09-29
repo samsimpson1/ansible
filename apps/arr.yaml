@@ -130,18 +130,3 @@
     nginx_site_certificate: int.simpson.id
     nginx_site_upstream: "http://lidarr:8080"
     nginx_site_networks: [media]
-
-- name: Prowlarr docker network
-  community.docker.docker_network:
-    name: prowlarr
-    state: absent
-
-- name: Lidarr docker network
-  community.docker.docker_network:
-    name: lidarr
-    state: absent
-
-- name: Radarr docker network
-  community.docker.docker_network:
-    name: radarr
-    state: absent
