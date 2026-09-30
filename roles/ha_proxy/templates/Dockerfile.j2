@@ -1,9 +1,0 @@
-FROM {{ container_images.caddy }}-builder AS builder
-
-RUN xcaddy build
-
-FROM {{ container_images.caddy }}
-
-COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-
-CMD [ "/usr/bin/caddy" ]

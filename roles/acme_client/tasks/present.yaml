@@ -63,4 +63,4 @@
     user: "{{ acme_client_source_user }}"
     runas: "root"
     commands: "/usr/bin/systemctl restart caddy-external caddy-ha"
-    state: present
+    state: absent

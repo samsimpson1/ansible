@@ -15,8 +15,7 @@ CHANGED_FILES=$(grep "Number of regular files transferred" <<< "${RSYNC}" | \
 echo "Changed files: ${CHANGED_FILES}"
 
 if [ "${CHANGED_FILES}" -ne "0" ]; then
-  echo "Files changed, restarting Caddy"
-  sudo systemctl restart caddy-external caddy-ha
+  echo "Files changed"
 fi
 
 echo "Certificate sync completed at $(date)"

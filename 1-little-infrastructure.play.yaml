@@ -20,8 +20,17 @@
       ansible.builtin.include_role:
         name: ssmtp
 
-    - name: Caddy
-      ansible.builtin.include_tasks: apps/caddy.yaml
+    - name: ShareX SSH key
+      ansible.posix.authorized_key:
+        user: app
+        state: present
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMSjn6O+qaATVQ9r5ZZJol840Q1uKVu0ZrwErYNNTNvM sam@sampc"
+
+    - name: ACME Manager
+      ansible.builtin.include_role:
+        name: acme_manager
+      vars:
+        acme_manager_hetzner_api_token: "{{ hetzner_api_token }}"
 
     - name: Nginx
       ansible.builtin.include_role:

@@ -1,4 +1,0 @@
-- name: "Restart caddy {{ caddy_id }}"
-  ansible.builtin.systemd:
-    name: "caddy-{{ caddy_id }}"
-    state: restarted

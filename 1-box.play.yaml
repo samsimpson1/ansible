@@ -112,16 +112,3 @@
       vars:
         concourse_worker_tsa_public_key: "{{ concourse_tsa_host_key_pub }}"
         concourse_worker_worker_key: "{{ concourse_worker_key }}"
-
-    - name: Caddy external
-      ansible.builtin.include_role:
-        name: caddy
-      vars:
-        caddy_id: "external"
-        caddy_state: absent
-        caddy_https_port: "6997"
-        caddy_http_port: "6996"
-        caddy_env_vars: {}
-        caddy_hosts: "{{ sites | selectattr('kind', 'equalto', 'external') }}"
-        caddy_data_directory: "/srv/app/caddy"
-        caddy_networks: ["concourse", "pocket_id", "forgejo"]
