@@ -5,3 +5,10 @@ acme_manager_hetzner_api_token: ""
 acme_manager_renew_cron_minute: "0"
 acme_manager_renew_cron_hour: "3"
 acme_manager_state: present
+acme_manager_domains:
+  - name: srv.simpson.id
+    wildcard: true
+  - name: int.simpson.id
+    wildcard: true
+  - name: sams.wtf
+  - name: git.sams.wtf

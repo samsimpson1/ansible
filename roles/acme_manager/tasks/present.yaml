@@ -75,7 +75,7 @@
     owner: root
     group: acme
     mode: '0750'
-  loop: "{{ sites }}"
+  loop: "{{ acme_manager_domains }}"
 
 - name: Issue certificates for domains
   ansible.builtin.command:
@@ -89,7 +89,7 @@
       --fullchain-file {{ acme_manager_cert_dir }}/{{ item.name }}/fullchain.pem
       --force
     creates: "{{ acme_manager_cert_dir }}/{{ item.name }}/cert.pem"
-  loop: "{{ sites }}"
+  loop: "{{ acme_manager_domains }}"
   environment:
     HETZNER_TOKEN: "{{ acme_manager_hetzner_api_token }}"
 
@@ -101,7 +101,7 @@
     group: acme
     mode: '0750'
     recurse: true
-  loop: "{{ sites }}"
+  loop: "{{ acme_manager_domains }}"
 
 - name: Set certificate file permissions
   ansible.builtin.file:
@@ -109,7 +109,7 @@
     owner: root
     group: acme
     mode: '0640'
-  loop: "{{ sites | product(['cert.pem', 'key.pem', 'fullchain.pem']) }}"
+  loop: "{{ acme_manager_domains | product(['cert.pem', 'key.pem', 'fullchain.pem']) }}"
   when: item[0].name is defined
 
 - name: Create certificate renewal script
