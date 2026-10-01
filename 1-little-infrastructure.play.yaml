@@ -11,6 +11,8 @@
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
+      vars:
+        tailscale_advertise_exit_node: true
 
     - name: Docker
       ansible.builtin.include_role:
