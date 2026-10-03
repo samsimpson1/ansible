@@ -4,12 +4,6 @@
     - vars/concourse.yaml
   become: true
   tasks:
-    - name: HA Proxy
-      ansible.builtin.include_role:
-        name: ha_proxy
-      vars:
-        ha_proxy_state: absent
-
     - name: Forgejo
       ansible.builtin.include_role:
         name: forgejo
