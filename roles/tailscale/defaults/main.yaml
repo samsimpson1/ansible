@@ -3,3 +3,4 @@ tailscale_tags:
   - "tag:automation"
 tailscale_accept_routes: false
 tailscale_advertise_exit_node: false
+tailscale_advertise_routes: null

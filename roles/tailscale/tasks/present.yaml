@@ -40,6 +40,7 @@
       --advertise-tags={{ tailscale_tags | join(',') }}
       --accept-routes={{ tailscale_accept_routes | ternary('true', 'false') }}
       --advertise-exit-node={{ tailscale_advertise_exit_node | ternary('true', 'false') }}
+      {% if tailscale_advertise_routes is string %}--advertise-routes={{ tailscale_advertise_routes }}{% endif %}
   register: tailscale_up
   # tailscale status returns 130 if not connected to tailnet
   changed_when: "tailscale_status.rc == 130"

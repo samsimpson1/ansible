@@ -8,11 +8,18 @@
         state: present
         key: "{{ lookup('file', 'github-actions.pub') }}"
 
+    - name: IP forwarding sysctl
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        state: present
+        reload: true
+
     - name: Tailscale
       ansible.builtin.include_role:
         name: tailscale
       vars:
-        tailscale_advertise_exit_node: true
+        tailscale_advertise_routes: "10.0.0.0/8"
 
     - name: Docker
       ansible.builtin.include_role:
