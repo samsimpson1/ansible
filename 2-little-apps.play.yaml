@@ -39,3 +39,25 @@
         - stonks
     - name: Apple Music gateway
       ansible.builtin.include_tasks: apps/apple-music-gateway.yaml
+    - name: ShareX directory
+      ansible.builtin.file:
+        path: "/srv/containers/storage/ssd/sharex"
+        state: directory
+        owner: app
+        group: app
+        mode: '0755'
+    - name: ShareX nginx site
+      ansible.builtin.include_role:
+        name: nginx_site
+      vars:
+        nginx_site_name: sharex
+        nginx_site_state: present
+        nginx_site_server_names: [sharex.srv.simpson.id]
+        nginx_site_kind: external
+        nginx_site_certificate: srv.simpson.id
+        nginx_site_config: |
+          root /sharex;
+        nginx_site_volumes:
+          - target: /sharex
+            source: "/srv/containers/storage/ssd/sharex"
+            read_only: true
