@@ -20,7 +20,7 @@ container_images:
   qbittorrent: ghcr.io/home-operations/qbittorrent:5.2.4
   sabnzbd: ghcr.io/home-operations/sabnzbd:5.1.3
   unpackerr: ghcr.io/unpackerr/unpackerr:v0.16.1
-  slskd: slskd/slskd:0.26.0
+  slskd: slskd/slskd:0.26.1
   plex: ghcr.io/home-operations/plex:rolling
   jellyfin: jellyfin/jellyfin:latest
   audiobookshelf: ghcr.io/advplyr/audiobookshelf:2.37.1
