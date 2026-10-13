@@ -2,11 +2,20 @@
   hosts: box
   vars_files:
     - vars/concourse.yaml
+    - vars/forgejo-runner.yaml
   become: true
   tasks:
     - name: Forgejo
       ansible.builtin.include_role:
         name: forgejo
+
+    - name: Forgejo Runner
+      ansible.builtin.include_role:
+        name: forgejo_runner
+      vars:
+        forgejo_runner_labels:
+          - alpine:docker://docker.io/library/alpine:3.24
+          - archlinux:docker://docker.io/archlinux:base-devel
 
     - name: Nginx
       ansible.builtin.include_role:

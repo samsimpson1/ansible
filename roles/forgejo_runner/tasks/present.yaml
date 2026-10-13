@@ -1,0 +1,37 @@
+- name: Forgejo Runner user
+  ansible.builtin.user:
+    name: forgejo-runner
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+- name: Getent passwd
+  ansible.builtin.getent:
+    database: passwd
+  changed_when: false
+
+- name: Set forgejo-runner uid and gid
+  ansible.builtin.set_fact:
+    forgejo_runner_uid: "{{ ansible_facts['getent_passwd']['forgejo-runner'].1 }}"
+    forgejo_runner_gid: "{{ ansible_facts['getent_passwd']['forgejo-runner'].2 }}"
+  changed_when: false
+
+- name: Create Forgejo Runner directory
+  ansible.builtin.file:
+    path: "{{ forgejo_runner_directory }}{{ item }}"
+    state: directory
+    owner: forgejo-runner
+    group: forgejo-runner
+    mode: '0750'
+  loop:
+    - "/"
+    - "/data"
+
+- name: Template Forgejo Runner config file
+  ansible.builtin.template:
+    src: runner.yaml.j2
+    dest: "{{ forgejo_runner_directory }}/data/runner.yaml"
+    owner: forgejo-runner
+    group: forgejo-runner
+    mode: '0640'
+  notify: Restart service forgejo-runner

@@ -1,0 +1,11 @@
+server:
+  connections:
+    forgejo:
+      url: "{{ forgejo_runner_url }}"
+      uuid: "{{ forgejo_runner_uuid }}"
+      token: "{{ forgejo_runner_token }}"
+runner:
+  labels:
+    {% for label in forgejo_runner_labels %}
+    - "{{ label }}"
+    {% endfor %}

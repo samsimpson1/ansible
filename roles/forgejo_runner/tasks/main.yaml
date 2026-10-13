@@ -1,0 +1,44 @@
+- name: Assert vars
+  ansible.builtin.assert:
+    that:
+      - forgejo_runner_uuid is defined
+      - forgejo_runner_token is defined
+
+- name: Present tasks
+  ansible.builtin.include_tasks:
+    file: present.yaml
+  when: forgejo_runner_state == 'present'
+
+- name: Forgejo Runner DinD docker service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: forgejo-runner-dind
+    docker_service_description: "Forgejo Runner Docker-in-Docker"
+    docker_service_image: "{{ container_images.dind }}"
+    docker_service_command: "dockerd -H tcp://0.0.0.0:2375 --tls=false"
+    docker_service_network: "{{ forgejo_runner_network }}"
+    docker_service_privileged: true
+    docker_service_state: "{{ forgejo_runner_state }}"
+
+- name: Forgejo Runner docker service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: forgejo-runner
+    docker_service_description: "Forgejo Runner"
+    docker_service_image: "{{ container_images.forgejo_runner }}"
+    docker_service_command: "forgejo-runner daemon --config /data/runner.yaml"
+    docker_service_network: "{{ forgejo_runner_network }}"
+    docker_service_user: "{{ forgejo_runner_uid | default(none) }}"
+    docker_service_groups: "{{ [forgejo_runner_gid] if forgejo_runner_gid is defined else [] }}"
+    docker_service_env_vars:
+      DOCKER_HOST: "tcp://forgejo-runner-dind:2375"
+    docker_service_volumes:
+      - "{{ forgejo_runner_directory }}/data:/data:rw"
+    docker_service_state: "{{ forgejo_runner_state }}"
+
+- name: Absent tasks
+  ansible.builtin.include_tasks:
+    file: absent.yaml
+  when: forgejo_runner_state == 'absent'

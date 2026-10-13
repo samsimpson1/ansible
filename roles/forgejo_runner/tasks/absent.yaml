@@ -1,0 +1,9 @@
+- name: Remove Forgejo Runner directory
+  ansible.builtin.file:
+    path: "{{ forgejo_runner_directory }}"
+    state: absent
+
+- name: Remove Forgejo Runner user
+  ansible.builtin.user:
+    name: forgejo-runner
+    state: absent

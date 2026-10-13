@@ -1,0 +1,7 @@
+forgejo_runner_labels: []
+forgejo_runner_url: "https://git.sams.wtf/"
+forgejo_runner_uuid: null
+forgejo_runner_token: null
+forgejo_runner_directory: "/srv/app/forgejo-runner"
+forgejo_runner_network: forgejo
+forgejo_runner_state: present
