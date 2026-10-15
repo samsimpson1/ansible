@@ -1,0 +1,23 @@
+- name: Install apt-cacher-ng package
+  ansible.builtin.package:
+    name: apt-cacher-ng
+    state: "{{ apt_cacher_state }}"
+- name: Install apt-cacher-ng config file
+  ansible.builtin.copy:
+    src: acng.conf
+    dest: /etc/apt-cacher-ng/acng.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: apt_cacher_state == "present"
+  notify: Restart apt-cacher-ng
+- name: APT Cacher nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: apt
+    nginx_site_state: "{{ apt_cacher_state }}"
+    nginx_site_kind: internal
+    nginx_site_server_names: [apt.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://10.0.0.191:3142"
