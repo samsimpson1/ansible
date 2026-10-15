@@ -16,6 +16,7 @@
         forgejo_runner_labels:
           - alpine:docker://docker.io/library/alpine:3.24
           - archlinux:docker://docker.io/archlinux:base-devel
+          - debian:docker://git.sams.wtf/coop/images/debian:13
 
     - name: Nginx
       ansible.builtin.include_role:
