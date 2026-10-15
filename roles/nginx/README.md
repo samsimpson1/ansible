@@ -17,7 +17,7 @@ directories and supplies its own routing, network and mount requirements:
 ```
 
 Sites default to internal access. Use `nginx_site_kind: external` for the
-external listeners. Certificates must already exist in
+external listeners. The `acme` role must already have installed the group in
 `/srv/certificates/<certificate group>/{fullchain,key}.pem`.
 
 Each site owns three files under `/srv/app/nginx`: `sites/<name>.conf`,
@@ -57,10 +57,13 @@ inspect the service journal, fix the cause and restart the service.
 
 ## Certificates and lifecycle
 
-Certificate issuance and installation belong to ACME. After installing a
-renewed certificate, `/srv/app/nginx/reload` validates and reloads the running
-nginx container. To validate staged certificates first, run
-`/srv/app/nginx/start test /path/to/staged-certificates`.
+The `acme` role issues certificates with lego and installs each group as a
+relative symlink, `<group> -> .<group>.<sha256>/`. The switch is atomic, so
+nginx never sees a key and chain that do not match. Before switching, ACME
+runs `/srv/app/nginx/start test /path/to/staged-certificates` to validate all
+sites against the candidate. Afterwards, it runs `/srv/app/nginx/reload` to
+validate and gracefully reload the running container. It retries the reload on
+later runs until one succeeds. See `roles/acme/README.md`.
 
 `nginx_state: absent` removes the service and its base network, retaining the
 site registrations and certificate files. Application networks belong to the

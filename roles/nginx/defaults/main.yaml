@@ -3,8 +3,8 @@ nginx_directory: /srv/app/nginx
 nginx_state: present
 nginx_id: nginx
 nginx_image: "{{ container_images.nginx }}"
-# Each group contains fullchain.pem and key.pem. ACME installs them here,
-# then calls <nginx_directory>/reload to validate and load the certificates.
+# Each group is a symlink to .<group>.<sha256>/{fullchain,key}.pem. The acme
+# role installs it here, then calls <nginx_directory>/reload to activate it.
 nginx_certificate_directory: /srv/certificates
 nginx_base_network: "{{ nginx_id }}"
 # Published explicitly on IPv4. The container listener ports are fixed; these
