@@ -27,6 +27,13 @@
     - "/"
     - "/data"
 
+- name: Forgejo Runner workflow Docker network
+  community.docker.docker_network:
+    name: "{{ forgejo_runner_workflow_network }}"
+    ipam_config:
+      - subnet: "{{ forgejo_runner_workflow_subnet }}"
+    state: present
+
 - name: Template Forgejo Runner config file
   ansible.builtin.template:
     src: runner.yaml.j2

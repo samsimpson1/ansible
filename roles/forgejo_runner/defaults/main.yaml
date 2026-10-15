@@ -5,3 +5,10 @@ forgejo_runner_token: null
 forgejo_runner_directory: "/srv/app/forgejo-runner"
 forgejo_runner_network: forgejo
 forgejo_runner_state: present
+
+# dedicated network for the workflow DinD; jobs reach it by IP as the
+# host's docker DNS isn't visible from inside the runner DinD.
+# must not overlap docker's default pools (172.17.0.0/16 onwards).
+forgejo_runner_workflow_network: forgejo-runner-workflow
+forgejo_runner_workflow_subnet: 172.16.250.0/29
+forgejo_runner_workflow_docker_ip: 172.16.250.2

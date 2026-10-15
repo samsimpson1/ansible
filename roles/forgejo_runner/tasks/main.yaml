@@ -17,7 +17,22 @@
     docker_service_description: "Forgejo Runner Docker-in-Docker"
     docker_service_image: "{{ container_images.dind }}"
     docker_service_command: "dockerd -H tcp://0.0.0.0:2375 --tls=false"
-    docker_service_network: "{{ forgejo_runner_network }}"
+    docker_service_network:
+      - "{{ forgejo_runner_network }}"
+      - "{{ forgejo_runner_workflow_network }}"
+    docker_service_privileged: true
+    docker_service_state: "{{ forgejo_runner_state }}"
+
+# a separate DinD instance to expose to running workflows
+- name: Forgejo Runner workflow DinD docker service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: forgejo-runner-workflow-dind
+    docker_service_description: "Forgejo Runner Workflow Docker-in-Docker"
+    docker_service_image: "{{ container_images.dind }}"
+    docker_service_command: "dockerd -H tcp://0.0.0.0:2375 --tls=false"
+    docker_service_network: "name={{ forgejo_runner_workflow_network }},ip={{ forgejo_runner_workflow_docker_ip }}"
     docker_service_privileged: true
     docker_service_state: "{{ forgejo_runner_state }}"
 

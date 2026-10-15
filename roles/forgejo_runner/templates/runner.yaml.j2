@@ -5,6 +5,8 @@ server:
       uuid: "{{ forgejo_runner_uuid }}"
       token: "{{ forgejo_runner_token }}"
 runner:
+  envs:
+    DOCKER_HOST: "tcp://{{ forgejo_runner_workflow_docker_ip }}:2375"
   labels:
     {% for label in forgejo_runner_labels %}
     - "{{ label }}"

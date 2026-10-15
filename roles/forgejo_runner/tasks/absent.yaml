@@ -7,3 +7,8 @@
   ansible.builtin.user:
     name: forgejo-runner
     state: absent
+
+- name: Remove Forgejo Runner workflow Docker network
+  community.docker.docker_network:
+    name: "{{ forgejo_runner_workflow_network }}"
+    state: absent
