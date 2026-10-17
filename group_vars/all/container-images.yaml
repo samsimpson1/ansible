@@ -34,7 +34,7 @@ container_images:
   karakeep_meilisearch: getmeili/meilisearch:v1.54.3
   karakeep_chrome: ghcr.io/karakeep-app/karakeep-chrome:154.0.8037.57-r1
   nginx: nginx:1.31.6
-  forgejo: codeberg.org/forgejo/forgejo:16.0.6
+  forgejo: codeberg.org/forgejo/forgejo:17.0.0
   forgejo_runner: code.forgejo.org/forgejo/runner:13.2.0
   dind: docker:29.9.0
   stonks_scraper: ghcr.io/samsimpson1/stonks:2026.2.12-125036
