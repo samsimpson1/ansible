@@ -15,7 +15,7 @@ container_images:
   samba: quay.io/samba.org/samba-server:latest
   prowlarr: ghcr.io/home-operations/prowlarr:2.6
   radarr: ghcr.io/home-operations/radarr:6.4.4
-  sonarr: ghcr.io/home-operations/sonarr:4.0.20
+  sonarr: ghcr.io/home-operations/sonarr:5.0.0
   lidarr: ghcr.io/home-operations/lidarr:3.1.6
   qbittorrent: ghcr.io/home-operations/qbittorrent:5.2.4
   sabnzbd: ghcr.io/home-operations/sabnzbd:5.1.3
