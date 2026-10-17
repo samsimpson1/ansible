@@ -33,7 +33,7 @@ container_images:
   karakeep: ghcr.io/karakeep-app/karakeep:0.33.2
   karakeep_meilisearch: getmeili/meilisearch:v1.54.3
   karakeep_chrome: ghcr.io/karakeep-app/karakeep-chrome:154.0.8037.57-r1
-  nginx: nginx:1.31.6
+  nginx: nginx:1.31.7
   forgejo: codeberg.org/forgejo/forgejo:16.0.6
   forgejo_runner: code.forgejo.org/forgejo/runner:13.2.0
   dind: docker:29.9.0
