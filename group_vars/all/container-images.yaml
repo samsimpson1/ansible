@@ -42,4 +42,4 @@ container_images:
   nextcloud_aio: ghcr.io/nextcloud-releases/all-in-one:20260805_083533
   hermes: git.sams.wtf/coop/hermes-image:v2026.8.10.211704
   apple_music_gateway: git.sams.wtf/coop/apple-music-gateway:v2026.8.19.222435
-  opo: git.sams.wtf/coop/opo:0.0.1
+  opo: git.sams.wtf/coop/opo:0.0.2
