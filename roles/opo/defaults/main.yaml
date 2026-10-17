@@ -1,0 +1,6 @@
+opo_state: present
+opo_network: opo
+opo_issuer: "https://git.sams.wtf/api/actions"
+opo_audience: "https://opo.int.simpson.id"
+opo_vault: null
+opo_service_account_token: null

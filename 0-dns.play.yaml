@@ -54,6 +54,14 @@
         ttl: "3600"
         records: [value: "10.0.0.202"]
 
+    - name: Create opo.int.simpson.id A
+      hetzner.hcloud.zone_rrset:
+        zone: simpson.id
+        name: "opo.int"
+        type: "A"
+        ttl: "3600"
+        records: [value: "10.0.0.202"]
+
     # simpson.id - AAAA records
     - name: Create *.int.simpson.id AAAA
       hetzner.hcloud.zone_rrset:

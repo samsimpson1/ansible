@@ -3,6 +3,7 @@
   vars_files:
     - vars/concourse.yaml
     - vars/forgejo-runner.yaml
+    - vars/opo.yaml
   become: true
   tasks:
     - name: Forgejo
@@ -17,6 +18,10 @@
           - alpine:docker://docker.io/library/alpine:3.24
           - archlinux:docker://docker.io/archlinux:base-devel
           - debian:docker://git.sams.wtf/coop/images/debian:13
+
+    - name: Opo
+      ansible.builtin.include_role:
+        name: opo
 
     - name: Nginx
       ansible.builtin.include_role:

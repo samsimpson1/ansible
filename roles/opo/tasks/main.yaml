@@ -1,0 +1,45 @@
+- name: Validate vars
+  ansible.builtin.assert:
+    that:
+      - opo_vault is defined
+      - opo_service_account_token is defined
+  when: opo_state == "present"
+
+- name: Create opo docker network
+  community.docker.docker_network:
+    name: "{{ opo_network }}"
+    state: "present"
+  when: opo_state == "present"
+
+- name: Opo docker service
+  ansible.builtin.include_role:
+    name: docker_service
+  vars:
+    docker_service_id: opo
+    docker_service_description: "Opo"
+    docker_service_image: "{{ container_images.opo }}"
+    docker_service_network: "{{ opo_network }}"
+    docker_service_state: "{{ opo_state }}"
+    docker_service_env_vars:
+      OP_SERVICE_ACCOUNT_TOKEN: "{{ opo_service_account_token }}"
+      OPO_ISSUER: "{{ opo_issuer }}"
+      OPO_AUDIENCE: "{{ opo_audience }}"
+      OPO_VAULT: "{{ opo_vault }}"
+
+- name: Opo nginx site
+  ansible.builtin.include_role:
+    name: nginx_site
+  vars:
+    nginx_site_name: opo
+    nginx_site_state: "{{ opo_state }}"
+    nginx_site_kind: internal
+    nginx_site_server_names: [opo.int.simpson.id]
+    nginx_site_certificate: int.simpson.id
+    nginx_site_upstream: "http://opo:8080"
+    nginx_site_networks: ["{{ opo_network }}"]
+
+- name: Delete opo docker network
+  community.docker.docker_network:
+    name: "{{ opo_network }}"
+    state: "absent"
+  when: opo_state == "absent"
