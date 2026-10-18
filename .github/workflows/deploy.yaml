@@ -1,0 +1,46 @@
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4.2.0
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_CLIENT_ID }}
+          audience: ${{ secrets.TAILSCALE_AUD }}
+          tags: tag:github-actions
+
+      - uses: 1password/install-cli-action@1a3160d5e9de1ae0803eaa08a88746f5ae3daa50 # v4.1.0
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Prepare Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip3 install ansible
+          ansible-galaxy install -r requirements.yaml
+
+      - name: Run playbooks
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        run: |
+          op read "op://Infrastructure/ansible-vault/password" -o vault_password
+          op read "op://Infrastructure/github-actions-ssh/private key" -o ssh_key
+          chmod 600 ssh_key
+
+          export ANSIBLE_HOST_KEY_CHECKING=false
+          export ANSIBLE_PRIVATE_KEY_FILE=./ssh_key
+          export ANSIBLE_VAULT_PASSWORD_FILE=./vault_password
+
+          ansible-playbook *.play.yaml
