@@ -5,7 +5,9 @@
   tasks:
     - name: Tap casks
       community.general.homebrew_tap:
+        trust: true
         name:
+          - atlassian/homebrew-acli
           - goreleaser/tap
 
     - name: Install packages
@@ -14,6 +16,7 @@
           - actionlint
           - ansible
           - ansible-lint
+          - atlassian/acli/acli
           - awscli
           - caffeine
           - chart-releaser
