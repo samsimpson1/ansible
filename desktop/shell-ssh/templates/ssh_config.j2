@@ -18,3 +18,8 @@ Match host {{ host.host }} exec "test %p = {{ host.port }}"
   IdentitiesOnly yes
 {% endfor %}
 {% endif %}
+
+Host *
+  ControlPath ~/.ssh/controlmasters/%r@%h:%p
+  ControlMaster auto
+  ControlPersist 10m
