@@ -46,7 +46,7 @@ jobs:
           echo "OP_SERVICE_ACCOUNT_TOKEN=${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" >> $GITHUB_ENV
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@fac2489f3e4ccffa83a40b839770abbf4ab52327 # main
+        uses: ansible/ansible-lint@b74fb6f73d234bf92672372cb1c10768e4018d16 # main
         with:
           setup_python: "false"
           working_directory: "."
